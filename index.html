@@ -388,6 +388,7 @@ ol.steps{margin:0;padding-left:1.3em;display:grid;gap:6px}
 .cal i{aspect-ratio:1;border-radius:3px;background:var(--line)}
 .cal i.on{background:var(--accent)}
 .cal i.today{box-shadow:0 0 0 2px var(--ink) inset}
+.updbar{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom));z-index:200;border:0;border-radius:999px;padding:12px 22px;font-size:15px;font-weight:600;background:var(--accent);color:var(--on-accent);box-shadow:0 6px 24px rgba(0,0,0,.3);cursor:pointer}
 .jobpill{margin-left:auto;border:0;border-radius:999px;padding:4px 12px;font-size:13px;cursor:pointer;background:var(--m5);color:#1a130a;font-weight:500}
 .jobpill.run{background:var(--accent);color:var(--on-accent)}
 .jobpill:not([hidden])+.about-btn{margin-left:0}
@@ -744,6 +745,10 @@ function loadWeekly(){fetch("weekly.json",{cache:"no-cache"}).then(r=>r.ok?r.jso
 let installEvt=null;
 addEventListener("beforeinstallprompt",e=>{e.preventDefault();installEvt=e;schedule()});
 if("serviceWorker" in navigator&&location.protocol==="https:")navigator.serviceWorker.register("sw.js").catch(()=>{});
+const APP_VER="2026.11.13-3";
+async function checkUpdate(){try{const r=await fetch("version.json?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.json()).v;
+  if(v&&v!==APP_VER&&!$("#updBar")){const b=document.createElement("button");b.id="updBar";b.className="updbar";b.textContent="有新版本，點這裡更新";b.onclick=()=>{b.textContent="更新中……";location.reload()};document.body.appendChild(b)}}catch(e){}}
+setTimeout(checkUpdate,1500);document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
 
 /* ============================================================
    settings
@@ -961,6 +966,7 @@ function shSettings(){
     <p class="small">所有紀錄只存在這台裝置的瀏覽器裡，心路沒有伺服器，沒有人看得到你的日記。請定期備份，換手機時用備份還原。</p>
     <div class="row"><button class="btn sm" data-act="export">匯出備份</button><button class="btn sm ghost" data-act="import">從備份還原</button></div>
     <div class="row">${sheet.confirmWipe?`<span class="small">確定要刪除這台裝置上所有心路資料嗎？無法復原，建議先備份。</span><button class="btn sm danger" data-act="wipe-yes">全部刪除</button><button class="btn sm ghost" data-act="wipe-no">取消</button>`:`<button class="linkbtn" style="color:var(--warn)" data-act="wipe">刪除我的所有資料</button>`}</div></div>
+   <p class="tiny muted" style="text-align:center">版本 ${APP_VER}　<button class="linkbtn" data-act="force-update">檢查更新</button></p>
   </div>`}
 function installHelp(){
   return `<div class="kv"><div><b>iPhone（Safari）</b><p>按下方的「分享」按鈕，往下找「加入主畫面」。</p></div><div><b>Android（Chrome）</b><p>按右上角「⋮」，選「安裝應用程式」或「加到主畫面」。</p></div>${installEvt?`<div><button class="btn sm" data-act="install">直接安裝到這台裝置</button></div>`:""}</div>`}
@@ -2069,6 +2075,7 @@ document.addEventListener("click",async ev=>{
    case"job-run":runJob(id);break;
    case"job-del":cancelJob(id);break;
    case"open-jobs":openSheet({kind:"jobs"});break;
+   case"force-update":t.textContent="更新中……";try{const rs=await navigator.serviceWorker?.getRegistrations();for(const r of rs||[])await r.update()}catch(e){}location.reload();break;
    case"ai-done":{const q=jobById(aiOpen);if(!q)break;const v=$("#ai-paste").value;q.draft=v;if(!v.trim()){q.err="請先貼上 AI 的回覆。";drawAI();break}t.disabled=true;t.textContent="讀取中……";try{await completeJob(q.id,v)}catch(e){}break}
    case"ai-switch-copy":{const q=jobById(aiOpen);if(q){q.copy=true;q.err="";saveJobs();drawAI()}break}
    case"pick-photo":$("#f-photo")?.click();break;
