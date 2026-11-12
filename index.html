@@ -1,0 +1,2073 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' data: blob:; font-src 'self'; connect-src 'self' https://api.openai.com https://api.anthropic.com https://generativelanguage.googleapis.com; worker-src 'self'; manifest-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta name="referrer" content="no-referrer">
+<title>心路</title>
+<meta name="description" content="每天寫一點，看見自己心裡反覆發生的事。資料只存在你的裝置，用你自己的 AI 整理。">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#F1F2F0" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#11131B" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="心路">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="icon-192.png">
+<style>
+/* Layout: a private notebook that grows a map. Top bar + five views (phone: bottom tabs); details and the editor open as a sheet.
+   Node types carry fixed hues everywhere: people = rose, themes = indigo ink, methods = teal, records = slate. */
+:root{
+  --bg:#F1F2F0; --surface:#FAFAF9; --raise:#FFFFFF;
+  --ink:#1D2130; --muted:#616677; --line:#DADCE0;
+  --accent:#3D4B9A; --accent-soft:#E4E7F5; --on-accent:#FFFFFF;
+  --person:#B4574F; --person-soft:#F6E3E0;
+  --theme:#3D4B9A; --theme-soft:#E4E7F5;
+  --method:#2B776D; --method-soft:#DCEFEA;
+  --entry:#858A9C;
+  --warn:#A8423A; --warn-soft:#F7E3E0;
+  --ok:#3F7D4E; --ok-soft:#E1F0E4;
+  --m1:#7A6FA8; --m2:#6F8DB5; --m3:#9AA0A8; --m4:#7DAE8E; --m5:#D3A24B;
+  --shadow:0 1px 2px rgba(29,33,48,.05),0 8px 28px rgba(29,33,48,.07);
+  --f-display:"Noto Serif TC","Noto Serif CJK TC","Songti TC","PMingLiU",serif;
+  --f-body:"PingFang TC","Noto Sans TC","Noto Sans CJK TC","Microsoft JhengHei",system-ui,sans-serif;
+  --r:16px; --tab-h:64px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#11131B; --surface:#171A24; --raise:#1D2130;
+  --ink:#E6E8F0; --muted:#9AA0B4; --line:#2A2F3E;
+  --accent:#9DA9F0; --accent-soft:#252B49; --on-accent:#11131B;
+  --person:#E8998F; --person-soft:#3A2725;
+  --theme:#9DA9F0; --theme-soft:#252B49;
+  --method:#7BCBBE; --method-soft:#1B3531;
+  --entry:#7D8396;
+  --warn:#F2A196; --warn-soft:#3B2422;
+  --ok:#8FCB9B; --ok-soft:#1D3323;
+  --m1:#A99BE0; --m2:#94B3DE; --m3:#A3A8B2; --m4:#9DCFAD; --m5:#E9C27A;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.28); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#11131B; --surface:#171A24; --raise:#1D2130;
+  --ink:#E6E8F0; --muted:#9AA0B4; --line:#2A2F3E;
+  --accent:#9DA9F0; --accent-soft:#252B49; --on-accent:#11131B;
+  --person:#E8998F; --person-soft:#3A2725;
+  --theme:#9DA9F0; --theme-soft:#252B49;
+  --method:#7BCBBE; --method-soft:#1B3531;
+  --entry:#7D8396;
+  --warn:#F2A196; --warn-soft:#3B2422;
+  --ok:#8FCB9B; --ok-soft:#1D3323;
+  --m1:#A99BE0; --m2:#94B3DE; --m3:#A3A8B2; --m4:#9DCFAD; --m5:#E9C27A;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.28); color-scheme:dark}
+
+*{box-sizing:border-box}
+html{color-scheme:light;-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0}
+img{max-width:100%}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.7;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  padding-block:0 calc(var(--tab-h) + 28px + env(safe-area-inset-bottom,0px))}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--bg)}
+h1,h2,h3{font-family:var(--f-display);font-weight:700;line-height:1.35;margin:0;text-wrap:balance}
+p{margin:0}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:8px}
+.shell{max-width:980px;margin:0 auto}
+.muted{color:var(--muted)}
+.small{font-size:14px}
+.tiny{font-size:12px}
+.label{font-size:12px;letter-spacing:.14em;color:var(--muted);font-weight:500}
+.stack{display:grid;gap:12px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.spread{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+
+/* top bar */
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:color-mix(in srgb,var(--bg) 90%,transparent);
+  -webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);
+  margin-inline:calc(-1 * max(16px,env(safe-area-inset-left,0px)));padding:10px max(16px,env(safe-area-inset-left,0px))}
+.bar-in{max-width:980px;margin:0 auto;display:flex;align-items:center;gap:14px}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--f-display);font-size:22px;font-weight:700;text-decoration:none;color:var(--ink)}
+.brand svg{width:28px;height:28px}
+.topnav{display:flex;gap:2px;margin-left:12px}
+.topnav button{border:0;background:none;padding:6px 14px;border-radius:999px;color:var(--muted);cursor:pointer;font-size:15px}
+.topnav button[aria-current="page"]{background:var(--accent-soft);color:var(--accent);font-weight:500}
+.about-btn{margin-left:auto;border:0;background:none;color:var(--muted);cursor:pointer;font-size:14px;padding:4px 8px;border-radius:999px}
+.about-btn[aria-current="page"]{color:var(--accent)}
+.bar .sos{border:1px solid var(--warn);color:var(--warn);background:transparent;border-radius:999px;padding:4px 14px;font-size:14px;cursor:pointer}
+.tabs{position:fixed;left:0;right:0;bottom:0;z-index:20;display:none;background:var(--surface);border-top:1px solid var(--line);
+  padding:6px max(8px,env(safe-area-inset-left,0px)) calc(6px + env(safe-area-inset-bottom,0px))}
+.tabs-in{display:grid;grid-template-columns:repeat(5,1fr);max-width:520px;margin:0 auto}
+.tabs button{border:0;background:none;display:grid;justify-items:center;gap:2px;color:var(--muted);font-size:11px;padding:4px 0;cursor:pointer}
+.tabs svg{width:24px;height:24px}
+.tabs button[aria-current="page"]{color:var(--accent)}
+@media (max-width:760px){.topnav{display:none}.tabs{display:block}}
+@media (min-width:761px){body{padding-bottom:56px}}
+
+/* generic */
+.view{padding-top:18px;display:grid;gap:26px}
+.head{display:grid;gap:4px}
+.head h1{font-size:clamp(28px,6vw,38px)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:20px;box-shadow:var(--shadow)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:0;cursor:pointer;background:var(--accent);color:var(--on-accent);
+  padding:9px 20px;border-radius:999px;font-size:15px;font-weight:500;text-decoration:none;transition:transform .15s}
+.btn:active{transform:scale(.97)}
+.btn.ghost{background:transparent;color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.btn.quiet{background:var(--accent-soft);color:var(--accent)}
+.btn.danger{background:transparent;color:var(--warn);box-shadow:inset 0 0 0 1px var(--warn)}
+.btn.sm{padding:5px 14px;font-size:14px}
+.btn[disabled]{opacity:.45;cursor:default}
+.linkbtn{border:0;background:none;color:var(--accent);cursor:pointer;padding:0;font-size:14px}
+.chip{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:2px 12px;font-size:13px;line-height:1.7;border:1px solid transparent;white-space:nowrap}
+.chip.p{background:var(--person-soft);color:var(--person)}
+.chip.t{background:var(--theme-soft);color:var(--theme)}
+.chip.m{background:var(--method-soft);color:var(--method)}
+.chip.s{background:transparent;border-color:var(--line);color:var(--muted)}
+.chip.k{background:var(--accent);color:var(--on-accent)}
+button.chip{cursor:pointer;font:inherit;font-size:13px}
+.pick{border:1px solid var(--line);background:var(--raise);border-radius:999px;padding:4px 14px;cursor:pointer;font-size:14px}
+.pick[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.pick.p[aria-pressed="true"]{background:var(--person);border-color:var(--person);color:var(--raise)}
+.notice{border-radius:12px;padding:10px 14px;font-size:14px;background:var(--accent-soft);color:var(--ink)}
+.notice.warn{background:var(--warn-soft)}
+.toast{position:fixed;left:50%;bottom:calc(var(--tab-h) + 24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:80;
+  background:var(--ink);color:var(--bg);padding:8px 18px;border-radius:999px;font-size:14px;box-shadow:var(--shadow);max-width:90vw;text-align:center}
+@media (min-width:761px){.toast{bottom:28px}}
+.mood{display:inline-block;width:10px;height:10px;border-radius:50%;flex:none}
+
+/* home */
+.hello{padding-top:10px}
+.hello .date{color:var(--muted);font-size:14px}
+.hello h1{font-size:clamp(30px,6.5vw,44px);margin-top:2px}
+.actions{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+@media (max-width:620px){.actions{grid-template-columns:1fr 1fr}}
+.action.tool{box-shadow:none;background:var(--raise)}
+@media (max-width:620px){.action{padding:12px 14px}.action b{font-size:18px}}
+.action.tool i{color:var(--method)}
+.action{text-align:left;cursor:pointer;border:1px solid var(--line);background:var(--surface);border-radius:var(--r);padding:18px;display:grid;gap:4px;box-shadow:var(--shadow);transition:transform .2s}
+.action:hover{transform:translateY(-2px)}
+.action b{font-family:var(--f-display);font-size:20px}
+.action span{font-size:14px;color:var(--muted)}
+.action i{font-style:normal;font-size:12px;letter-spacing:.12em;color:var(--accent)}
+.action.session i{color:var(--person)}
+.cols{display:grid;grid-template-columns:1.2fr 1fr;gap:18px;align-items:start}
+@media (max-width:760px){.cols{grid-template-columns:1fr}}
+.cols>*{min-width:0}
+.steplist{display:grid;gap:8px}
+.step{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;background:var(--raise);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.step .dot{width:10px;height:10px;border-radius:50%;background:var(--method)}
+.step b{font-weight:500}
+.step .sub{font-size:13px;color:var(--muted);display:block}
+.qlist{display:grid;gap:6px}
+.q{display:flex;gap:10px;align-items:flex-start;font-size:15px}
+.q input{margin-top:6px;accent-color:var(--accent)}
+.q.done span{color:var(--muted);text-decoration:line-through}
+.themebar{display:grid;gap:8px}
+.tb{display:grid;grid-template-columns:1fr auto;gap:4px 10px;cursor:pointer;border:0;background:none;text-align:left;padding:0}
+.tb .track{grid-column:1/-1;height:6px;border-radius:3px;background:var(--line);overflow:hidden}
+.tb .track i{display:block;height:100%;background:var(--theme);border-radius:3px}
+.tb span{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.how{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+@media (max-width:620px){.how{grid-template-columns:1fr}}
+.how div{display:grid;gap:4px}
+.how b{font-family:var(--f-display);font-size:18px}
+.how em{font-style:normal;color:var(--accent);font-family:var(--f-display);font-size:24px}
+
+/* entries */
+.elist{display:grid;gap:10px}
+.erow{display:grid;grid-template-columns:auto 1fr;gap:14px;text-align:left;cursor:pointer;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px;width:100%}
+.erow:hover{border-color:var(--accent)}
+.erow .when{display:grid;justify-items:center;align-content:start;gap:4px;min-width:44px;font-variant-numeric:tabular-nums}
+.erow .when b{font-size:20px;font-family:var(--f-display);line-height:1}
+.erow .when span{font-size:11px;color:var(--muted)}
+.erow .body{display:grid;gap:4px;min-width:0}
+.erow .title{font-weight:500}
+.erow .ex{font-size:14px;color:var(--muted);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.badge{font-size:11px;letter-spacing:.08em;padding:1px 8px;border-radius:6px;background:var(--accent-soft);color:var(--accent)}
+.badge.session{background:var(--person-soft);color:var(--person)}
+.badge.ex{background:transparent;border:1px dashed var(--muted);color:var(--muted)}
+.search{width:100%;background:var(--raise);border:1px solid var(--line);border-radius:999px;padding:8px 16px}
+
+/* sheet */
+.sheet-wrap{position:fixed;inset:0;z-index:60;background:rgba(10,12,20,.45);display:flex;justify-content:center;align-items:flex-end}
+@media (min-width:761px){.sheet-wrap{align-items:center}}
+.sheet{background:var(--bg);width:min(100%,760px);max-height:94%;overflow:auto;border-radius:22px 22px 0 0;
+  padding:0 max(18px,env(safe-area-inset-right,0px)) calc(28px + env(safe-area-inset-bottom,0px)) max(18px,env(safe-area-inset-left,0px));
+  box-shadow:0 -10px 40px rgba(0,0,0,.25)}
+@media (min-width:761px){.sheet{border-radius:22px;max-height:90%}}
+.sheet-top{position:sticky;top:0;z-index:2;background:var(--bg);padding:14px 0 10px;display:flex;justify-content:space-between;align-items:center;gap:10px;border-bottom:1px solid var(--line);margin-bottom:16px}
+.sheet-top h2{font-size:20px;min-width:0}
+.sheet-top>.row{flex-wrap:nowrap;flex:none}
+.btn{white-space:nowrap}
+.sheet-body{display:grid;gap:18px}
+.field{display:grid;gap:6px}
+.field>label,.field>.lab{font-weight:500;font-size:15px}
+.field .hint{font-size:13px;color:var(--muted)}
+.inp,textarea{width:100%;background:var(--raise);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:16px;line-height:1.7}
+textarea{min-height:110px;resize:vertical}
+textarea.big{min-height:220px}
+.inp:focus,textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.ta-wrap{position:relative}
+.mic{position:absolute;right:8px;bottom:8px;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:3px 12px;font-size:13px;cursor:pointer;color:var(--muted)}
+.mic.on{background:var(--warn);color:#fff;border-color:var(--warn)}
+.partial{font-size:13px;color:var(--muted);min-height:1em}
+.moods{display:flex;gap:8px;flex-wrap:wrap}
+.moods button{border:1px solid var(--line);background:var(--raise);border-radius:12px;padding:6px 12px;cursor:pointer;display:inline-flex;gap:6px;align-items:center;font-size:14px}
+.moods button[aria-pressed="true"]{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.seg{display:inline-flex;background:var(--accent-soft);border-radius:999px;padding:3px;gap:2px}
+.seg button{border:0;background:none;border-radius:999px;padding:5px 16px;cursor:pointer;color:var(--accent);font-size:14px}
+.seg button[aria-pressed="true"]{background:var(--raise);color:var(--ink);font-weight:500;box-shadow:var(--shadow)}
+.addp{display:grid;grid-template-columns:1fr 1fr auto auto;gap:8px;align-items:center}
+@media (max-width:560px){.addp{grid-template-columns:1fr 1fr}}
+select.inp{padding:9px 10px}
+.prose{white-space:pre-wrap;word-break:break-word}
+.kv{display:grid;gap:12px}
+.kv div{display:grid;gap:2px}
+.kv b{font-size:13px;color:var(--muted);font-weight:500}
+.quote{font-family:var(--f-display);font-size:19px;border-left:3px solid var(--person);padding-left:14px}
+
+/* analysis */
+.ana{display:grid;gap:16px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px}
+.ana h3{font-size:18px}
+.chain{display:flex;flex-wrap:wrap;gap:6px;align-items:stretch}
+.link{flex:1 1 140px;min-width:0;background:var(--raise);border:1px solid var(--line);border-radius:12px;padding:8px 12px;display:grid;gap:2px;position:relative}
+.link b{font-size:12px;letter-spacing:.1em;color:var(--accent);font-weight:500}
+.link span{font-size:14px}
+.need{font-family:var(--f-display);font-size:18px}
+.sug{display:grid;gap:8px}
+.sug .s{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;background:var(--raise);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.sug .s b{color:var(--method);font-weight:500}
+@media (max-width:560px){.sug .s{grid-template-columns:1fr}}
+.risk{background:var(--warn-soft);border-radius:12px;padding:14px 16px;display:grid;gap:6px}
+.risk b{color:var(--warn)}
+.applyl{display:grid;gap:6px}
+.applyl label{display:flex;gap:8px;align-items:center;font-size:14px}
+.applyl input{accent-color:var(--accent)}
+.thinking{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:14px}
+.thinking i{width:8px;height:8px;border-radius:50%;background:var(--accent);animation:pulse 1.2s infinite}
+@keyframes pulse{0%,100%{opacity:.25}50%{opacity:1}}
+
+/* people */
+.stagegrid{display:grid;gap:18px}
+.stage h3{font-size:18px;display:flex;align-items:baseline;gap:10px}
+.stage h3 span{font-family:var(--f-body);font-size:13px;color:var(--muted);font-weight:400}
+.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin-top:10px}
+.pcard{text-align:left;cursor:pointer;border:1px solid var(--line);background:var(--surface);border-radius:14px;padding:14px;display:grid;gap:4px;min-width:0}
+.pcard:hover{border-color:var(--person)}
+.pcard .nm{display:flex;align-items:center;gap:10px}
+.av{width:34px;height:34px;border-radius:50%;background:var(--person-soft);color:var(--person);display:grid;place-items:center;font-family:var(--f-display);font-weight:700;flex:none}
+.pcard b{font-size:16px}
+.pcard .rel{font-size:13px;color:var(--muted)}
+.pcard .meta{font-size:12px;color:var(--muted)}
+
+/* map */
+.mapwrap{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;height:min(68vh,620px);min-height:380px;touch-action:none}
+.mapwrap svg{width:100%;height:100%;display:block;cursor:grab}
+#nodePanel{position:absolute;left:10px;right:10px;bottom:10px;max-height:58%;overflow:auto;touch-action:auto;pointer-events:none}
+#nodePanel>*{pointer-events:auto}
+#nodePanel .panel{box-shadow:var(--shadow);background:var(--raise)}
+.maphint{display:inline-block;background:var(--raise);border:1px solid var(--line);border-radius:999px;padding:3px 12px;font-size:13px;color:var(--muted)}
+.linked{display:grid;gap:8px;background:var(--raise);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.chip .x{border:0;background:none;color:inherit;cursor:pointer;font-size:15px;line-height:1;padding:0 0 0 2px;opacity:.7}
+.chip .x:hover{opacity:1}
+.mapwrap svg.dragging{cursor:grabbing}
+.nlabel{font-size:12px;fill:var(--ink);paint-order:stroke;stroke:var(--surface);stroke-width:4px;stroke-linejoin:round;pointer-events:none}
+.nlabel.big{font-size:14px;font-weight:700}
+.mapctl{position:absolute;right:10px;top:10px;display:grid;gap:6px}
+.mapctl button{width:34px;height:34px;border-radius:10px;border:1px solid var(--line);background:var(--raise);cursor:pointer;font-size:18px;line-height:1}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:13px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:10px;height:10px;border-radius:50%}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;display:grid;gap:10px}
+.mini-e{display:block;width:100%;text-align:left;border:0;background:var(--raise);border-radius:10px;padding:8px 12px;cursor:pointer;font-size:14px}
+.mini-e span{color:var(--muted);font-size:12px;margin-right:8px;font-variant-numeric:tabular-nums}
+
+/* journey */
+.lanes{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+@media (max-width:760px){.lanes{grid-template-columns:1fr 1fr}}
+@media (max-width:420px){.lanes{grid-template-columns:1fr}}
+.lane{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;display:grid;gap:8px;align-content:start;min-width:0}
+.lane h3{font-size:17px}
+.tl{display:grid;gap:0;position:relative;padding-left:22px}
+.tl::before{content:"";position:absolute;left:6px;top:6px;bottom:6px;width:2px;background:var(--line)}
+.tli{position:relative;padding:0 0 16px;display:grid;gap:2px;text-align:left;border:0;background:none;cursor:pointer;width:100%}
+.tli::before{content:"";position:absolute;left:-21px;top:7px;width:12px;height:12px;border-radius:50%;background:var(--person);box-shadow:0 0 0 3px var(--bg)}
+.tli b{font-weight:500}
+.tli span{font-size:14px;color:var(--muted)}
+.board{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+@media (max-width:620px){.board{grid-template-columns:1fr}}
+.bcol{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px;display:grid;gap:8px;align-content:start;min-width:0}
+.bcol h3{font-size:16px}
+.tcard{background:var(--raise);border:1px solid var(--line);border-radius:10px;padding:10px 12px;display:grid;gap:6px}
+.tcard b{color:var(--theme)}
+
+/* methods */
+.mgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}
+.mcard{text-align:left;cursor:pointer;border:1px solid var(--line);background:var(--surface);border-radius:14px;padding:16px;display:grid;gap:6px;align-content:start;min-width:0}
+.mcard:hover{border-color:var(--method)}
+.mcard b{font-family:var(--f-display);font-size:18px}
+.mcard .cat{font-size:12px;letter-spacing:.12em;color:var(--method)}
+.mcard p{font-size:14px;color:var(--muted)}
+.mcard .with{font-size:12px;color:var(--person)}
+ol.steps{margin:0;padding-left:1.3em;display:grid;gap:6px}
+.research{background:var(--method-soft);border-radius:12px;padding:12px 14px;font-size:14px}
+.lines{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.lines div{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px;display:grid}
+.lines b{font-family:var(--f-display);font-size:28px;color:var(--warn);user-select:all;font-variant-numeric:tabular-nums}
+.foot{margin-top:40px;padding-top:18px;border-top:1px solid var(--line);display:grid;gap:12px;font-size:13px;color:var(--muted)}
+.foot-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.sync{display:inline-flex;align-items:center;gap:6px}
+.sync i{width:7px;height:7px;border-radius:50%;background:var(--ok)}
+.sync.local i,.sync.loading i{background:var(--m5)}
+.foot-acts{display:flex;flex-wrap:wrap;gap:8px}
+.fbtn{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;padding:7px 14px;font-size:13px;cursor:pointer}
+.fbtn:hover{border-color:var(--accent);color:var(--accent)}
+.fbtn.warn{color:var(--warn)}
+@media (max-width:420px){.foot-acts{display:grid;grid-template-columns:1fr 1fr}}
+.loading{padding:60px 0;text-align:center;color:var(--muted)}
+.ev{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--c);white-space:nowrap}
+.ev::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--c)}
+.clamp{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.rcard b{font-size:17px}
+.weekcard{display:grid;gap:4px;text-align:left;cursor:pointer;border:1px solid var(--method);background:var(--method-soft);border-radius:var(--r);padding:16px 18px;width:100%}
+.weekcard b{font-family:var(--f-display);font-size:19px}
+.rref{display:grid;gap:2px;text-align:left;border:0;background:var(--raise);border-radius:10px;padding:8px 12px;cursor:pointer;width:100%}
+.rref b{color:var(--method);font-weight:500;font-size:14px}
+.rref span{font-size:12px;color:var(--muted)}
+.implist{display:grid;gap:8px}
+.improw{display:grid;grid-template-columns:auto 150px 1fr;gap:10px;align-items:start;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px}
+.improw input[type=checkbox]{margin-top:10px;accent-color:var(--accent)}
+.improw .inp{padding:6px 8px;font-size:14px}
+.impbody{display:grid;gap:2px;min-width:0}
+@media (max-width:560px){.improw{grid-template-columns:auto 1fr}.improw .impbody{grid-column:1/-1}}
+.mgal{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:8px}
+.mthumb{position:relative;aspect-ratio:1;max-width:100%;min-width:0}
+.mimg{display:block;width:100%;height:100%;padding:0;border:0;border-radius:10px;overflow:hidden;background:var(--line);cursor:zoom-in}
+.mimg img{width:100%;height:100%;object-fit:cover;display:block}
+.maudio{grid-column:1/-1;display:grid;gap:6px;position:relative;background:var(--raise);border:1px solid var(--line);border-radius:12px;padding:10px 40px 10px 12px;min-width:0}
+.maudio audio{width:100%}
+.mx{position:absolute;top:6px;right:6px;width:26px;height:26px;border-radius:50%;border:0;background:rgba(0,0,0,.55);color:#fff;cursor:pointer;font-size:16px;line-height:1}
+.photo-ov{position:fixed;inset:0;z-index:90;background:rgba(0,0,0,.88);display:grid;place-items:center;align-content:center;gap:10px;cursor:zoom-out;
+  padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(16px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.photo-ov img{max-width:100%;max-height:85vh;border-radius:8px}
+.badge.letter{background:var(--method-soft);color:var(--method)}
+.quotecard{display:grid;gap:6px;text-align:left;cursor:pointer;border:0;background:var(--accent-soft);border-radius:var(--r);padding:16px 18px;width:100%;color:var(--ink)}
+.quotecard b{font-family:var(--f-display);font-size:19px;line-height:1.6;font-weight:500}
+.quotebox{background:var(--accent-soft);border-radius:12px;padding:12px 16px;display:grid;gap:4px}
+.quotebox p{font-family:var(--f-display);font-size:17px}
+.qitem{background:var(--raise);border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:grid;gap:6px}
+.qitem p{font-family:var(--f-display);font-size:17px;line-height:1.6}
+.qitem.kept{border-color:var(--accent-soft)}
+.quotefab{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(24px + env(safe-area-inset-bottom,0px));z-index:85;border:0;border-radius:999px;background:var(--accent);color:var(--on-accent);padding:10px 22px;font-size:15px;font-weight:500;box-shadow:var(--shadow);cursor:pointer}
+.unsaid{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px;background:var(--raise);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.unsaid>span:first-child{flex:1;min-width:0}
+.unsaid.done{opacity:.8}
+.ritual{position:fixed;inset:0;z-index:95;background:rgba(10,12,20,.94);display:grid;place-items:center;align-content:center;gap:28px;padding:24px max(16px,env(safe-area-inset-right,0px)) 24px max(16px,env(safe-area-inset-left,0px))}
+.paper{position:relative;width:min(80vw,360px);height:220px;max-width:100%}
+.half{position:absolute;inset:0;background:#F3EEE2;color:#3a3530;padding:18px;font-size:14px;line-height:1.7;overflow:hidden;border-radius:4px;white-space:pre-wrap;transition:transform 1.4s cubic-bezier(.3,.7,.2,1),opacity 1.4s}
+.half.l{clip-path:polygon(0 0,52% 0,46% 18%,55% 36%,47% 55%,54% 74%,49% 100%,0 100%)}
+.half.r{clip-path:polygon(52% 0,100% 0,100% 100%,49% 100%,54% 74%,47% 55%,55% 36%,46% 18%)}
+.torn .half.l{transform:translate(-46px,40px) rotate(-14deg);opacity:.35}
+.torn .half.r{transform:translate(46px,56px) rotate(12deg);opacity:.35}
+.rcount{color:#F3EEE2;font-family:var(--f-display);font-size:34px;min-height:1.4em;text-align:center}
+.optcards{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media (max-width:520px){.optcards{grid-template-columns:1fr}}
+.optc{display:grid;gap:4px;text-align:left;cursor:pointer;border:1px solid var(--line);background:var(--raise);border-radius:14px;padding:14px;color:var(--ink);font:inherit}
+.optc b{font-size:16px}.optc span{font-size:13px;color:var(--muted)}
+.optc[aria-pressed="true"]{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent);background:var(--accent-soft)}
+.optc.wide{margin-top:10px;width:100%}
+.ai-ov{position:fixed;inset:0;z-index:75;background:rgba(10,12,20,.5);display:flex;justify-content:center;align-items:flex-end}
+@media (min-width:761px){.ai-ov{align-items:center}}
+.ai-box{background:var(--bg);width:min(100%,680px);max-height:94%;overflow:auto;border-radius:22px 22px 0 0;padding:0 max(18px,env(safe-area-inset-right,0px)) calc(24px + env(safe-area-inset-bottom,0px)) max(18px,env(safe-area-inset-left,0px))}
+@media (min-width:761px){.ai-box{border-radius:22px}}
+.aisteps{margin:0;padding-left:1.3em;display:grid;gap:18px}
+.aisteps li{display:grid;gap:8px}
+.aipre{white-space:pre-wrap;word-break:break-word;background:var(--raise);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:12px;max-height:240px;overflow:auto;margin:8px 0 0}
+.cal{display:grid;grid-template-rows:repeat(7,1fr);grid-auto-flow:column;grid-auto-columns:1fr;gap:4px;max-width:420px}
+.cal i{aspect-ratio:1;border-radius:3px;background:var(--line)}
+.cal i.on{background:var(--accent)}
+.cal i.today{box-shadow:0 0 0 2px var(--ink) inset}
+.prog{height:6px;border-radius:3px;background:var(--line);overflow:hidden}
+.prog i{display:block;height:100%;background:var(--accent);transition:width .4s}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<header class="bar">
+  <div class="bar-in">
+    <span class="brand"><svg viewBox="0 0 28 28" aria-hidden="true"><path d="M5 22c4-1 5-6 9-8s7-1 9-6" fill="none" stroke="var(--accent)" stroke-width="2.2" stroke-linecap="round"/><circle cx="5" cy="22" r="2.6" fill="var(--person)"/><circle cx="14" cy="14" r="2.6" fill="var(--theme)"/><circle cx="23" cy="8" r="2.6" fill="var(--method)"/></svg>心路</span>
+    <nav class="topnav" id="topnav" aria-label="主要選單"></nav>
+    <button type="button" class="about-btn" data-view="about">介紹</button><button type="button" class="about-btn" style="margin-left:0" data-act="settings">設定</button><button type="button" class="sos" data-act="help">求助</button>
+  </div>
+</header>
+
+<main class="shell" id="main"><p class="loading">正在打開你的心路……</p></main>
+
+<nav class="tabs" aria-label="主要選單"><div class="tabs-in" id="tabs"></div></nav>
+<div id="sheetRoot"></div>
+<div id="toastRoot"></div>
+<div id="photoRoot"></div>
+<div id="aiRoot"></div>
+<button type="button" id="quoteFab" class="quotefab" data-act="fab-quote" hidden>收藏這句</button>
+
+<script>
+(function(){
+"use strict";
+/* ============================================================
+   basics
+   ============================================================ */
+const $=s=>document.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const pad=n=>String(n).padStart(2,"0");
+const today=()=>{const d=new Date();return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`};
+const daysAgo=n=>{const d=new Date();d.setDate(d.getDate()-n);return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`};
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+const clone=o=>JSON.parse(JSON.stringify(o));
+const fmtD=s=>{if(!s)return"";const[y,m,d]=s.split("-");return `${+m}/${+d}`};
+const local={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){return false}}};
+
+const STAGES=["童年","青少年","成年","現在"];
+const STAGE_HINT={"童年":"約 0–12 歲","青少年":"約 13–18 歲","成年":"離家、求學、工作、感情","現在":"最近這段日子"};
+const MOODS=[[1,"很低落","var(--m1)"],[2,"有點難受","var(--m2)"],[3,"平平","var(--m3)"],[4,"還不錯","var(--m4)"],[5,"很好","var(--m5)"]];
+const moodOf=v=>MOODS.find(m=>m[0]===v);
+const TSTATUS=[["facing","正在面對"],["progress","有進展"],["walked","已經走過"]];
+
+function toast(msg){const r=$("#toastRoot");r.innerHTML=`<div class="toast" role="status">${esc(msg)}</div>`;clearTimeout(toast.t);toast.t=setTimeout(()=>r.innerHTML="",2600)}
+
+/* ============================================================
+   method library — rituals and psychology, each with its basis
+   ============================================================ */
+const CATS=[["ritual","儀式感"],["aware","覺察想法"],["emotion","情緒調節"],["body","照顧身體"],["mind","正念"],["action","行動與價值"],["relate","人際與界線"],["kind","溫柔對待自己"],["meaning","正向與意義"],["past","處理過去"],["weekly","每週新增"]];
+const EVID={strong:["多項統合分析支持","var(--ok)"],mid:["有實驗或臨床研究支持","var(--method)"],theory:["來自治療取向的臨床做法","var(--muted)"]};
+
+/* ---------- research library ---------- */
+const RESEARCH=[
+ {id:"R01",area:"儀式",ev:"mid",cite:"Norton & Gino（2014），Journal of Experimental Psychology: General",title:"儀式能減輕失落後的悲傷",
+  finding:"在一系列實驗中，失去親人、結束關係，或在實驗中失去 200 美元獎金的人，做了儀式之後悲傷較低。實驗中的儀式很簡單：畫出感受、撒鹽、撕碎、數到十。效果來自重新找回控制感，而且不相信儀式的人一樣有效。",
+  meaning:"面對無法改變的失去時，一個有開始、有結尾的小動作，可以讓心重新感覺「我還能做點什麼」。",limits:"多數是實驗室或線上研究，長期效果還不清楚。",url:"https://dash.harvard.edu/bitstream/1/10683152/1/norton%20gino_rituals-and-grief.pdf"},
+ {id:"R02",area:"儀式",ev:"mid",cite:"Brooks 等人（2016），Organizational Behavior and Human Decision Processes",title:"上場前的儀式能降低焦慮",
+  finding:"在公開唱歌、解數學題等高壓任務前，做一段簡短儀式的人，自評焦慮和心跳都較低，表現也較好。同樣的動作如果只被當成「隨機動作」，就沒有這個效果。",
+  meaning:"面對讓你緊張的人或對話前，可以設計一組屬於自己的固定動作。",limits:"任務以短期表現為主，在人際情境中的效果還需要更多研究。",url:"https://ideas.repec.org/a/eee/jobhdp/v137y2016icp71-85.html"},
+ {id:"R03",area:"儀式",ev:"mid",cite:"Vohs、Wang、Gino、Norton（2013），Psychological Science",title:"儀式讓人更投入當下",
+  finding:"照固定步驟吃巧克力或紅蘿蔔的人，覺得食物更好吃、品嚐得更久。自己動手做的人才有效，旁觀別人做沒有效果。研究者認為儀式提高了「投入程度」。",
+  meaning:"為日常安排一些自己動手的小儀式，可以讓人更專注、更能感受當下。",limits:"研究對象是食物體驗，延伸到情緒調節屬於推論。",url:"https://greatergood.berkeley.edu/article/item/do_rituals_help_us_to_savor_food"},
+ {id:"R04",area:"書寫",ev:"strong",cite:"Pennebaker & Beall（1986），Journal of Abnormal Psychology；Frattaroli（2006），Psychological Bulletin",title:"把深刻的經驗寫下來，對身心有益",
+  finding:"Pennebaker 讓受試者連續幾天、每天約 15–20 分鐘書寫創傷或深刻的經驗，之後幾個月的就醫次數減少。Frattaroli 整合了 146 個研究，發現表達性書寫有小而穩定的正面效果。",
+  meaning:"日記本身就是有研究支持的練習，尤其是寫下事情「和你的感受」，而不只是流水帳。",limits:"效果量不大；剛寫完時情緒可能短暫變差，這是正常的。",url:"https://doi.org/10.1037/0021-843X.95.3.274"},
+ {id:"R05",area:"情緒",ev:"mid",cite:"Lieberman 等人（2007），Psychological Science",title:"替情緒命名，能讓大腦的警報降下來",
+  finding:"受試者看情緒強烈的臉孔時，如果替它選一個情緒詞，大腦杏仁核（警報系統）的活動會下降，前額葉的調節區域則較活躍。研究者稱為「情緒標記」。",
+  meaning:"說出「我現在覺得委屈」而不只是「我很不爽」，本身就是一種調節。",limits:"實驗是在掃描儀中看圖片，和真實生活中的強烈情緒仍有差距。",url:"https://doi.org/10.1111/j.1467-9280.2007.01916.x"},
+ {id:"R06",area:"情緒",ev:"mid",cite:"Kashdan、Barrett、McKnight（2015），Current Directions in Psychological Science",title:"情緒分得越細，越能調節情緒",
+  finding:"能精細分辨自己情緒（例如分清楚失望、委屈、被忽略）的人，在壓力下比較不會用酗酒、攻擊等方式應對，情緒調節也較好。",
+  meaning:"在心路裡練習用更精確的詞描述情緒，長期下來是在培養一種能力。",limits:"多為相關研究，因果方向仍在研究中。",url:"https://doi.org/10.1177/0963721414550708"},
+ {id:"R07",area:"認知行為治療",ev:"strong",cite:"Hofmann 等人（2012），Cognitive Therapy and Research",title:"認知行為治療（CBT）的整體效果",
+  finding:"這篇回顧整理了 269 篇統合分析，CBT 對焦慮相關問題、暴食、憤怒控制、一般壓力等有最強的證據，對憂鬱也有效。",
+  meaning:"想法紀錄、找證據、去災難化等練習，都來自這個證據最多的心理治療取向。",limits:"不同問題的效果差異很大，自己練習的效果通常不如在治療師帶領下進行。",url:"https://doi.org/10.1007/s10608-012-9476-1"},
+ {id:"R08",area:"認知行為治療",ev:"mid",cite:"Masuda 等人（2004），Behaviour Research and Therapy",title:"和想法拉開距離，能讓它變得沒那麼可信",
+  finding:"讓受試者快速重複一個負面的自我評價詞（例如「笨」）幾十秒，這個詞帶來的不舒服和可信度都明顯下降。這是接受與承諾治療（ACT）中「認知脫鉤」的經典實驗。",
+  meaning:"不一定要和念頭爭辯，也可以練習把它看成「我腦中出現了一個想法」。",limits:"實驗樣本小、效果持續時間短。",url:"https://doi.org/10.1016/j.brat.2003.10.008"},
+ {id:"R09",area:"接受與承諾治療",ev:"strong",cite:"A-Tjak 等人（2015），Psychotherapy and Psychosomatics",title:"接受與承諾治療（ACT）的效果",
+  finding:"整合 39 個隨機對照試驗，ACT 在焦慮、憂鬱、物質使用、身體疼痛等問題上優於對照組，和其他成熟的治療效果相當。",
+  meaning:"釐清價值、帶著不舒服仍往重要的方向前進，是有實證的做法。",limits:"部分研究品質參差，與 CBT 比較時沒有明顯優勢。",url:"https://doi.org/10.1159/000365764"},
+ {id:"R10",area:"情緒調節",ev:"mid",cite:"Gross & John（2003），Journal of Personality and Social Psychology",title:"換個框架看，比把情緒壓下去更好",
+  finding:"習慣用「重新評估」（換個角度理解事情）調節情緒的人，正向情緒較多、人際關係較好、幸福感較高；習慣「壓抑」的人則相反。",
+  meaning:"處理情緒時，與其忍住，不如試著重新理解事情的意義。",limits:"相關研究，不能直接推論因果。",url:"https://doi.org/10.1037/0022-3514.85.2.348"},
+ {id:"R11",area:"情緒調節",ev:"mid",cite:"Borkovec 等人（1983），Behaviour Research and Therapy",title:"把擔心集中到固定時間",
+  finding:"受試者每天安排一段 30 分鐘的「擔心時間」，其他時候出現擔心就延後到那段時間處理。四週後，他們花在擔心上的時間明顯減少。",
+  meaning:"擔心停不下來時，不是硬逼自己不想，而是先跟它約好時間。",limits:"早期研究，樣本為大學生。",url:"https://doi.org/10.1016/0005-7967(83)90121-3"},
+ {id:"R12",area:"情緒調節",ev:"mid",cite:"Bowen & Marlatt（2009），Psychology of Addictive Behaviors",title:"衝動像浪，可以不跟著做",
+  finding:"學習「衝動衝浪」（觀察渴望的起伏，不馬上行動）的吸菸者，一週後抽菸的數量較少，雖然渴望本身沒有減少。",
+  meaning:"強烈的衝動（傳訊息給前任、想吵架）會來，也會退。不必消滅它，只要先不跟著做。",limits:"研究對象是吸菸，套用在情緒衝動屬於延伸。",url:"https://doi.org/10.1037/a0017221"},
+ {id:"R13",area:"辯證行為治療",ev:"mid",cite:"Neacsiu、Rizvi、Linehan（2010），Behaviour Research and Therapy",title:"辯證行為治療（DBT）的技巧真的有用",
+  finding:"接受 DBT 的個案，越常使用學到的技巧（情緒調節、人際效能、痛苦耐受），自殺行為、憂鬱和憤怒的改善就越多。",
+  meaning:"相反行動、DEAR MAN 這類技巧，練得越多越有效。",limits:"研究對象為邊緣型人格的女性個案。",url:"https://doi.org/10.1016/j.brat.2010.05.017"},
+ {id:"R14",area:"身體",ev:"strong",cite:"Noetel 等人（2024），BMJ",title:"運動對憂鬱有明確的效果",
+  finding:"整合 218 個隨機對照試驗的網絡統合分析：走路或慢跑、瑜伽、肌力訓練對憂鬱都有中等程度的改善，強度越高效果越好。有結構、有人帶的運動計畫效果較好。",
+  meaning:"心情低落時，規律地動起來是有力的方法，不一定要很激烈，走路也有效。",limits:"許多試驗規模小、無法盲測。",url:"https://doi.org/10.1136/bmj-2023-075847"},
+ {id:"R15",area:"身體",ev:"mid",cite:"Bratman 等人（2015），PNAS",title:"在自然裡走路，比較不會反覆鑽牛角尖",
+  finding:"在自然環境走 90 分鐘的人，「反芻思考」（反覆想負面的事）減少，大腦中與反芻有關的區域（膝下前額葉）活動下降；在都市街道走同樣時間的人則沒有變化。",
+  meaning:"一直想同一件事、停不下來時，去公園或山邊走一走是有根據的。",limits:"樣本只有約 38 人，一次性的效果。",url:"https://doi.org/10.1073/pnas.1510459112"},
+ {id:"R16",area:"身體",ev:"strong",cite:"Trauer 等人（2015），Annals of Internal Medicine",title:"失眠的認知行為治療（CBT-I）",
+  finding:"整合 20 個研究、1,162 人：CBT-I 讓入睡時間平均縮短約 19 分鐘，半夜醒來的時間減少約 26 分鐘，睡眠效率提升約 10%。",
+  meaning:"睡不好會讓情緒更難處理。固定起床時間、只在想睡時上床，是效果最好的做法之一。",limits:"完整的 CBT-I 通常需要專業人員帶領。",url:"https://pubmed.ncbi.nlm.nih.gov/26054060/"},
+ {id:"R17",area:"身體",ev:"strong",cite:"Manzoni 等人（2008），BMC Psychiatry",title:"放鬆訓練能降低焦慮",
+  finding:"整合 27 個研究，漸進式肌肉放鬆、呼吸放鬆等放鬆訓練，對焦慮有中到大的改善效果。",
+  meaning:"身體放鬆了，心比較容易跟著放鬆。呼吸和肌肉放鬆都值得每天練一點。",limits:"研究之間差異大。",url:"https://doi.org/10.1186/1471-244X-8-41"},
+ {id:"R18",area:"正念",ev:"strong",cite:"Kuyken 等人（2016），JAMA Psychiatry",title:"正念認知治療（MBCT）能預防憂鬱復發",
+  finding:"整合 9 個試驗、1,258 位曾經憂鬱的人：接受 MBCT 的人，60 週內憂鬱復發的風險比只接受一般照護的人低約 31%。",
+  meaning:"身體掃描、三分鐘呼吸空間都來自 MBCT。它特別適合曾經低落過、想避免再陷進去的人。",limits:"對象是曾有憂鬱症的人，不是一般人。",url:"https://pubmed.ncbi.nlm.nih.gov/27119968/"},
+ {id:"R19",area:"自我關懷",ev:"strong",cite:"MacBeth & Gumley（2012），Clinical Psychology Review",title:"自我關懷越高，憂鬱、焦慮、壓力越低",
+  finding:"整合 20 個研究，自我關懷和憂鬱、焦慮、壓力之間有很強的負相關（相關係數約 −0.54）。",
+  meaning:"對自己溫柔不是放縱，而是和心理健康最密切相關的能力之一。",limits:"相關研究；不能說自我關懷「造成」較少的症狀。",url:"https://pubmed.ncbi.nlm.nih.gov/22796446/"},
+ {id:"R20",area:"自我關懷",ev:"mid",cite:"Hofmann、Grossman、Hinton（2011），Clinical Psychology Review",title:"慈心與悲憫靜心能增加正向情緒",
+  finding:"回顧研究發現，練習慈心（祝福自己和他人）與悲憫靜心，能增加正向情緒、減少負向情緒，也和人際連結感提升有關。",
+  meaning:"對關係感到受傷時，慈心練習能從內在慢慢修復對人的感覺。",limits:"研究數量和品質仍在累積中。",url:"https://doi.org/10.1016/j.cpr.2011.07.003"},
+ {id:"R21",area:"行動",ev:"mid",cite:"Dimidjian 等人（2006），Journal of Consulting and Clinical Psychology",title:"行為活化對憂鬱的效果",
+  finding:"在中重度憂鬱的個案中，行為活化（有計畫地重新安排有意義、有成就感的活動）的效果和抗憂鬱藥相當，也優於認知治療。",
+  meaning:"低落時不必等到有動力才行動，先做一件小事，動力會慢慢跟上來。",limits:"單一大型試驗，後續研究結果大致一致。",url:"https://doi.org/10.1037/0022-006X.74.4.658"},
+ {id:"R22",area:"行動",ev:"strong",cite:"Gollwitzer & Sheeran（2006），Advances in Experimental Social Psychology",title:"「如果…就…」計畫能讓人真的做到",
+  finding:"整合 94 個研究：把目標寫成「如果遇到情境 X，我就做 Y」的人，達成目標的程度明顯較高（中到大的效果）。",
+  meaning:"選好下一步之後，把它寫成「如果媽媽又問我什麼時候回家，我就說……」，比較容易做到。",limits:"對很困難、需要長期堅持的目標，效果較小。",url:"https://doi.org/10.1016/S0065-2601(06)38002-1"},
+ {id:"R23",area:"人際",ev:"strong",cite:"Holt-Lunstad、Smith、Layton（2010），PLoS Medicine",title:"人際關係和壽命一樣重要",
+  finding:"整合 148 個研究、30 多萬人：社會關係較強的人，存活的可能性高出約 50%，影響程度和戒菸相當。",
+  meaning:"你在心路裡處理的人際課題，不只關係到心情，也關係到整體健康。",limits:"觀察性研究。",url:"https://doi.org/10.1371/journal.pmed.1000316"},
+ {id:"R24",area:"人際",ev:"mid",cite:"Hazan & Shaver（1987），Journal of Personality and Social Psychology",title:"成年後的親密關係，延續了小時候的依附模式",
+  finding:"成人的戀愛關係可以分成安全、焦慮、逃避等依附風格，比例和嬰兒依附研究相似，而且和他們描述的童年親子關係有關。",
+  meaning:"在感情中特別怕被丟下，或特別想保持距離，可能和早年的依附經驗有關。這是很值得和諮商師討論的方向。",limits:"依附風格會隨經驗改變，不是一輩子固定。",url:"https://doi.org/10.1037/0022-3514.52.3.511"},
+ {id:"R25",area:"人際",ev:"mid",cite:"Gottman & Levenson（1992），Journal of Personality and Social Psychology",title:"關係裡最傷的四種溝通方式",
+  finding:"Gottman 長期觀察伴侶的互動，發現批評、輕蔑、防衛、冷戰這四種模式，能預測關係的惡化。能在衝突中「修復」的伴侶，關係較穩定。",
+  meaning:"人際衝突中，重點不是不吵架，而是避開這四種模式，並學會修復。",limits:"研究對象主要是伴侶，延伸到家人、職場是推論。",url:"https://doi.org/10.1037/0022-3514.63.2.221"},
+ {id:"R26",area:"童年經驗",ev:"strong",cite:"Felitti 等人（1998），American Journal of Preventive Medicine",title:"童年的困難經驗會影響一生",
+  finding:"超過九千位成人的研究：童年經歷越多種困難（例如被虐待、家人衝突、家人有成癮問題），成年後的身心健康風險越高，呈現劑量效應。",
+  meaning:"如果你發現現在的課題和童年有關，那不是你想太多，而是有大量研究支持的現象。它也說明了為什麼值得好好處理。",limits:"童年經驗是回溯自述；風險不代表命運，保護因子和後來的支持同樣重要。",url:"https://doi.org/10.1016/S0749-3797(98)00017-8"},
+ {id:"R27",area:"童年經驗",ev:"theory",cite:"Young、Klosko、Weishaar（2003），《基模治療》",title:"童年形成的「基模」會在長大後被觸發",
+  finding:"基模治療認為，童年核心需求（安全、被接納、自主）沒被滿足時，會形成「我不夠好」「別人會離開我」這類深層信念，並在長大後的關係中一再被觸發。",
+  meaning:"這是心路「把不同時期的人連起來」的理論基礎。看見重複的模式，是改變的起點。",limits:"理論框架；對特定問題（如邊緣型人格）已有臨床試驗支持。",url:"https://www.guilford.com/books/Schema-Therapy/Young-Klosko-Weishaar/9781593853723"},
+ {id:"R28",area:"創傷",ev:"strong",cite:"Cusack 等人（2016），Clinical Psychology Review",title:"處理創傷，有證據支持的治療",
+  finding:"整合 64 個試驗：延長暴露、認知處理治療、認知治療、EMDR 等以創傷為焦點的治療，對創傷後壓力症狀都有明確效果。",
+  meaning:"如果過去有很深的傷，請和諮商師討論這些方法，不建議自己一個人重新回到創傷記憶裡。",limits:"這些治療都需要受過訓練的專業人員帶領。",url:"https://doi.org/10.1016/j.cpr.2015.10.003"},
+ {id:"R29",area:"正向",ev:"mid",cite:"Seligman、Steen、Park、Peterson（2005），American Psychologist",title:"三件好事與感恩拜訪",
+  finding:"隨機對照實驗中，連續一週每晚寫下「三件好事和它們發生的原因」，以及「用新的方式運用自己的優勢」，在之後六個月持續提升幸福感、降低憂鬱症狀。「感恩拜訪」的效果很強，但大約一個月後就消退。",
+  meaning:"正向練習不是否認痛苦，而是讓注意力也看得見其他東西。",limits:"網路樣本，參與者是自願者。",url:"https://doi.org/10.1037/0003-066X.60.5.410"},
+ {id:"R30",area:"正向",ev:"mid",cite:"King（2001），Personality and Social Psychology Bulletin",title:"寫下最好的未來自己",
+  finding:"連續四天、每天 20 分鐘寫下「一切順利時的未來自己」，比書寫創傷更能提升主觀幸福感，而且不會帶來情緒的短暫下降；幾個月後的就醫次數也較少。",
+  meaning:"除了回頭看傷，也可以往前看，想像自己想成為的樣子。",limits:"樣本是大學生。",url:"https://doi.org/10.1177/0146167201277003"},
+ {id:"R31",area:"諮商",ev:"strong",cite:"Flückiger 等人（2018），Psychotherapy",title:"和諮商師的關係，是療效的重要關鍵",
+  finding:"整合 295 個研究、超過三萬位個案：個案與治療師的「工作同盟」（信任、對目標和做法的共識）和治療效果穩定相關（r ≈ 0.28），不論哪種治療取向都一樣。",
+  meaning:"把心路裡的紀錄和問題帶去諮商，讓諮商師更了解你，本身就在強化這段同盟。覺得不對勁時，也可以直接跟諮商師說。",limits:"相關研究。",url:"https://www.societyforpsychotherapy.org/the-alliance-in-adult-psychotherapy/"}
+];
+/* weekly updates — written to the shared "weekly" collection by a scheduled research task; treated as untrusted text */
+let WEEK=new Map();
+const safeUrl=u=>/^https:\/\/[^\s"'<>]+$/.test(String(u||""))?String(u):"";
+const EVK=k=>["strong","mid","theory"].includes(k)?k:"mid";
+function weeklyIssues(){return [...WEEK.values()].filter(w=>w&&Array.isArray(w.items)).sort((a,b)=>String(b.issue||"").localeCompare(String(a.issue||"")))}
+function weeklyItems(){const out=[];weeklyIssues().forEach(w=>w.items.forEach((it,i)=>{if(it&&it.title)out.push({it,w,id:"WK-"+String(w.issue||w.id)+"-"+i})}));return out}
+function weeklyResearch(){return weeklyItems().map(({it,w,id})=>({id,area:"每週新知",ev:EVK(it.ev),cite:esc(it.cite||""),title:esc(it.title),finding:esc(it.finding||""),meaning:esc(it.meaning||"")+(it.tryIt?`<br><br><b>生活中可以這樣用</b><br>${esc(it.tryIt)}`:""),limits:esc(it.limits||"尚未說明"),url:safeUrl(it.url),issue:String(w.issue||""),published:esc(it.published||""),weekly:true}))}
+const allResearch=()=>[...weeklyResearch(),...RESEARCH];
+const researchById=id=>allResearch().find(r=>r.id===id);
+
+/* ---------- method library ---------- */
+const METHODS=[
+ /* ritual */
+ {id:"r_tear",cat:"ritual",ev:"mid",refs:["R01"],name:"寫下、撕掉、數到十",when:"失落、被拒絕、事情已經無法挽回時",
+  what:"把此刻的感受畫下來或寫下來，然後用一個固定的動作結束它。",
+  steps:["拿一張紙，用幾個字或簡單的線條，寫下或畫出現在的感受","慢慢看一遍，承認它：這就是我現在的感覺","把紙對折、撕成小片","深呼吸，從一數到十","把碎紙丟掉，對自己說：我允許這件事結束"]},
+ {id:"r_letter",cat:"ritual",ev:"strong",refs:["R01","R04"],name:"一封不寄出的信",when:"有話想對某人說，但說不出口、不能說，或對方已經不在",
+  what:"寫一封完整的信給那個人，寫完不寄出，用你選的方式收起來或銷毀。",
+  steps:["找一段不被打擾的 20 分鐘","寫下對方的稱呼作為開頭","寫你一直沒說的話：發生了什麼、你當時的感受、你希望的是什麼","最後一段寫：我現在想對自己說的話","讀一遍，決定它的去處：撕掉、燒掉，或封起來放進抽屜"]},
+ {id:"r_close",cat:"ritual",ev:"mid",refs:["R01"],name:"告別儀式",when:"一段關係、一個階段結束了，心裡卻還沒結束",
+  what:"為結束安排一個有開始、有結尾的小儀式，讓心知道「這裡可以畫句點了」。",
+  steps:["選一個代表這段關係或階段的物品、照片或地點","寫下三件這段經歷給你的東西（好的、難的都可以）","在一個你選的日子跟它說再見：收進盒子、歸還，或最後一次回到那個地方","離開時做一個象徵開始的動作，例如換一條新的回家路"]},
+ {id:"r_pre",cat:"ritual",ev:"mid",refs:["R02"],name:"上場前的小儀式",when:"要面對一場困難的對話、見某個讓你緊張的人之前",
+  what:"在進場前做一組固定的小動作，讓身體和心先準備好。",
+  steps:["設計三個步驟，例如：雙手握拳三秒再放開、長長吐一口氣、在心裡說一句「我可以慢慢說」","每次面對那個人之前，都照同一個順序做","結束後記一筆：這次跟以前有什麼不同"]},
+ {id:"r_daily",cat:"ritual",ev:"mid",refs:["R03"],name:"一天的開場與收尾",when:"日子很亂、心很散，需要一點穩定的節奏",
+  what:"為早上或睡前設計一個固定的小儀式，例如用同一套步驟泡一杯茶。",
+  steps:["選一個每天都做得到的時刻","設計 3 到 4 個固定步驟（燒水、聞茶葉、看著茶色變深、雙手捧著喝第一口）","每次都照同樣的順序，慢慢做","收尾時問自己一句：今天我需要什麼？"]},
+ /* aware */
+ {id:"a_name",cat:"aware",ev:"mid",refs:["R05","R06"],name:"為情緒命名",when:"情緒很滿、很亂，說不清楚自己怎麼了",
+  what:"用盡量精確的詞說出現在的情緒：不只是「不好」，而是「委屈」「被忽略」「失望」。",
+  steps:["停下來，問自己：我現在的感覺是什麼？","先說大類：生氣、難過、害怕、羞愧……","再往下找更精確的詞：是「失望」還是「被背叛」？","說出來或寫下來：我現在感到______，因為______"]},
+ {id:"c_abc",cat:"aware",ev:"strong",refs:["R07"],name:"想法紀錄：事件、想法、情緒",when:"同樣的情緒反覆出現，想看清楚是什麼觸發了它",
+  what:"把一件事拆成：發生了什麼、我怎麼解讀、因此產生什麼情緒和行動。心路的「幫我整理」就是用這個架構。",
+  steps:["寫下事件：只寫事實，像攝影機拍到的","寫下當下的自動想法：腦中閃過的那一句","寫下情緒和強度（0 到 100）","問自己：還有沒有別的解讀？","重新評一次情緒的強度"]},
+ {id:"c_evidence",cat:"aware",ev:"strong",refs:["R07"],name:"替想法找證據",when:"一個念頭讓你很痛，例如「我很沒用」「沒有人在乎我」",
+  what:"把念頭當成假設，而不是事實，分別列出支持和反對它的證據。",
+  steps:["寫下那個念頭","列出支持它的事實（只寫事實，不寫感覺）","列出不支持它的事實，包括別人說過、你做到過的事","寫一句比較平衡的說法","留意寫完之後，心裡有什麼不同"]},
+ {id:"c_decat",cat:"aware",ev:"strong",refs:["R07"],name:"最壞、最好、最可能",when:"腦中一直往最壞的方向想，覺得「完蛋了」",
+  what:"把災難化的想像攤開，分別寫出最壞、最好和最可能的結果。",
+  steps:["寫下你擔心會發生的最壞結果","寫下最好的結果，即使覺得不可能","寫下最可能發生的結果","問自己：如果最壞的真的發生，我可以怎麼應對？誰能幫我？","看看現在的擔心，跟「最可能」差多遠"]},
+ {id:"c_defuse",cat:"aware",ev:"mid",refs:["R08","R09"],name:"和想法拉開一點距離",when:"一個念頭黏著你，怎麼爭辯都沒用",
+  what:"不和念頭爭辯，而是換一種方式看它：它只是腦中出現的一句話。",
+  steps:["把念頭寫成一句短句，例如「我很失敗」","在前面加上：「我注意到，我有一個想法是……」","大聲、快速重複那句話裡的關鍵詞 30 秒，直到它變成一串聲音","問自己：這個想法現在對我有幫助嗎？","不論有沒有，都讓它待著，然後回到你正在做的事"]},
+ {id:"c_pattern",cat:"aware",ev:"theory",refs:["R27","R24"],name:"把重複的模式擺在一起",when:"你發現自己對不同的人，好像都有類似的反應",
+  what:"把同一個課題下的三件事並排，找出共同的觸發點、想法和反應。",
+  steps:["在「地圖」裡點一個課題，看看連到哪些人和紀錄","挑三件事，分別寫下：當時是誰、發生什麼、我想到什麼、我做了什麼","圈出三件事裡重複出現的詞","問自己：這個反應最早是什麼時候學會的？","把發現帶去下次諮商"]},
+ /* emotion */
+ {id:"e_reappraise",cat:"emotion",ev:"mid",refs:["R10"],name:"換個框架看",when:"一件事讓你很受傷，卻只看得到一種解釋",
+  what:"不壓抑情緒，而是試著用另一個角度理解同一件事。",
+  steps:["寫下事件，以及你目前的解讀","想想：一年後的我，會怎麼看這件事？","想想：對方可能正在經歷什麼？","想想：這件事讓我學到或看見了什麼？","選一個最能接受的角度，寫成一句話"]},
+ {id:"e_opposite",cat:"emotion",ev:"mid",refs:["R13"],name:"相反行動",when:"情緒推著你做一件你知道會讓事情更糟的事",
+  what:"辨識情緒想讓你做的事，然後刻意做相反的事。這是辯證行為治療（DBT）的技巧。",
+  steps:["說出情緒：我現在是______","說出它想讓我做的事：例如難過想躲起來、生氣想反擊","問自己：照著做，會讓事情變好嗎？","如果不會，選相反的行動：難過時出門走走、生氣時先溫和地離開","全心做那個相反行動，然後留意情緒的變化"]},
+ {id:"e_surf",cat:"emotion",ev:"mid",refs:["R12"],name:"情緒衝浪",when:"有一股很強的衝動：想傳訊息、想吵架、想逃",
+  what:"把衝動看成一道浪，觀察它升起、到頂、退下，不跟著它行動。",
+  steps:["察覺衝動，告訴自己：浪來了","注意它在身體的哪裡，是什麼感覺","像衝浪一樣跟著呼吸，觀察它的強度變化","通常幾分鐘內，浪會到頂、開始退","浪退了之後，再決定要不要行動"]},
+ {id:"e_worry",cat:"emotion",ev:"mid",refs:["R11"],name:"擔心時間",when:"擔心一直冒出來，影響工作和睡眠",
+  what:"每天安排固定 20 到 30 分鐘專門擔心，其他時間出現的擔心就先記下、延後處理。",
+  steps:["選一個固定時段和地點（不要在床上、不要睡前）","白天擔心出現時，寫下一個關鍵字，告訴自己：等一下再想","到了擔心時間，把清單上的事一件件想完","想完能做的就排進行動，不能做的就放下","時間到就停，下次再繼續"]},
+ /* body */
+ {id:"b_breath",cat:"body",ev:"strong",refs:["R17"],name:"延長吐氣呼吸",when:"緊張、生氣、心跳很快的時候",
+  what:"吸氣 4 秒、停 4 秒、吐氣 6 秒，做 5 輪。吐氣比吸氣長，能幫身體從緊繃模式退下來。",
+  steps:["坐好或躺好，一手放在腹部","用鼻子吸氣 4 秒，感覺腹部鼓起","停住 4 秒","用嘴巴慢慢吐氣 6 秒","重複 5 輪，留意身體的變化"]},
+ {id:"b_pmr",cat:"body",ev:"strong",refs:["R17"],name:"漸進式肌肉放鬆",when:"身體很緊、肩頸僵硬、睡不著",
+  what:"一個部位一個部位地先用力、再放鬆，讓身體記得放鬆的感覺。",
+  steps:["從雙手開始：握緊拳頭 5 秒，再完全放開 10 秒","依序做手臂、肩膀、臉、肚子、大腿、小腿、腳","每次放鬆時，留意緊和鬆的差別","最後讓整個身體一起鬆開，停留一分鐘"]},
+ {id:"b_ground",cat:"body",ev:"theory",refs:[],name:"5-4-3-2-1 著陸",when:"焦慮、恐慌，或被回憶拉走、覺得不在現場時",
+  what:"用五種感官，把注意力帶回此時此地。這是處理焦慮和創傷反應時常用的著陸技巧。",
+  steps:["說出 5 樣你看得到的東西","感覺 4 樣你摸得到的東西","聽 3 種聲音","找 2 種氣味","感覺嘴裡的 1 種味道"]},
+ {id:"b_move",cat:"body",ev:"strong",refs:["R14"],name:"動起來",when:"心情低落、提不起勁，或壓力很大的一段時間",
+  what:"安排規律的身體活動。走路、慢跑、瑜伽、肌力訓練都有研究支持。",
+  steps:["選一種你不討厭的運動，從每次 20 分鐘開始","排進固定的日子，例如一週三次","可以的話找人一起，或參加有人帶的課程","做完記一下運動前後的心情","慢慢增加強度，強度高一點效果通常更好"]},
+ {id:"b_nature",cat:"body",ev:"mid",refs:["R15"],name:"走進自然",when:"一直反覆想同一件事、停不下來",
+  what:"去有樹、有水、有山的地方走一段時間，不帶任務，只是走。",
+  steps:["找一個附近的公園、河濱或步道","把手機調成勿擾","慢慢走，留意看到的綠色、聽到的聲音","念頭出現時不用趕走，讓它跟著你走","回來後寫一句：走完之後，那件事看起來有什麼不同"]},
+ {id:"b_sleep",cat:"body",ev:"strong",refs:["R16"],name:"把睡眠找回來",when:"睡不著、睡不好，白天情緒更難控制",
+  what:"失眠認知行為治療（CBT-I）的核心做法：讓床只和睡覺連在一起。",
+  steps:["每天固定時間起床，週末也一樣","想睡了才上床","躺了大約 20 分鐘還睡不著，就起來做一件安靜的事，想睡再回去","床只用來睡覺，不在床上滑手機或工作","白天不補長時間的午覺"]},
+ /* mind */
+ {id:"m_space",cat:"mind",ev:"strong",refs:["R18"],name:"三分鐘呼吸空間",when:"忙亂的一天裡，想給自己一個停頓",
+  what:"正念認知治療（MBCT）的核心練習：覺察、聚焦、擴展，各一分鐘。",
+  steps:["第一分鐘，覺察：此刻有什麼想法、情緒、身體感覺？只是看見","第二分鐘，聚焦：把注意力收到呼吸上，感覺一吸一吐","第三分鐘，擴展：讓覺察擴展到整個身體、坐姿、表情","帶著這份覺察，回到你的一天"]},
+ {id:"m_scan",cat:"mind",ev:"strong",refs:["R18"],name:"身體掃描",when:"身體很累、心很散，或睡前想放鬆",
+  what:"從腳底到頭頂，一處一處把注意力帶過身體，不改變什麼，只是感覺。",
+  steps:["躺下或坐好，閉上眼睛","從腳趾開始，感覺那裡的溫度、壓力、刺麻","慢慢往上：小腿、膝蓋、大腿、腹部、胸口、肩膀、手臂、脖子、臉","注意力飄走時，溫和地帶回來","最後感覺整個身體，停留一會兒"]},
+ /* action */
+ {id:"ac_activity",cat:"action",ev:"strong",refs:["R21"],name:"小小的活動排程",when:"低落、什麼都不想做，日子好像停住了",
+  what:"行為活化：不等動力出現，先安排幾件有意義或有成就感的小事。",
+  steps:["列出三種活動：讓你開心的、讓你有成就感的、對你重要的","從每類挑一件很小的（例如洗一個碗、傳一則訊息給朋友）","排進明天的具體時間","做完後替心情和成就感各打一個分數（0 到 10）","下週根據分數，多安排讓你好一點的活動"]},
+ {id:"ac_values",cat:"action",ev:"strong",refs:["R09"],name:"價值羅盤",when:"不知道自己想要什麼，或總是照別人的期待活",
+  what:"接受與承諾治療（ACT）的練習：釐清在關係、工作、自己、休閒中，你在乎的是什麼樣的人。",
+  steps:["在四個領域各寫一句：我想成為一個______的人（例如：在關係中，誠實而溫暖）","替每個領域打分數：最近活得有多接近它？（0 到 10）","挑分數最低的一個，想一個這週能做的小行動","做的時候，不舒服的感覺可能還在，這是正常的","週末回來看：做了之後，有沒有更像自己一點？"]},
+ {id:"ac_ifthen",cat:"action",ev:"strong",refs:["R22"],name:"「如果……就……」計畫",when:"知道該做什麼，但到了那個時刻總是做不到",
+  what:"把下一步寫成具體的情境和行動，讓大腦在那個時刻自動想起來。",
+  steps:["寫下你想做到的事","找出會遇到的關鍵情境：什麼時候、跟誰、在哪裡","寫成：「如果______，我就______。」","例如：「如果媽媽問我什麼時候回家，我就先說謝謝她想我，再說我這週很累。」","把這句話放在看得到的地方，事後回來記錄有沒有做到"]},
+ /* relate */
+ {id:"p_ineed",cat:"relate",ev:"theory",refs:[],name:"用「我」開頭說出需要",when:"想告訴某人你的感受，又怕一開口就吵架",
+  what:"Marshall Rosenberg 的「非暴力溝通」：用觀察、感受、需要、請求四個部分來說話。",
+  steps:["觀察：只說具體發生的事（「這週你打了三次電話問我什麼時候回家」）","感受：說你的感受（「我覺得有壓力」）","需要：說背後的需要（「因為我最近工作很累，需要休息」）","請求：提出具體、做得到的請求（「我們可以約週日晚上一起吃飯嗎？」）","先寫下來練習，再找時機說"]},
+ {id:"p_dearman",cat:"relate",ev:"mid",refs:["R13"],name:"DEAR MAN 提出請求",when:"需要向主管、家人提出一個要求，或拒絕一件事",
+  what:"辯證行為治療（DBT）的人際效能技巧，讓請求清楚又不傷關係。",
+  steps:["描述（Describe）：說出事實","表達（Express）：說出你的感受和想法","主張（Assert）：清楚說出你要什麼，或你不要什麼","增強（Reinforce）：說明這對對方的好處","保持專注、表現自信、願意協商：被岔開時溫和地回到你的請求"]},
+ {id:"p_boundary",cat:"relate",ev:"theory",refs:[],name:"練習一個小界線",when:"常常答應不想答應的事，事後很累或很委屈",
+  what:"從一個風險很小的情境開始，練習說「不」或「我需要想一下」。",
+  steps:["挑一個低風險的情境（例如晚上十點後不回工作訊息）","準備一句話：「這個我需要想一下，明天回你」","實際說一次","記下對方的反應，以及你自己的感受","留意：最壞的情況真的發生了嗎？"]},
+ {id:"p_repair",cat:"relate",ev:"mid",refs:["R25"],name:"避開四種傷人的溝通，學會修復",when:"和伴侶、家人總是越吵越兇",
+  what:"Gottman 發現批評、輕蔑、防衛、冷戰最傷關係。練習用替代的說法，並在衝突中主動修復。",
+  steps:["回想最近一次衝突，看看出現了哪幾種：批評、輕蔑、防衛、冷戰","把批評換成「我」開頭的抱怨（不攻擊人格）","把防衛換成承擔一小部分：「這部分我確實有做不好」","快要冷戰時，說：「我需要 20 分鐘冷靜，等一下回來談」","衝突後找一個修復的動作：一句道歉、一個擁抱、一杯茶"]},
+ {id:"p_attach",cat:"relate",ev:"mid",refs:["R24"],name:"看見自己的依附模式",when:"在親密關係中特別怕被丟下，或特別想保持距離",
+  what:"回顧你在不同關係中的反應，看看是偏向焦慮（怕失去）還是逃避（怕靠近）。",
+  steps:["回想你最親近的三段關係（家人、伴侶、好友）","寫下：當對方沒回訊息、需要空間時，我通常怎麼反應？","寫下：當對方很靠近、需要我時，我通常怎麼反應？","看看有沒有共同的模式，它像不像小時候和照顧者的相處？","把發現帶去諮商，和諮商師一起理解它"]},
+ {id:"p_reach",cat:"relate",ev:"strong",refs:["R23"],name:"主動連結一個人",when:"覺得孤單，或習慣一個人扛所有事",
+  what:"每週主動和一個人有真實的接觸，不一定要談心事。",
+  steps:["列出三個你覺得相處起來安全的人","這週挑一個，傳訊息約喝咖啡、散步或通個電話","見面時試著分享一件真實的小事","結束後記下：跟他相處時，我的感覺是什麼？","下週換一個人，或再約同一個人"]},
+ {id:"p_chair",cat:"relate",ev:"theory",refs:["R27"],withCounselor:true,name:"空椅對話",when:"對某個人有很多沒說完的話，特別是過去的人",
+  what:"想像那個人坐在對面的椅子上，把想說的話說出來，再換位置用對方的角度回應。源自完形治療。",
+  steps:["跟諮商師提出想做這個練習","在諮商室裡，由諮商師引導進行","結束後記下：說出了什麼、身體有什麼感覺","回來寫一篇日記，把它連到那個人"]},
+ /* kind */
+ {id:"k_three",cat:"kind",ev:"strong",refs:["R19"],name:"自我關懷三步驟",when:"自責、覺得自己很糟的時候",
+  what:"Kristin Neff 的自我關懷：承認痛苦、提醒自己不孤單、對自己說一句溫柔的話。",
+  steps:["把手放在胸口，對自己說：這是很難受的時刻","提醒自己：難受是人生的一部分，很多人也正經歷著","問自己：如果是好朋友遇到這件事，我會對他說什麼？","把那句話對自己說一遍"]},
+ {id:"k_letter",cat:"kind",ev:"strong",refs:["R19"],name:"從朋友的角度寫一封信給自己",when:"一直放不下某個缺點或錯誤",
+  what:"想像一位完全接納你的朋友，用他的口吻寫一封信給你。",
+  steps:["寫下讓你覺得羞愧或不夠好的那件事","想像一位無條件接納你、了解你所有經歷的朋友","用他的口吻寫信給你：他怎麼看這件事？他會怎麼安慰你？","放一陣子再讀，讓那些話慢慢進到心裡"]},
+ {id:"k_inner",cat:"kind",ev:"theory",refs:["R27"],name:"寫給小時候的自己",when:"發現現在的痛，跟小時候的經驗有關",
+  what:"以現在的你，寫幾句話給當年那個孩子。基模治療中的「重新養育」也有類似的做法。如果情緒太強，可以停下來，帶去諮商時一起處理。",
+  steps:["找一張那個年紀的照片，或想像當時的自己","寫下：那時候發生了什麼","寫下：那時候的你最需要聽到什麼","把那句話寫給他，用你最溫柔的語氣","寫完，告訴自己：現在我會照顧你"]},
+ {id:"k_metta",cat:"kind",ev:"mid",refs:["R20"],name:"慈心祝福",when:"對某個人有很多怨，或對人失去信任",
+  what:"在心裡依序祝福自己、所愛的人、普通的人，最後是讓你受傷的人（還沒準備好可以跳過）。",
+  steps:["把手放在胸口，對自己說：願我平安、健康、快樂","想一個你愛的人，對他說同樣的話","想一個不太熟的人，對他說同樣的話","如果準備好了，想一個讓你有點受傷的人，試著說一次","最後回到自己，停留一會兒"]},
+ /* meaning */
+ {id:"g_three",cat:"meaning",ev:"mid",refs:["R29"],name:"三件好事",when:"最近只看得到不好的事",
+  what:"連續一週，每晚寫下三件好事，以及它們為什麼會發生。",
+  steps:["睡前寫下今天三件好事，大小都可以","每件後面寫：為什麼會發生？（例如：因為我主動問了同事）","連續做七天","第七天讀一遍，看看哪些好事跟你自己有關"]},
+ {id:"g_visit",cat:"meaning",ev:"mid",refs:["R29"],name:"感恩拜訪",when:"想起某個曾經幫過你、卻沒好好道謝的人",
+  what:"寫一封具體的感謝信給他，最好當面念給他聽。",
+  steps:["想一個曾經真正幫助過你的人","寫下：他做了什麼、那對你有什麼影響、你現在怎麼樣了","約他見面，或打電話念給他聽","記下對方的反應，和你自己的感受"]},
+ {id:"g_best",cat:"meaning",ev:"mid",refs:["R30"],name:"最好的未來自己",when:"只顧著回頭看傷，看不見往前的路",
+  what:"連續幾天，寫下一切都順利時，未來的你會是什麼樣子。",
+  steps:["設定一個時間點，例如三年後","想像你努力的事都順利了：你的關係、工作、自己","具體寫下那時候的一天：你在哪裡、和誰、感覺如何","連續寫四天，每天 15 到 20 分鐘","最後挑一個畫面，想想現在可以為它做的第一步"]},
+ {id:"g_strength",cat:"meaning",ev:"mid",refs:["R29"],name:"用新的方式運用優勢",when:"覺得自己一無是處，或日子很乏味",
+  what:"找出你的核心優勢，連續一週，每天用一種新的方式使用它。",
+  steps:["寫下三個你最像自己的特質（例如好奇、善良、幽默、堅持）","也可以問一個了解你的朋友","挑一個，每天用一種沒試過的方式使用它","記下用的時候有什麼感覺"]},
+ /* past */
+ {id:"t_timeline",cat:"past",ev:"strong",refs:["R26","R27"],withCounselor:true,name:"畫一條人生時間線",when:"想整理自己是怎麼一路走到現在的",
+  what:"在一條線上標出從小到大的重要事件和人物，看見它們之間的關係。適合和諮商師一起看。",
+  steps:["畫一條線，左邊是出生，右邊是現在","標出重要事件：搬家、轉學、家人變化、關係開始與結束","在每個事件旁寫下當時身邊重要的人","用不同顏色標出：滋養你的、傷害你的","帶去諮商，和諮商師一起看哪些事件到現在還在影響你"]},
+ {id:"t_write4",cat:"past",ev:"strong",refs:["R04"],name:"四天的深度書寫",when:"有一件事壓在心裡很久，一直沒有好好說過",
+  what:"Pennebaker 的表達性書寫：連續四天，每天 15 到 20 分鐘，寫下那件事和你最深的感受。",
+  steps:["找連續四天、每天不被打擾的 20 分鐘","寫那件事，以及你最深的想法和感受，不用管文筆","可以每天寫同一件事，也可以寫不同面向","寫完後剛開始可能會比較難受，這是正常的","如果情緒太強烈、難以平復，請停下來，帶去跟諮商師談"]},
+ {id:"t_safe",cat:"past",ev:"theory",refs:["R28"],name:"建立一個安全的地方",when:"回想過去時容易被情緒淹沒，需要一個可以回來的地方",
+  what:"在心裡建立一個讓你感到安全、平靜的畫面。很多創傷治療會先做這個準備。",
+  steps:["想一個真實或想像的地方，在那裡你覺得完全安全","仔細想像：顏色、聲音、溫度、氣味","替它取一個名字","練習幾次：情緒很滿時，閉上眼睛回到那裡","可以請諮商師帶你一起練習"]},
+ {id:"t_trauma",cat:"past",ev:"strong",refs:["R28"],withCounselor:true,name:"和諮商師談創傷治療",when:"過去的某些經驗讓你有閃回、惡夢，或至今仍強烈影響你",
+  what:"以創傷為焦點的治療（例如認知處理治療、延長暴露、EMDR）有很強的證據，但需要由受過訓練的專業人員帶領。",
+  steps:["在心路裡整理那段經驗的時間、人物，和它現在怎麼影響你","不需要寫下細節，寫你願意寫的就好","下次諮商時告訴諮商師：我想處理這段經驗","詢問諮商師是否受過相關訓練，或是否能轉介"]}
+];
+function weeklyMethods(){return weeklyItems().filter(x=>x.it.practice&&x.it.practice.name&&Array.isArray(x.it.practice.steps)&&x.it.practice.steps.length).map(({it,w,id})=>{const pr=it.practice;
+  return{id:"wk:"+id,cat:"weekly",ev:EVK(it.ev),refs:[id],name:esc(pr.name),when:esc(pr.when||it.title),what:esc(pr.what||it.tryIt||""),steps:pr.steps.slice(0,8).map(x=>esc(x)),withCounselor:pr.withCounselor===true,issue:String(w.issue||"")}})}
+const allMethods=()=>[...METHODS,...weeklyMethods()];
+const methodById=id=>allMethods().find(m=>m.id===id);
+
+/* ============================================================
+   data model
+   ============================================================ */
+const COLS=["people","entries","themes","steps","reviews","quotes","meta"];
+const S={people:new Map(),entries:new Map(),themes:new Map(),steps:new Map(),reviews:new Map(),quotes:new Map(),meta:new Map()};
+let mode="loading", root=null, sample=null, dict=null, dls=null, slowNote=false;
+const LKEY="xinlu-local-v1";
+function saveLocal(){if(mode!=="local")return;const o={};COLS.forEach(c=>o[c]=[...S[c].values()]);local.set(LKEY,o)}
+function loadLocal(){const o=local.get(LKEY,null);if(!o)return;COLS.forEach(c=>{S[c]=new Map((o[c]||[]).map(x=>[x.id,x]))})}
+/* ============================================================
+   device storage — IndexedDB (falls back to localStorage)
+   ============================================================ */
+const IDB={db:null,
+  open(){return new Promise((res,rej)=>{if(!("indexedDB" in window))return rej(new Error("no idb"));const r=indexedDB.open("xinlu-lite",1);
+    r.onupgradeneeded=()=>{const d=r.result;if(!d.objectStoreNames.contains("cols"))d.createObjectStore("cols");if(!d.objectStoreNames.contains("media"))d.createObjectStore("media")};
+    r.onsuccess=()=>{IDB.db=r.result;res()};r.onerror=()=>rej(r.error)})},
+  get(st,k){return new Promise((res,rej)=>{const q=IDB.db.transaction(st,"readonly").objectStore(st).get(k);q.onsuccess=()=>res(q.result);q.onerror=()=>rej(q.error)})},
+  set(st,k,v){return new Promise((res,rej)=>{const t=IDB.db.transaction(st,"readwrite");t.objectStore(st).put(v,k);t.oncomplete=()=>res();t.onerror=()=>rej(t.error)})},
+  del(st,k){return new Promise((res,rej)=>{const t=IDB.db.transaction(st,"readwrite");t.objectStore(st).delete(k);t.oncomplete=()=>res();t.onerror=()=>rej(t.error)})},
+  clear(st){return new Promise((res,rej)=>{const t=IDB.db.transaction(st,"readwrite");t.objectStore(st).clear();t.oncomplete=()=>res();t.onerror=()=>rej(t.error)})}};
+const saveTimers={};
+function persist(col){
+  if(mode==="local"){saveLocal();return Promise.resolve()}
+  if(mode!=="device")return Promise.resolve();
+  clearTimeout(saveTimers[col]);const w=(saveWait[col]=saveWait[col]||[]);
+  return new Promise(res=>{w.push(res);saveTimers[col]=setTimeout(()=>{const ws=saveWait[col].splice(0);IDB.set("cols",col,[...S[col].values()]).catch(()=>toast("這台裝置的儲存空間可能不足，請先匯出備份。")).then(()=>ws.forEach(f=>f()))},150)})}
+const saveWait={};
+addEventListener("pagehide",()=>{if(mode!=="device")return;Object.keys(saveTimers).forEach(c=>{clearTimeout(saveTimers[c]);IDB.set("cols",c,[...S[c].values()]).catch(()=>{})})});
+function put(col,obj){obj.updatedAt=Date.now();S[col].set(obj.id,obj);schedule();return persist(col)}
+function del(col,id){S[col].delete(id);schedule();return persist(col)}
+async function boot(){
+  try{await IDB.open();for(const c of COLS){const v=await IDB.get("cols",c);if(Array.isArray(v))S[c]=new Map(v.map(x=>[x.id,x]))}mode="device"}
+  catch(e){mode="local";loadLocal()}
+  sample=AI;schedule();loadWeekly();
+  if(!local.get("xinlu-welcomed",false))setTimeout(()=>openSheet({kind:"welcome"}),300);
+}
+function loadWeekly(){fetch("weekly.json",{cache:"no-cache"}).then(r=>r.ok?r.json():null).then(o=>{if(o&&Array.isArray(o.issues)){WEEK=new Map(o.issues.filter(w=>w&&w.issue).map(w=>[String(w.issue),w]));schedule()}}).catch(()=>{})}
+let installEvt=null;
+addEventListener("beforeinstallprompt",e=>{e.preventDefault();installEvt=e;schedule()});
+if("serviceWorker" in navigator&&location.protocol==="https:")navigator.serviceWorker.register("sw.js").catch(()=>{});
+
+/* ============================================================
+   settings
+   ============================================================ */
+const SET_KEY="xinlu-settings";
+const PROVIDERS={
+  openai:{name:"OpenAI（ChatGPT）",model:"gpt-4.1-mini",keyHint:"sk-…",doc:"https://platform.openai.com/api-keys"},
+  anthropic:{name:"Anthropic（Claude）",model:"claude-haiku-5-5",keyHint:"sk-ant-…",doc:"https://console.anthropic.com/settings/keys"},
+  gemini:{name:"Google（Gemini）",model:"gemini-2.5-flash",keyHint:"AIza…",doc:"https://aistudio.google.com/apikey"}};
+const CHATS=[["ChatGPT","https://chatgpt.com/"],["Claude","https://claude.ai/new"],["Gemini","https://gemini.google.com/app"]];
+function settings(){const s=Object.assign({aiMode:"copy",provider:"openai",models:{},preview:true,maskWords:"",remember:false},local.get(SET_KEY,{}));if(!PROVIDERS[s.provider])s.provider="openai";return s}
+function saveSettings(s){local.set(SET_KEY,s)}
+let memKeys={};
+function getKey(p){if(memKeys[p])return memKeys[p];try{return localStorage.getItem("xinlu-key-"+p)||""}catch(e){return ""}}
+function setKey(p,k,remember){memKeys[p]=k;try{if(remember&&k)localStorage.setItem("xinlu-key-"+p,k);else localStorage.removeItem("xinlu-key-"+p)}catch(e){}}
+
+/* ============================================================
+   privacy — pseudonymize names, mask identifiers before anything leaves the device
+   ============================================================ */
+const CODE=i=>{let s="";i++;while(i>0){i--;s=String.fromCharCode(65+i%26)+s;i=Math.floor(i/26)}return s};
+function protect(text){
+  const st=settings(),map=[];
+  const names=[...new Set([...people().map(p=>p.name),...String(st.maskWords||"").split(/[\n,，、]/)].map(x=>String(x||"").trim()).filter(x=>x.length>=2))].sort((a,b)=>b.length-a.length);
+  let t=String(text);
+  names.forEach((n,i)=>{if(!t.includes(n))return;const code=`［人物${CODE(i)}］`;map.push([code,n]);t=t.split(n).join(code)});
+  const masks=[[/[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/g,"［Email］"],[/\b[A-Z][12489]\d{8}\b/g,"［身分證號］"],[/(?:\+?886[-\s]?|0)9\d{2}[-\s]?\d{3}[-\s]?\d{3}/g,"［手機］"],[/\(?0\d{1,2}\)?[-\s]?\d{3,4}[-\s]?\d{4}/g,"［電話］"],[/\b(?:\d[ -]?){13,19}\b/g,"［卡號］"]];
+  let masked=0;masks.forEach(([re,rep])=>{t=t.replace(re,()=>{masked++;return rep})});
+  const head=map.length?"（說明：文中的［人物A］這類代號代表真實人物，為了保護隱私已替換。請直接沿用代號，不要猜測真名。）\n\n":"";
+  return{text:head+t,map,masked}}
+function restore(text,map){let t=String(text);map.slice().sort((a,b)=>b[0].length-a[0].length).forEach(([code,n])=>{t=t.split(code).join(n);const bare=code.slice(1,-1);t=t.split(bare).join(n)});return t}
+function parseJSONLoose(s){const m=String(s).replace(/```(?:json)?/gi,"");const a=m.indexOf("{"),b=m.lastIndexOf("}");if(a<0||b<=a)throw{code:"invalid_json"};try{return JSON.parse(m.slice(a,b+1))}catch(e){throw{code:"invalid_json"}}}
+
+/* ============================================================
+   AI — your own model: copy & paste, or your own API key
+   ============================================================ */
+async function callAPI(text,signal){
+  const st=settings(),p=st.provider,key=getKey(p),model=(st.models&&st.models[p])||PROVIDERS[p].model;
+  if(!key)throw{code:"no_key"};
+  let r;
+  try{
+    if(p==="openai")r=await fetch("https://api.openai.com/v1/chat/completions",{method:"POST",signal,headers:{"content-type":"application/json","authorization":"Bearer "+key},body:JSON.stringify({model,messages:[{role:"user",content:text}],temperature:.4})});
+    else if(p==="anthropic")r=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",signal,headers:{"content-type":"application/json","x-api-key":key,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},body:JSON.stringify({model,max_tokens:2500,messages:[{role:"user",content:text}]})});
+    else r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`,{method:"POST",signal,headers:{"content-type":"application/json","x-goog-api-key":key},body:JSON.stringify({contents:[{parts:[{text}]}]})});
+  }catch(e){if(e&&e.name==="AbortError")throw{code:"cancelled"};throw{code:"network"}}
+  if(r.status===401||r.status===403)throw{code:"auth"};
+  if(r.status===404||r.status===400)throw{code:"model"};
+  if(r.status===429)throw{code:"rate"};
+  if(!r.ok)throw{code:"network"};
+  const j=await r.json();
+  const out=p==="openai"?j.choices?.[0]?.message?.content:p==="anthropic"?(j.content||[]).map(c=>c.text||"").join(""):(j.candidates?.[0]?.content?.parts||[]).map(x=>x.text||"").join("");
+  if(!out)throw{code:"refused"};return out}
+let aiReq=null;
+function askAI(prompt,{json=true,signal}={}){
+  return new Promise((resolve,reject)=>{
+    const st=settings(),pr=protect(prompt);
+    const finish=(raw)=>{try{const t=restore(raw,pr.map);closeAI();resolve(json?parseJSONLoose(t):t)}catch(e){aiReq&&(aiReq.err=errMsg(e.code));drawAI()}};
+    aiReq={pr,json,mode:st.aiMode,step:st.aiMode==="api"&&!st.preview?"sending":"ready",err:"",resolve,reject,finish};
+    if(signal)signal.addEventListener("abort",()=>{if(aiReq){const r=aiReq.reject;closeAI();r({code:"cancelled"})}});
+    drawAI();
+    if(aiReq.step==="sending")sendAPI(signal);
+  })}
+async function sendAPI(signal){const q=aiReq;if(!q)return;q.step="sending";q.err="";drawAI();
+  try{const out=await callAPI(q.pr.text,signal);if(aiReq===q)q.finish(out)}
+  catch(e){if(aiReq!==q)return;if(e.code==="cancelled"){const r=q.reject;closeAI();r(e);return}q.step="ready";q.err=errMsg(e.code);drawAI()}}
+function closeAI(){aiReq=null;$("#aiRoot").innerHTML=""}
+function drawAI(){
+  const q=aiReq,r=$("#aiRoot");if(!q){r.innerHTML="";return}
+  const st=settings(),api=q.mode==="api";
+  const privacy=`<p class="tiny muted">已自動把 ${q.pr.map.length} 個人名換成代號${q.pr.masked?`，遮蔽 ${q.pr.masked} 筆電話、Email 或證號`:""}。AI 回覆後，代號會在你的裝置上換回真名。</p>`;
+  const preview=`<details><summary class="small" style="cursor:pointer;color:var(--accent)">看看實際送出的內容（${q.pr.text.length} 字）</summary><pre class="aipre">${esc(q.pr.text)}</pre></details>`;
+  let body;
+  if(api){
+    body=q.step==="sending"?`<div class="thinking"><i></i>正在送到 ${esc(PROVIDERS[st.provider].name)}，請稍候……</div>`
+     :`<p>將用你的 ${esc(PROVIDERS[st.provider].name)} 金鑰整理。</p>${privacy}${preview}<div class="row"><button class="btn" data-act="ai-send">送出</button><button class="btn ghost" data-act="ai-switch-copy">這次改用複製貼上</button></div>`;
+  }else{
+    body=`<ol class="aisteps">
+     <li><b>複製下面這段文字</b>${privacy}<div class="row"><button class="btn" data-act="ai-copy">複製</button></div>${preview}</li>
+     <li><b>打開你常用的 AI，貼上送出</b><div class="row">${CHATS.map(([n,u])=>`<a class="btn sm quiet" href="${u}" target="_blank" rel="noopener noreferrer">打開 ${n}</a>`).join("")}</div><p class="tiny muted">建議用「臨時對話」或關閉「用我的內容改善模型」，日記比較不會被保留或拿去訓練。</p></li>
+     <li><b>把 AI 的整段回覆複製回來，貼在這裡</b><textarea id="ai-paste" placeholder="${q.json?"貼上 AI 的回覆（會有一段大括號 { } 包起來的內容）":"貼上 AI 的回覆"}"></textarea><div class="row"><button class="btn" data-act="ai-done">完成</button></div></li></ol>`;
+  }
+  r.innerHTML=`<div class="ai-ov"><div class="ai-box" role="dialog" aria-modal="true" aria-label="用你的 AI 整理"><div class="sheet-top"><h2>用你的 AI 整理</h2><button class="btn sm ghost" data-act="ai-cancel">取消</button></div>
+   <div class="sheet-body">${q.err?`<p class="notice warn">${esc(q.err)}</p>`:""}${body}</div></div></div>`}
+const AI=Object.assign((p,o)=>askAI(p,{json:false,signal:o&&o.signal}).then(t=>({text:t})),{json:(p,o)=>askAI(p,{json:true,signal:o&&o.signal})});
+
+/* ============================================================
+   writing calendar, backup reminder, delete everything
+   ============================================================ */
+function streakInfo(){
+  const days=new Set(entries().map(e=>e.date));let n=0;const d=new Date();
+  if(!days.has(today()))d.setDate(d.getDate()-1);
+  while(days.has(`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`)){n++;d.setDate(d.getDate()-1)}
+  return{days,streak:n,todayDone:days.has(today())}}
+function homeCalendar(){
+  const {days,streak,todayDone}=streakInfo();if(!entries().length)return "";
+  const cells=[];const end=new Date();const start=new Date();start.setDate(end.getDate()-7*12+1-((end.getDay()+6)%7)+((end.getDay()+6)%7));
+  const s=new Date();s.setDate(s.getDate()-83);s.setDate(s.getDate()-((s.getDay()+6)%7));
+  for(let d=new Date(s);d<=end;d.setDate(d.getDate()+1)){const k=`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;cells.push(`<i class="${days.has(k)?"on":""}${k===today()?" today":""}" title="${k}"></i>`)}
+  return `<div class="card stack"><div class="spread"><h2 style="font-size:20px">寫作日曆</h2><span class="small ${todayDone?"":"muted"}">${todayDone?"今天寫了":"今天還沒寫"}${streak>1?` · 連續 ${streak} 天`:""}</span></div>
+   <div class="cal" aria-label="最近 12 週有寫紀錄的日子">${cells.join("")}</div><p class="tiny muted">每一格是一天，有寫紀錄的日子會亮起來。</p></div>`}
+function backupNote(){
+  const n=entries().length;if(n<3)return "";const last=local.get("xinlu-lastbackup",0),d=last?Math.floor((Date.now()-last)/864e5):null;
+  if(d!==null&&d<14)return "";
+  return `<p class="notice warn">${d===null?"你還沒有備份過。":`上次備份是 ${d} 天前。`}資料只存在這台裝置，換手機或清除瀏覽器資料就會不見。<button class="linkbtn" data-act="export">現在備份</button></p>`}
+async function wipeAll(){for(const c of COLS)S[c]=new Map();try{if(mode==="device"){await IDB.clear("cols");await IDB.clear("media")}}catch(e){}
+  try{["xinlu-local-v1","xinlu-settings","xinlu-lastbackup","xinlu-key-openai","xinlu-key-anthropic","xinlu-key-gemini","xinlu-welcomed","xinlu-view"].forEach(k=>localStorage.removeItem(k))}catch(e){}
+  memKeys={};mediaCache.clear();closeSheet();go("home");toast("所有資料都已刪除")}
+
+/* ============================================================
+   settings / welcome / assistant sheets
+   ============================================================ */
+function shSettings(){
+  const st=settings(),p=st.provider,key=getKey(p);
+  return top_("設定")+`<div class="sheet-body">
+   <div class="stack"><p class="label">AI 整理的方式</p>
+    <div class="optcards">
+     <button type="button" class="optc" data-act="set-mode" data-m="copy" aria-pressed="${st.aiMode==="copy"}"><b>複製貼上</b><span>用你自己的 ChatGPT、Claude 或 Gemini，免費帳號也可以。多兩次複製貼上。</span></button>
+     <button type="button" class="optc" data-act="set-mode" data-m="api" aria-pressed="${st.aiMode==="api"}"><b>我的 API 金鑰</b><span>按一下就整理，費用由你自己的 AI 帳號支付。適合常用的人。</span></button>
+    </div>
+    <button type="button" class="optc wide" data-act="open-assistant"><b>心路助手範本</b><span>想直接在 ChatGPT、Claude、Gemini 裡聊天寫日記？用這份設定建立你自己的助手。</span></button></div>
+   ${st.aiMode==="api"?`<div class="card stack" style="box-shadow:none">
+    <div class="field"><label for="st-prov">AI 服務</label><select class="inp" id="st-prov">${Object.entries(PROVIDERS).map(([k,v])=>`<option value="${k}" ${k===p?"selected":""}>${v.name}</option>`).join("")}</select></div>
+    <div class="field"><label for="st-key">API 金鑰</label><input class="inp" id="st-key" type="password" autocomplete="off" spellcheck="false" placeholder="${PROVIDERS[p].keyHint}" value="${esc(key)}"><p class="hint">金鑰只存在這台裝置，不會傳到任何地方，只用來直接呼叫 ${PROVIDERS[p].name}。<a href="${PROVIDERS[p].doc}" target="_blank" rel="noopener noreferrer" style="color:var(--accent)">取得金鑰 ↗</a></p></div>
+    <label class="row small" for="st-remember"><input type="checkbox" id="st-remember" ${st.remember?"checked":""} style="accent-color:var(--accent)">記住金鑰（共用的手機或電腦請不要勾）</label>
+    <div class="field"><label for="st-model">模型名稱</label><input class="inp" id="st-model" value="${esc((st.models&&st.models[p])||PROVIDERS[p].model)}" spellcheck="false"><p class="hint">預設是較便宜的模型。名稱會隨時間更新，如果出現「模型名稱不正確」，請到該平台查最新名稱。</p></div>
+    <label class="row small" for="st-preview"><input type="checkbox" id="st-preview" ${st.preview?"checked":""} style="accent-color:var(--accent)">每次送出前，先讓我看要送出的內容</label>
+    <div class="row"><button class="btn sm" data-act="save-key">儲存金鑰設定</button>${key?`<button class="btn sm danger" data-act="clear-key">刪除金鑰</button>`:""}</div></div>`:""}
+   <div class="card stack" style="box-shadow:none"><p class="label">隱私保護</p>
+    <p class="small">送給任何 AI 之前，心路會自動：把你記下的人物名字換成「人物A、人物B」這類代號；遮蔽電話、Email、身分證字號、卡號。AI 回覆後，代號只在你的裝置上換回真名。</p>
+    <div class="field"><label for="st-mask">其他也要遮蔽的字詞</label><textarea id="st-mask" style="min-height:70px" placeholder="一行一個，例如你的名字、公司名稱、住的地方">${esc(st.maskWords||"")}</textarea><div><button class="btn sm quiet" data-act="save-mask">儲存</button></div></div></div>
+   <div class="card stack" style="box-shadow:none"><p class="label">我的資料</p>
+    <p class="small">所有紀錄只存在這台裝置的瀏覽器裡，心路沒有伺服器，沒有人看得到你的日記。請定期備份，換手機時用備份還原。</p>
+    <div class="row"><button class="btn sm" data-act="export">匯出備份</button><button class="btn sm ghost" data-act="import">從備份還原</button></div>
+    <div class="row">${sheet.confirmWipe?`<span class="small">確定要刪除這台裝置上所有心路資料嗎？無法復原，建議先備份。</span><button class="btn sm danger" data-act="wipe-yes">全部刪除</button><button class="btn sm ghost" data-act="wipe-no">取消</button>`:`<button class="linkbtn" style="color:var(--warn)" data-act="wipe">刪除我的所有資料</button>`}</div></div>
+  </div>`}
+function installHelp(){
+  return `<div class="kv"><div><b>iPhone（Safari）</b><p>按下方的「分享」按鈕，往下找「加入主畫面」。</p></div><div><b>Android（Chrome）</b><p>按右上角「⋮」，選「安裝應用程式」或「加到主畫面」。</p></div>${installEvt?`<div><button class="btn sm" data-act="install">直接安裝到這台裝置</button></div>`:""}</div>`}
+function shWelcome(){
+  return top_("歡迎來到心路")+`<div class="sheet-body">
+   <p class="need">每天寫一點，累積久了，就看得見自己心裡反覆發生的事。</p>
+   <div class="kv">
+    <div><b>你的資料只在你這裡</b><p>心路沒有帳號、沒有伺服器。日記只存在這台裝置，別人看不到，也不會被拿去做任何用途。記得定期備份。</p></div>
+    <div><b>用你自己的 AI 整理</b><p>想讓 AI 幫你整理時，可以用你平常的 ChatGPT、Claude 或 Gemini。送出前，人名會自動換成代號，電話、Email 等資料會被遮蔽。</p></div>
+    <div><b>這不是心理諮商</b><p>心路是自我紀錄和心理衛教工具，AI 的整理只是歸納，不是診斷。如果你正在經歷困難，請找專業的人一起面對。</p></div>
+    <div><b>需要幫忙的時候</b><p>右上角的「求助」隨時都在。撐不下去時，請打安心專線 1925（24 小時）或生命線 1995，緊急時撥 119。</p></div>
+   </div>
+   <div class="card stack" style="box-shadow:none"><p class="label">放到手機桌面，每天打開</p>${installHelp()}</div>
+   <div class="row"><button class="btn" data-act="welcome-ok">開始使用</button><button class="btn ghost" data-act="welcome-ex">先看範例</button></div>
+  </div>`}
+function assistantPrompt(){
+  return `你是「心路助手」，陪使用者寫日記、整理心情的助手。你不是治療師，不做診斷，也不使用任何診斷名詞。全程使用繁體中文，語氣溫和、具體，盡量沿用使用者自己的用詞。
+
+【你的工作】
+1. 使用者寫下一段日記或心情時，先簡短回應他的感受（一兩句就好），再幫他把這件事拆成：事件、當下的想法、情緒、身體反應、做了什麼或想做什麼，以及這個反應背後可能的需要。推論時用「可能」的語氣。
+2. 指出 1 到 3 個可能的課題（4 到 10 字的中性描述，例如「害怕被否定」「界線難以說出口」），以及文中出現的重要人物和他們的角色。
+3. 從知識檔「心路方法庫」裡挑 2 到 3 個適合這次的方法，說明為什麼適合，並給出具體步驟。
+4. 列出 2 到 3 個他可以帶去和諮商師或信任的人討論的問題。
+5. 如果使用者以前在這個對話或專案裡寫過其他日記，可以溫和地指出可能重複出現的模式。
+
+【隱私】
+使用者可能用「［人物A］」這類代號代替真名，請直接沿用代號，不要猜測或追問真名，也不要要求使用者提供電話、地址、證號等個人資料。
+
+【安全】
+如果使用者提到想傷害自己、自殺念頭，或正處於被傷害的危險中，先停下整理，溫和地表達關心，並提供台灣的求助管道：安心專線 1925（24 小時）、生命線 1995、張老師 1980、緊急時撥 119 或 110，鼓勵他現在就聯絡專業人員或信任的人。
+
+【存回心路】
+當使用者說「存成心路格式」時，只輸出一個 JSON 物件（可以放在程式碼區塊裡），格式如下，讓他貼回心路 App：
+{"xinlu":1,"date":"YYYY-MM-DD","text":"使用者這篇日記的原文","analysis":{"summary":"一句話核心（20字內）","chain":{"event":"","thought":"","emotion":[""],"body":"","behavior":""},"need":"","people":[{"name":"","relation":"","stage":"童年|青少年|成年|現在|未知","role":""}],"themes":[{"name":"","why":""}],"pattern":"","methods":[{"id":"方法庫裡的 id","why":""}],"questions":[""],"risk":false}}
+risk 只有在出現自傷、自殺念頭或立即危險時才設為 true。`}
+function knowledgeMD(){
+  const L=["# 心路方法庫與研究庫","","給「心路助手」參考的知識檔。方法的 id 用於「存成心路格式」。","","## 方法庫",""];
+  CATS.filter(c=>c[0]!=="weekly").forEach(([k,n])=>{L.push(`### ${n}`,"");METHODS.filter(m=>m.cat===k).forEach(m=>{L.push(`#### ${m.name}（id: ${m.id}）`,`- 適合：${m.when}`,`- 說明：${m.what}`,`- 依據：${m.refs.map(r=>researchById(r)?.cite).filter(Boolean).join("；")||"臨床常用做法"}`,m.withCounselor?"- 注意：建議和諮商師一起做":"","- 步驟：",...m.steps.map((s,i)=>`  ${i+1}. ${s}`),"")})});
+  L.push("## 研究庫","");RESEARCH.forEach(r=>L.push(`### ${r.title}`,`- 出處：${r.cite}`,`- 發現：${r.finding}`,`- 意義：${r.meaning}`,`- 限制：${r.limits}`,`- 連結：${r.url}`,""));
+  L.push("## 台灣求助資源","- 衛福部安心專線 1925（24 小時）","- 生命線 1995","- 張老師 1980","- 保護專線 113","- 緊急狀況 119、110");
+  return L.filter(x=>x!==null).join("\n")}
+function shAssistant(){
+  return top_("心路助手範本")+`<div class="sheet-body">
+   <p>想直接在聊天裡寫日記？把下面的設定放進你自己的 AI，它就會用心路的方式陪你整理。對話和紀錄留在你自己的 AI 帳號裡。</p>
+   <div class="stack"><p class="label">第一步：準備兩份資料</p>
+    <div class="row"><button class="btn sm" data-act="copy-assist">複製助手指示</button><button class="btn sm ghost" data-act="dl-knowledge">下載知識檔（方法與研究）</button></div>
+    <details><summary class="small" style="cursor:pointer;color:var(--accent)">看看助手指示的內容</summary><pre class="aipre">${esc(assistantPrompt())}</pre></details></div>
+   <div class="stack"><p class="label">第二步：放進你的 AI</p>
+    <div class="kv">
+     <div><b>ChatGPT</b><p>到「探索 GPT」→「建立」→「設定」，把指示貼進「指示」欄位，知識檔上傳到「知識」。建立自訂 GPT 需要付費方案；免費帳號可以在每次對話開頭貼上指示。</p></div>
+     <div><b>Claude</b><p>建立一個「專案」，把指示貼進專案的自訂指示，知識檔加到專案知識裡。之後在這個專案裡開對話寫日記。</p></div>
+     <div><b>Gemini</b><p>建立一個「Gem」，把指示貼進說明欄位，知識檔加入知識。</p></div></div>
+    <p class="tiny muted">各平台的功能名稱和方案會調整，以實際畫面為準。</p></div>
+   <div class="stack"><p class="label">第三步：存回心路（選用）</p><p class="small">寫完後跟助手說「存成心路格式」，把它給你的那段內容複製下來，到心路的「紀錄」按「從 AI 對話貼上」，就能存進來、長進你的地圖。</p></div>
+   <p class="notice">提醒：在 AI 平台裡寫的內容，會依照該平台的隱私政策保存。建議關閉「用我的內容改善模型」，提到別人時用代號或稱呼就好。</p>
+  </div>`}
+function shPasteChat(){
+  return top_("從 AI 對話貼上")+`<div class="sheet-body">
+   <p class="small">在心路助手的對話裡說「存成心路格式」，把它回覆的整段內容貼在這裡。</p>
+   <textarea id="pc-text" class="big" placeholder='{"xinlu":1, "date":"…", "text":"…", "analysis":{…}}'></textarea>
+   ${sheet.err?`<p class="notice warn">${esc(sheet.err)}</p>`:""}
+   <div class="row"><button class="btn" data-act="pc-save">存進心路</button></div></div>`}
+async function savePastedChat(){
+  let o;try{o=parseJSONLoose($("#pc-text").value)}catch(e){sheet.err="讀不出內容。請確認貼上的是助手給你的整段「心路格式」。";drawSheet();return}
+  const text=String(o.text||"").trim();if(!text){sheet.err="內容裡沒有日記原文（text）。";drawSheet();return}
+  const date=/^\d{4}-\d{2}-\d{2}$/.test(o.date||"")?o.date:today();
+  const e={id:uid(),type:"journal",date,title:"",text:text.slice(0,30000),mood:0,people:[],stage:"",themes:[],asked:{},source:"assistant",createdAt:Date.now()};
+  await put("entries",e);
+  try{if(o.analysis){const a=cleanAnalysis(o.analysis);const c=clone(S.entries.get(e.id));c.analysis=a;c.applied=false;await put("entries",c);await applyCore(e.id,a.people.map((_,i)=>i),a.themes.map((_,i)=>i))}}catch(err){}
+  sheet={kind:"entry",id:e.id};drawSheet();toast("已存進心路")}
+function downloadText(name,text,type){const b=new Blob([text],{type:type||"application/json"});const u=URL.createObjectURL(b);const a=document.createElement("a");a.href=u;a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(u);a.remove()},1000)}
+
+
+/* ============================================================
+   derived helpers
+   ============================================================ */
+const people=()=>[...S.people.values()].sort((a,b)=>(a.name||"").localeCompare(b.name||"","zh-Hant"));
+const entries=()=>[...S.entries.values()].sort((a,b)=>(b.date||"").localeCompare(a.date||"")||(b.createdAt||0)-(a.createdAt||0));
+const themes=()=>[...S.themes.values()];
+const steps=()=>[...S.steps.values()].sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+const pName=id=>S.people.get(id)?.name||"（已刪除）";
+const tName=id=>S.themes.get(id)?.name||"（已刪除）";
+const entriesOfPerson=pid=>entries().filter(e=>(e.people||[]).includes(pid));
+const entriesOfTheme=tid=>entries().filter(e=>(e.themes||[]).includes(tid));
+const sessions=()=>entries().filter(e=>e.type==="session");
+const hasExamples=()=>COLS.some(c=>[...S[c].values()].some(x=>x.ex));
+function typeLabel(e){return e.type==="session"?"諮商":e.type==="letter"?"信":"日記"}
+function entryTitle(e){
+  if(e.type==="letter")return e.title||`給${pName(e.to)}的信`;
+  if(e.title)return e.title;
+  if(e.type==="session")return `第 ${e.no||"?"} 次諮商`;
+  const t=(e.text||"").trim().split(/\n/)[0];return t.length>24?t.slice(0,24)+"…":(t||"沒有標題的日記")}
+function entryText(e){
+  if(e.type!=="session")return e.text||"";
+  return [e.talk&&`談了什麼：${e.talk}`,e.said&&`諮商師說：${e.said}`,e.insight&&`我的領悟：${e.insight}`,e.homework&&`回家作業：${e.homework}`,e.next&&`下次想談：${e.next}`].filter(Boolean).join("\n")}
+function themeStats(){
+  return themes().map(t=>{const es=entriesOfTheme(t.id);return{t,n:es.length,last:es[0]?.date||""}}).sort((a,b)=>b.n-a.n)}
+
+/* ============================================================
+   router + render
+   ============================================================ */
+const VIEWS=[["home","今天",'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>'],
+ ["log","紀錄",'<path d="M5 4h11l3 3v13H5z"/><path d="M9 10h6M9 14h6"/>'],
+ ["map","地圖",'<circle cx="6" cy="17" r="2.5"/><circle cx="12" cy="7" r="2.5"/><circle cx="18" cy="16" r="2.5"/><path d="M7.5 15l3.4-6M13.4 9l3.3 5M8.5 17h7"/>'],
+ ["people","人物",'<circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c.8-3.4 3-5 5.5-5s4.7 1.6 5.5 5"/><circle cx="17" cy="9" r="2.4"/><path d="M15.5 14.2c2.4-.3 4.3 1.2 5 4.3"/>'],
+ ["methods","方法",'<path d="M12 3l2.6 5.4 5.9.8-4.3 4.1 1 5.8L12 16.4 6.8 19.1l1-5.8L3.5 9.2l5.9-.8z"/>']];
+let view=local.get("xinlu-view","home");if(!VIEWS.some(v=>v[0]===view)&&view!=="about")view="home";
+let mapMode="net", logFilter="all", logQuery="", methodCat="all", peopleStage="all";
+$("#topnav").innerHTML=VIEWS.map(v=>`<button type="button" data-view="${v[0]}">${v[1]}</button>`).join("");
+$("#tabs").innerHTML=VIEWS.map(v=>`<button type="button" data-view="${v[0]}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${v[2]}</svg>${v[1]}</button>`).join("");
+function go(v){view=v;local.set("xinlu-view",v);render();window.scrollTo(0,0)}
+let rq=0;function schedule(){if(rq)return;rq=requestAnimationFrame(()=>{rq=0;render();refreshSheet()})}
+
+function render(){
+  $$("[data-view]").forEach(b=>b.dataset.view===view?b.setAttribute("aria-current","page"):b.removeAttribute("aria-current"));
+  if(mode==="loading"){$("#main").innerHTML=`<p class="loading">正在打開你的心路……</p>`;return}
+  const html={home:vHome,log:vLog,map:vMap,people:vPeople,methods:vMethods,about:vAbout}[view]();
+  const keepScroll=window.scrollY;
+  $("#main").innerHTML=html+vFoot();
+  if(view==="map"&&mapMode==="net")mountGraph();
+  window.scrollTo(0,keepScroll);
+}
+
+function statusNote(){return backupNote()}
+
+/* ---------------- home ---------------- */
+function vHome(){
+  const d=new Date(),h=d.getHours();
+  const hello=h<5?"夜深了":h<11?"早安":h<18?"午安":"晚上好";
+  const es=entries(),todo=steps().filter(s=>s.status!=="done").slice(0,5);
+  const lastS=sessions()[0];
+  const qs=[];es.filter(e=>!lastS||(e.date||"")>=(lastS.date||"")).forEach(e=>(e.analysis?.questions||[]).forEach((q,i)=>qs.push({e,q,i,done:!!(e.asked||{})[i]})));
+  const ts=themeStats().filter(x=>x.n>0&&(S.themes.get(x.t.id)?.status||"facing")!=="walked").slice(0,5),max=Math.max(1,...ts.map(x=>x.n));
+  const nu=unanalyzed("all").length;
+  return `<section class="view">${statusNote()}
+  <div class="hello"><p class="date">${d.getMonth()+1} 月 ${d.getDate()} 日 星期${"日一二三四五六"[d.getDay()]}</p><h1>${hello}</h1></div>
+  <div class="actions">
+    <button type="button" class="action" data-act="new" data-type="journal"><i>日記</i><b>寫下此刻</b></button>
+    <button type="button" class="action session" data-act="new" data-type="session"><i>諮商</i><b>記錄諮商</b></button>
+    <button type="button" class="action tool" data-act="import-old"><i>匯入</i><b>舊日記</b></button>
+    <button type="button" class="action tool" data-act="${nu?"batch":"go-review"}" data-scope="all"><i>${nu?"AI 整理":"回顧"}</i><b>${nu?`整理 ${nu} 篇`:"整體回顧"}</b></button>
+  </div>
+  ${homeCalendar()}
+  ${homeQuote()}
+  ${homeWeekly()}
+  ${es.length?"":`<div class="row"><button class="btn quiet sm" data-act="examples">載入範例</button><button class="btn ghost sm" data-view="about">認識心路</button></div>`}
+  ${installEvt?`<div><button class="btn sm ghost" data-act="install">安裝到桌面</button></div>`:""}
+  ${es.length?`<div class="cols">
+   <div class="stack">
+    <div class="card stack"><div class="spread"><h2 style="font-size:20px">我的下一步</h2><button class="linkbtn" data-goto="methods">方法庫</button></div>
+     ${todo.length?`<div class="steplist">${todo.map(s=>{const m=methodById(s.methodId),e=S.entries.get(s.entryId);return `<div class="step"><span class="dot"></span><div><b>${esc(m?.name||"自訂")}</b>${s.ex?' <span class="badge ex">範例</span>':""}<span class="sub">${e?esc(entryTitle(e)):esc(s.note||"")}</span></div><button class="btn sm quiet" data-act="done-step" data-id="${s.id}">做完了</button></div>`}).join("")}</div>`:`<p class="small muted">還沒有</p>`}
+    </div>
+    ${prepCard()}
+   </div>
+   <div class="stack">
+    <div class="card stack"><div class="spread"><h2 style="font-size:20px">正在面對的課題</h2><button class="linkbtn" data-act="journey">旅程</button></div>
+     ${ts.length?`<div class="themebar">${ts.map(x=>`<button type="button" class="tb" data-act="open-theme" data-id="${x.t.id}"><b style="color:var(--theme);font-weight:500">${esc(x.t.name)}</b><span>${x.n} 篇</span><span class="track"><i style="width:${x.n/max*100}%"></i></span></button>`).join("")}</div>`:`<p class="small muted">還沒有</p>`}
+    </div>
+    <div class="card stack"><div class="spread"><h2 style="font-size:20px">最近的紀錄</h2><button class="linkbtn" data-goto="log">全部</button></div>
+     <div class="stack">${es.slice(0,4).map(e=>`<button type="button" class="mini-e" data-act="open-entry" data-id="${e.id}"><span>${fmtD(e.date)}</span>${esc(entryTitle(e))}</button>`).join("")}</div>
+    </div>
+   </div></div>`:""}
+  </section>`}
+
+/* ---------------- about ---------------- */
+function vAbout(){
+  const sec=(t,b)=>`<div class="card stack"><h2 style="font-size:21px">${t}</h2>${b}</div>`;
+  return `<section class="view"><div class="head"><h1>認識心路</h1><p class="muted">每天寫一點，累積久了，就看得見自己心裡反覆發生的事。</p></div>
+  ${sec("怎麼運作",`<div class="how"><div><em>一</em><b>記下來</b><p class="small muted">寫日記，或在每次諮商後記下重點。標記跟誰有關、發生在人生哪個階段。也可以匯入以前的日記。</p></div>
+    <div><em>二</em><b>整理它</b><p class="small muted">用你自己的 AI，把一件事拆成事件、想法、情緒、身體和反應，找出背後的課題，建議可以試的方法。</p></div>
+    <div><em>三</em><b>看見路</b><p class="small muted">人物、課題、方法會連成一張地圖。累積越久，越看得清楚自己一直在面對的是什麼。</p></div></div>`)}
+  ${sec("放到手機桌面",installHelp())}
+  ${sec("每個頁面",`<div class="kv">
+    <div><b>今天</b><p>寫日記、記錄諮商、寫作日曆、給今天的你、準備下次諮商、你的下一步和正在面對的課題。</p></div>
+    <div><b>紀錄</b><p>所有日記、諮商紀錄和寫給別人的信，可以搜尋。點開一篇就能整理、選下一步、收藏一句話。</p></div>
+    <div><b>地圖</b><p>「心智網絡」把人物、課題、方法連成一張網；「旅程」依人生階段排列；「回顧」一次讀完所有紀錄，找出重複出現的模式。</p></div>
+    <div><b>人物</b><p>每個人的頁面可以記下你希望他知道的、你的界線、還沒說出口的話，也可以寫一封不寄出的信。</p></div>
+    <div><b>方法</b><p>方法庫有十類方法，每個都標示依據強度；研究庫收錄研究的發現、對你的意義和限制。</p></div></div>`)}
+  ${sec("AI 整理的三種方式",`<div class="kv">
+    <div><b>複製貼上</b><p>心路幫你準備好要給 AI 的文字，你貼到自己的 ChatGPT、Claude 或 Gemini，再把回覆貼回來。免費帳號也能用。</p></div>
+    <div><b>我的 API 金鑰</b><p>在「設定」填入你自己的金鑰，按一下就整理。費用由你自己的 AI 帳號支付，金鑰只存在你的裝置。</p></div>
+    <div><b>心路助手範本</b><p>在 ChatGPT、Claude 或 Gemini 裡建立自己的助手，直接聊天寫日記，再把結果存回心路。</p></div></div>
+    <p class="small muted">AI 只負責歸納，不做診斷。重要的理解，請和專業的人一起確認。</p>`)}
+  ${sec("隱私與 AI 風險",`<div class="kv">
+    <div><b>沒有伺服器</b><p>心路是一個靜態網站，沒有帳號、沒有資料庫、沒有追蹤。你的日記只存在這台裝置的瀏覽器裡。</p></div>
+    <div><b>送出前自動保護</b><p>交給 AI 之前，人名會換成「人物A」這類代號，電話、Email、身分證字號、卡號會被遮蔽，你也可以在設定加上其他要遮蔽的字詞。每次都能先看實際送出的內容。</p></div>
+    <div><b>你選的 AI 服務</b><p>送出的內容會依照該服務的隱私政策處理。建議關閉「用我的內容改善模型」，或使用臨時對話。</p></div>
+    <div><b>AI 可能出錯</b><p>AI 的整理可能不準，也可能過度解讀。哪些說法貼近你，由你決定；不貼近的，按 × 拿掉就好。</p></div>
+    <div><b>記得備份</b><p>換手機或清除瀏覽器資料，紀錄就會不見。請定期「匯出備份」，存到自己的雲端硬碟。</p></div></div>`)}
+  ${sec("每週心理學新知",`<p>每週會整理最近發表的心理學研究，挑出可以用在生活和人際關係上的幾篇，放進「研究庫」的每週新知。</p>`)}
+  ${sec("匯入舊日記",`<p>可以一次選很多個 .txt 檔，或直接貼上內容。以日期開頭的那一行會被當成新的一篇，例如「2019/3/5」「2019-03-05」「2019年3月5日」「108/3/5」（民國年）。Big5 編碼的舊檔案也讀得出來。</p>`)}
+  ${sec("需要幫忙的時候",`<p>心路是自我紀錄和心理衛教工具，不是心理諮商。右上角的「求助」隨時都在。撐不下去時，請打安心專線 1925 或生命線 1995，緊急時撥 119。</p>`)}
+  <div class="row"><button class="btn" data-view="home">開始使用</button>${entries().length?"":`<button class="btn quiet" data-act="examples">載入範例看看</button>`}</div>
+  </section>`}
+
+/* ---------------- log ---------------- */
+function vLog(){
+  const q=logQuery.trim();
+  const list=entries().filter(e=>logFilter==="all"||e.type===logFilter).filter(e=>!q||(entryTitle(e)+entryText(e)+(e.people||[]).map(pName).join("")).includes(q));
+  return `<section class="view">${statusNote()}<div class="head spread"><h1>紀錄</h1><div class="row"><button class="btn sm" data-act="new" data-type="journal">寫日記</button><button class="btn sm ghost" data-act="new" data-type="session">記錄諮商</button><button class="btn sm quiet" data-act="import-old">匯入舊日記</button><button class="btn sm quiet" data-act="paste-chat">從 AI 對話貼上</button></div></div>
+  <div class="row"><div class="seg">${[["all","全部"],["journal","日記"],["session","諮商"],["letter","信"]].map(f=>`<button type="button" data-act="logf" data-f="${f[0]}" aria-pressed="${logFilter===f[0]}">${f[1]}</button>`).join("")}</div>
+  <input class="search" id="logq" type="search" placeholder="搜尋內容或人物" value="${esc(logQuery)}" style="flex:1;min-width:180px"></div>
+  ${list.length?`<div class="elist">${list.map(rowEntry).join("")}</div>`:`<p class="muted">${entries().length?"沒有符合的紀錄。":"還沒有紀錄。從寫下第一篇開始吧。"}</p>`}
+  </section>`}
+function mediaChip(e){const ms=e.media||[];if(!ms.length)return "";const ni=ms.filter(m=>m.kind==="image").length,na=ms.length-ni;return `<span class="chip s">${[ni?`照片 ${ni}`:"",na?`錄音 ${na}`:""].filter(Boolean).join(" · ")}</span>`}
+function rowEntry(e){
+  const [y,m,d]=(e.date||"").split("-");const mo=moodOf(e.mood);
+  return `<button type="button" class="erow" data-act="open-entry" data-id="${e.id}">
+   <span class="when"><b>${+d||""}</b><span>${y?`${y}/${+m}`:""}</span>${mo?`<span class="mood" style="background:${mo[2]}" title="${mo[1]}"></span>`:""}</span>
+   <span class="body"><span class="row"><span class="badge ${e.type}">${typeLabel(e)}</span>${e.ex?'<span class="badge ex">範例</span>':""}<span class="title">${esc(entryTitle(e))}</span></span>
+   <span class="ex">${esc(entryText(e))}</span>
+   <span class="row">${(e.people||[]).map(p=>`<span class="chip p">${esc(pName(p))}</span>`).join("")}${(e.themes||[]).map(t=>`<span class="chip t">${esc(tName(t))}</span>`).join("")}${mediaChip(e)}${e.analysis?"":'<span class="chip s">尚未整理</span>'}</span></span>
+  </button>`}
+
+/* ---------------- people ---------------- */
+function vPeople(){
+  const ps=people();
+  const byStage=s=>ps.filter(p=>(p.stages||[]).includes(s));
+  const none=ps.filter(p=>!(p.stages||[]).length);
+  const card=p=>{const n=entriesOfPerson(p.id).length;return `<button type="button" class="pcard" data-act="open-person" data-id="${p.id}"><span class="nm"><span class="av">${esc((p.name||"?").slice(0,1))}</span><span><b>${esc(p.name)}</b><br><span class="rel">${esc(p.relation||"")}</span></span></span><span class="meta">${n} 篇紀錄${p.ex?" · 範例":""}</span></button>`};
+  const stages=peopleStage==="all"?STAGES:[peopleStage];
+  return `<section class="view">${statusNote()}<div class="head spread"><div><h1>人物</h1><p class="muted">在你的生命裡，對你影響深的人。</p></div><button class="btn sm" data-act="new-person">新增人物</button></div>
+  <div class="row">${["all",...STAGES].map(s=>`<button type="button" class="pick" data-act="pstage" data-s="${s}" aria-pressed="${peopleStage===s}">${s==="all"?"全部階段":s}</button>`).join("")}</div>
+  ${ps.length?`<div class="stagegrid">${stages.map(s=>{const l=byStage(s);return `<div class="stage"><h3>${s}<span>${STAGE_HINT[s]} · ${l.length} 人</span></h3>${l.length?`<div class="pgrid">${l.map(card).join("")}</div>`:`<p class="small muted" style="margin-top:6px">還沒有這個階段的人物。</p>`}</div>`}).join("")}
+   ${peopleStage==="all"&&none.length?`<div class="stage"><h3>還沒標記階段</h3><div class="pgrid">${none.map(card).join("")}</div></div>`:""}</div>`
+   :`<div class="card"><p class="muted">還沒有人物。寫紀錄時可以直接新增，整理紀錄時 AI 也會找出文中提到的人。</p></div>`}
+  </section>`}
+
+/* ---------------- weekly ---------------- */
+const isFresh=iss=>{const t=Date.parse(iss);return t&&Date.now()-t<8*864e5};
+function homeWeekly(){const w=weeklyIssues()[0];if(!w)return "";
+  return `<button type="button" class="weekcard" data-act="open-weekly"><span class="label" style="color:var(--method)">${isFresh(w.issue)?"本週":"最近一期"}心理學新知 · ${esc(w.issue)}</span><b>${esc(w.title||"這週的心理學研究")}</b>
+   <span class="small muted">${w.items.slice(0,3).map(it=>esc(it&&it.title||"")).join("、")}</span></button>`}
+function vWeekly(){const ws=weeklyIssues();
+  if(!ws.length)return `<div class="card stack"><h2 style="font-size:19px">每週新知</h2><p class="small muted">每週日晚上，會自動搜集最新的心理學研究，挑出可以用在生活和人際關係上的幾篇放進這裡。第一期完成後就會出現。</p></div>`;
+  const w=ws[0];
+  return `<div class="card stack"><div class="spread"><h2 style="font-size:19px">每週新知 · ${esc(w.issue)}</h2>${ws.length>1?`<span class="tiny muted">共 ${ws.length} 期</span>`:""}</div>
+   ${w.intro?`<p class="small">${esc(w.intro)}</p>`:""}
+   <div class="stack">${w.items.map((it,i)=>it&&it.title?`<button type="button" class="rref" data-act="open-research" data-id="WK-${esc(String(w.issue||w.id))}-${i}"><b>${esc(it.title)}</b><span>${esc(it.tryIt||it.meaning||"")}</span></button>`:"").join("")}</div>
+   ${ws.length>1?`<details><summary class="small" style="cursor:pointer;color:var(--accent)">過去幾期</summary><div class="stack" style="margin-top:8px">${ws.slice(1).map(x=>`<p class="small"><b>${esc(x.issue)}</b> ${esc(x.title||"")}</p>`).join("")}</div></details>`:""}</div>`}
+
+/* ---------------- methods + research ---------------- */
+let methodTab="methods", researchArea="all";
+const EVS={strong:"證據強",mid:"有研究支持",theory:"臨床做法"};
+const evTag=k=>`<span class="ev" style="--c:${EVID[k][1]}">${EVS[k]}</span>`;
+function vMethods(){
+  const seg=`<div class="seg"><button type="button" data-act="mtab" data-t="methods" aria-pressed="${methodTab==="methods"}">方法庫 ${allMethods().length}</button><button type="button" data-act="mtab" data-t="research" aria-pressed="${methodTab==="research"}">研究庫 ${allResearch().length}</button></div>`;
+  if(methodTab==="research"){
+    const areas=[...new Set(allResearch().map(r=>r.area))];const list=allResearch().filter(r=>researchArea==="all"||r.area===researchArea);
+    return `<section class="view"><div class="head spread"><div><h1>研究庫</h1><p class="muted">心路裡的方法，背後根據的心理學研究。每篇都寫了它發現什麼、對你的意義，以及它的限制。</p></div>${seg}</div>
+    <div class="row">${["all",...areas].map(a=>`<button type="button" class="pick" data-act="rarea" data-a="${a}" aria-pressed="${researchArea===a}">${a==="all"?"全部":a}</button>`).join("")}</div>
+    ${researchArea==="all"||researchArea==="每週新知"?vWeekly():""}
+    <div class="legend"><span>${evTag("strong")} 多項統合分析支持</span><span>${evTag("mid")} 有實驗或臨床研究</span><span>${evTag("theory")} 理論或臨床取向</span></div>
+    <div class="mgrid">${list.map(r=>`<button type="button" class="mcard rcard" data-act="open-research" data-id="${r.id}"><span class="row" style="justify-content:space-between"><span class="cat" style="color:var(--theme)">${r.area}</span>${evTag(r.ev)}</span><b>${r.weekly&&isFresh(r.issue)?'<span class="badge">新</span> ':""}${r.title}</b><p class="clamp">${r.finding}</p><span class="tiny muted">${r.cite}</span></button>`).join("")}</div></section>`}
+  const list=allMethods().filter(m=>methodCat==="all"||m.cat===methodCat);
+  return `<section class="view"><div class="head spread"><div><h1>方法庫</h1><p class="muted">面對一件事時，你可以選擇的辦法。分成十類，每個方法都標示它的依據。</p></div>${seg}</div>
+  <div class="row">${[["all","全部"],...CATS].map(c=>`<button type="button" class="pick" data-act="mcat" data-c="${c[0]}" aria-pressed="${methodCat===c[0]}">${c[1]}${c[0]==="all"?"":` <span class="tiny">${allMethods().filter(m=>m.cat===c[0]).length}</span>`}</button>`).join("")}</div>
+  <div class="mgrid">${list.map(m=>`<button type="button" class="mcard" data-act="open-method" data-id="${m.id}"><span class="row" style="justify-content:space-between"><span class="cat">${CATS.find(c=>c[0]===m.cat)[1]}</span>${evTag(m.ev)}</span><b>${m.name}</b><p>${m.when}</p>${m.withCounselor?'<span class="with">建議跟諮商師一起做</span>':""}</button>`).join("")}</div>
+  </section>`}
+
+/* ---------------- map + journey ---------------- */
+let mapStage="all", showEntries=false, selNode=null;
+function vMap(){
+  const seg=`<div class="seg"><button type="button" data-act="mapmode" data-m="net" aria-pressed="${mapMode==="net"}">心智網絡</button><button type="button" data-act="mapmode" data-m="journey" aria-pressed="${mapMode==="journey"}">旅程</button><button type="button" data-act="mapmode" data-m="review" aria-pressed="${mapMode==="review"}">回顧</button></div>`;
+  if(mapMode==="journey")return `<section class="view">${statusNote()}<div class="head spread"><h1>地圖</h1>${seg}</div>${vJourney()}</section>`;
+  if(mapMode==="review")return `<section class="view">${statusNote()}<div class="head spread"><h1>地圖</h1>${seg}</div>${vReview()}</section>`;
+  return `<section class="view">${statusNote()}<div class="head spread"><h1>地圖</h1>${seg}</div>
+  <div class="spread"><div class="row">${["all",...STAGES].map(s=>`<button type="button" class="pick" data-act="mstage" data-s="${s}" aria-pressed="${mapStage===s}">${s==="all"?"全部階段":s}</button>`).join("")}</div>
+  <label class="row small"><input type="checkbox" id="showE" ${showEntries?"checked":""} style="accent-color:var(--accent)">也顯示每篇紀錄</label></div>
+  <div class="legend"><span><i style="background:var(--person)"></i>人物</span><span><i style="background:var(--theme)"></i>課題</span><span><i style="background:var(--method)"></i>做過的方法</span>${showEntries?'<span><i style="background:var(--entry)"></i>紀錄</span>':""}<span>線越粗，連結越常出現</span></div>
+  <div class="mapwrap" id="mapwrap"><svg id="graph" role="img" aria-label="人物、課題與方法的關係圖"></svg>
+   <div class="mapctl"><button type="button" data-act="zoom" data-z="1.25" aria-label="放大">+</button><button type="button" data-act="zoom" data-z="0.8" aria-label="縮小">−</button><button type="button" data-act="zoom" data-z="0" aria-label="置中">◎</button></div><div id="nodePanel"></div></div>
+
+  </section>`}
+
+function vJourney(){
+  const ses=sessions().slice().reverse();
+  const lane=s=>{const ps=people().filter(p=>(p.stages||[]).includes(s));const es=entries().filter(e=>e.stage===s);
+    return `<div class="lane"><h3>${s}</h3><p class="tiny muted">${STAGE_HINT[s]}</p>
+     <div class="row">${ps.map(p=>`<button type="button" class="chip p" data-act="open-person" data-id="${p.id}">${esc(p.name)}</button>`).join("")||'<span class="tiny muted">還沒有人物</span>'}</div>
+     ${es.slice(0,6).map(e=>`<button type="button" class="mini-e" data-act="open-entry" data-id="${e.id}"><span>${fmtD(e.date)}</span>${esc(entryTitle(e))}</button>`).join("")}</div>`};
+  const ts=themeStats();
+  const col=([k,l])=>{const list=ts.filter(x=>(x.t.status||"facing")===k);
+    return `<div class="bcol"><h3>${l} <span class="tiny muted">${list.length}</span></h3>${list.map(x=>`<div class="tcard"><div class="spread"><button class="linkbtn" data-act="open-theme" data-id="${x.t.id}"><b>${esc(x.t.name)}</b></button><span class="tiny muted">${x.n} 篇</span></div>
+      <div class="row">${TSTATUS.filter(s=>s[0]!==k).map(s=>`<button class="chip s" data-act="tstatus" data-id="${x.t.id}" data-s="${s[0]}">移到「${s[1]}」</button>`).join("")}</div></div>`).join("")||'<p class="tiny muted">目前沒有</p>'}</div>`};
+  return `<div class="stack"><h2 style="font-size:20px">人生的四個階段</h2><div class="lanes">${STAGES.map(lane).join("")}</div></div>
+  <div class="stack"><h2 style="font-size:20px">課題的進展</h2><div class="board">${TSTATUS.map(col).join("")}</div></div>
+  <div class="stack"><h2 style="font-size:20px">諮商的歷程</h2>${ses.length?`<div class="tl">${ses.map(e=>`<button type="button" class="tli" data-act="open-entry" data-id="${e.id}"><b>第 ${e.no||"?"} 次 · ${esc(e.date||"")}</b><span>${esc(e.insight||e.talk||"")}</span></button>`).join("")}</div>`:'<p class="small muted">記錄諮商後，每一次都會排在這條路上。</p>'}</div>`}
+
+function vFoot(){
+  return `<footer class="foot shell"><div class="foot-head"><span class="label">我的資料</span><span class="sync"><i></i>只存在這台裝置</span></div>
+   <div class="foot-acts"><button type="button" class="fbtn" data-act="export">匯出備份</button><button type="button" class="fbtn" data-act="import">從備份還原</button>${hasExamples()?'<button type="button" class="fbtn warn" data-act="clear-ex">清除範例</button>':""}</div>
+   <input type="file" id="importFile" accept=".json,application/json" hidden></footer>`}
+
+/* ============================================================
+   graph — a small force layout drawn in SVG
+   ============================================================ */
+let G=null;
+function buildGraph(){
+  const inStage=e=>mapStage==="all"||e.stage===mapStage||(e.people||[]).some(p=>(S.people.get(p)?.stages||[]).includes(mapStage));
+  const es=entries().filter(inStage);
+  const nodes=new Map(),links=new Map();
+  const node=(id,type,label)=>{if(!nodes.has(id))nodes.set(id,{id,type,label,deg:0});return nodes.get(id)};
+  const link=(a,b)=>{const k=a<b?a+"|"+b:b+"|"+a;const l=links.get(k)||{a,b,w:0};l.w++;links.set(k,l);nodes.get(a).deg++;nodes.get(b).deg++};
+  es.forEach(e=>{
+    const ps=(e.people||[]).filter(p=>S.people.has(p)).filter(p=>mapStage==="all"||(S.people.get(p).stages||[]).includes(mapStage)||e.stage===mapStage);
+    const ts=(e.themes||[]).filter(t=>S.themes.has(t));
+    ps.forEach(p=>node("p:"+p,"p",pName(p)));ts.forEach(t=>node("t:"+t,"t",tName(t)));
+    const ms=steps().filter(s=>s.entryId===e.id).map(s=>s.methodId).filter(methodById);
+    ms.forEach(m=>node("m:"+m,"m",methodById(m).name));
+    if(showEntries){const en=node("e:"+e.id,"e",entryTitle(e));ps.forEach(p=>link(en.id,"p:"+p));ts.forEach(t=>link(en.id,"t:"+t));ms.forEach(m=>link(en.id,"m:"+m))}
+    else{ps.forEach(p=>ts.forEach(t=>link("p:"+p,"t:"+t)));
+      ms.forEach(m=>{(ts.length?ts.map(t=>"t:"+t):ps.map(p=>"p:"+p)).forEach(x=>link("m:"+m,x))});
+      if(!ts.length&&ps.length>1)for(let i=0;i<ps.length;i++)for(let j=i+1;j<ps.length;j++)link("p:"+ps[i],"p:"+ps[j])}
+  });
+  if(mapStage==="all")people().forEach(p=>node("p:"+p.id,"p",p.name));
+  return{nodes:[...nodes.values()],links:[...links.values()]}}
+const NS="http://www.w3.org/2000/svg";
+const radius=n=>n.type==="e"?5:(n.type==="t"?10:n.type==="p"?9:7)+Math.sqrt(n.deg)*3.2;
+const color=t=>({p:"var(--person)",t:"var(--theme)",m:"var(--method)",e:"var(--entry)"})[t];
+function mountGraph(){
+  const svg=$("#graph"),wrap=$("#mapwrap");if(!svg)return;
+  const {nodes,links}=buildGraph();
+  const W=wrap.clientWidth,H=wrap.clientHeight;
+  if(G&&G.raf)cancelAnimationFrame(G.raf);
+  if(!nodes.length){svg.innerHTML="";wrap.insertAdjacentHTML("beforeend",`<p class="muted small" style="position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:24px">寫下紀錄並整理之後，人物、課題和方法會在這裡連成一張網。</p>`);renderPanel();return}
+  const prev=G&&G.pos||new Map();
+  nodes.forEach((n,i)=>{const p=prev.get(n.id);const a=i/nodes.length*Math.PI*2;n.x=p?p.x:W/2+Math.cos(a)*Math.min(W,H)*.3+(Math.random()-.5)*20;n.y=p?p.y:H/2+Math.sin(a)*Math.min(W,H)*.3+(Math.random()-.5)*20;n.vx=0;n.vy=0;n.r=radius(n)});
+  const byId=new Map(nodes.map(n=>[n.id,n]));links.forEach(l=>{l.s=byId.get(l.a);l.t=byId.get(l.b)});
+  const view=G&&G.view||{x:0,y:0,k:1},fitted=!!(G&&G.fitted&&prev.size);
+  G={nodes,links,byId,W,H,view,alpha:prev.size?.3:1,pos:new Map(),raf:0,drag:null,fitted};
+  svg.innerHTML="";svg.setAttribute("viewBox",`0 0 ${W} ${H}`);
+  const g=document.createElementNS(NS,"g");svg.appendChild(g);G.g=g;
+  const lg=document.createElementNS(NS,"g"),ng=document.createElementNS(NS,"g");g.append(lg,ng);
+  const maxW=Math.max(1,...links.map(l=>l.w));
+  links.forEach(l=>{const el=document.createElementNS(NS,"line");el.setAttribute("stroke","var(--muted)");el.setAttribute("stroke-opacity",String(.18+.4*l.w/maxW));el.setAttribute("stroke-width",String(1+2.6*l.w/maxW));el.setAttribute("stroke-linecap","round");lg.appendChild(el);l.el=el});
+  nodes.forEach(n=>{const el=document.createElementNS(NS,"g");el.style.cursor="pointer";el.dataset.id=n.id;
+    const c=document.createElementNS(NS,"circle");c.setAttribute("r",n.r);c.setAttribute("fill",color(n.type));c.setAttribute("fill-opacity",n.type==="e"?".6":".92");
+    if(n.type==="t"){c.setAttribute("stroke","var(--surface)");c.setAttribute("stroke-width","3")}
+    el.appendChild(c);
+    if(n.type!=="e"||showEntries&&nodes.length<40){const t=document.createElementNS(NS,"text");t.setAttribute("class","nlabel"+(n.type==="t"&&n.deg>2?" big":""));t.setAttribute("text-anchor","middle");t.setAttribute("dy",String(n.r+15));t.textContent=n.label.length>12?n.label.slice(0,12)+"…":n.label;el.appendChild(t)}
+    ng.appendChild(el);n.el=el;n.circle=c});
+  applyView();highlight();
+  const tick=()=>{step();draw();G.alpha*=.972;if(G.alpha>.02||G.drag)G.raf=requestAnimationFrame(tick);else{G.raf=0;nodes.forEach(n=>G.pos.set(n.id,{x:n.x,y:n.y}));if(!G.fitted){G.fitted=true;fit()}}};
+  if(matchMedia("(prefers-reduced-motion: reduce)").matches){for(let i=0;i<300;i++){step();G.alpha*=.985}draw();nodes.forEach(n=>G.pos.set(n.id,{x:n.x,y:n.y}));fit()}else G.raf=requestAnimationFrame(tick);
+  G.kick=()=>{G.alpha=Math.max(G.alpha,.4);if(!G.raf)G.raf=requestAnimationFrame(tick)};
+  bindGraph(svg);renderPanel();
+}
+function step(){
+  const {nodes,links,W,H}=G,a=G.alpha;
+  for(let i=0;i<nodes.length;i++){const n=nodes[i];for(let j=i+1;j<nodes.length;j++){const m=nodes[j];let dx=n.x-m.x,dy=n.y-m.y,d2=dx*dx+dy*dy||.01;const d=Math.sqrt(d2);const min=n.r+m.r+18;
+    let f=3600/d2;if(d<min)f+=(min-d)*.08;dx/=d;dy/=d;n.vx+=dx*f*a;n.vy+=dy*f*a;m.vx-=dx*f*a;m.vy-=dy*f*a}}
+  links.forEach(l=>{const s=l.s,t=l.t;let dx=t.x-s.x,dy=t.y-s.y,d=Math.sqrt(dx*dx+dy*dy)||.01;const len=110+(s.r+t.r);const k=.03*Math.min(3,Math.sqrt(l.w))*(d-len)/d;
+    s.vx+=dx*k*a;s.vy+=dy*k*a;t.vx-=dx*k*a;t.vy-=dy*k*a});
+  nodes.forEach(n=>{n.vx+=(W/2-n.x)*.004*a;n.vy+=(H/2-n.y)*.004*a;if(n.fixed){n.vx=n.vy=0;return}n.vx*=.6;n.vy*=.6;n.x+=n.vx;n.y+=n.vy})}
+function draw(){G.links.forEach(l=>{l.el.setAttribute("x1",l.s.x);l.el.setAttribute("y1",l.s.y);l.el.setAttribute("x2",l.t.x);l.el.setAttribute("y2",l.t.y)});G.nodes.forEach(n=>n.el.setAttribute("transform",`translate(${n.x},${n.y})`))}
+function fit(){if(!G||!G.nodes.length)return;let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;G.nodes.forEach(n=>{x0=Math.min(x0,n.x-n.r-40);x1=Math.max(x1,n.x+n.r+40);y0=Math.min(y0,n.y-n.r-10);y1=Math.max(y1,n.y+n.r+30)});
+  const k=Math.min(2.2,Math.max(.4,Math.min(G.W/(x1-x0),G.H/(y1-y0))));G.view={k,x:G.W/2-(x0+x1)/2*k,y:G.H/2-(y0+y1)/2*k};G.g.style.transition='transform .6s';applyView();setTimeout(()=>{if(G&&G.g)G.g.style.transition=''},700)}
+function applyView(){const v=G.view;G.g.setAttribute("transform",`translate(${v.x},${v.y}) scale(${v.k})`)}
+function highlight(){
+  if(!G)return;const sel=selNode&&G.byId.get(selNode);const nb=new Set();
+  if(sel){nb.add(sel.id);G.links.forEach(l=>{if(l.s===sel)nb.add(l.t.id);if(l.t===sel)nb.add(l.s.id)})}
+  G.nodes.forEach(n=>{n.el.style.opacity=!sel||nb.has(n.id)?"1":".18";n.circle.setAttribute("stroke",sel&&n===sel?"var(--ink)":n.type==="t"?"var(--surface)":"none");n.circle.setAttribute("stroke-width",sel&&n===sel?"2.5":n.type==="t"?"3":"0")});
+  G.links.forEach(l=>l.el.style.opacity=!sel||l.s===sel||l.t===sel?"1":".08")}
+function bindGraph(svg){
+  const pt=e=>{const r=svg.getBoundingClientRect(),v=G.view;return{x:((e.clientX-r.left)*G.W/r.width-v.x)/v.k,y:((e.clientY-r.top)*G.H/r.height-v.y)/v.k,sx:e.clientX,sy:e.clientY}};
+  svg.onpointerdown=e=>{const ge=e.target.closest("g[data-id]");const p=pt(e);svg.setPointerCapture(e.pointerId);
+    if(ge){const n=G.byId.get(ge.dataset.id);G.drag={n,moved:false,sx:p.sx,sy:p.sy};n.fixed=true}
+    else G.drag={pan:true,sx:e.clientX,sy:e.clientY,vx:G.view.x,vy:G.view.y,moved:false};svg.classList.add("dragging")};
+  svg.onpointermove=e=>{const d=G.drag;if(!d)return;
+    if(Math.abs(e.clientX-d.sx)+Math.abs(e.clientY-d.sy)>4)d.moved=true;
+    if(d.pan){const r=svg.getBoundingClientRect();G.view.x=d.vx+(e.clientX-d.sx)*G.W/r.width;G.view.y=d.vy+(e.clientY-d.sy)*G.H/r.height;applyView()}
+    else if(d.moved){const p=pt(e);d.n.x=p.x;d.n.y=p.y;G.kick()}};
+  svg.onpointerup=e=>{const d=G.drag;G.drag=null;svg.classList.remove("dragging");if(!d)return;
+    if(d.n){d.n.fixed=false;if(!d.moved){selNode=selNode===d.n.id?null:d.n.id;highlight();renderPanel()}}
+    else if(!d.moved&&selNode){selNode=null;highlight();renderPanel()}};
+  svg.onwheel=e=>{e.preventDefault();zoomAt(e.deltaY<0?1.12:.89,e)};
+}
+function zoomAt(f,e){const svg=$("#graph");if(!G||!svg)return;
+  if(f===0){fit();return}
+  const r=svg.getBoundingClientRect(),cx=e?(e.clientX-r.left)*G.W/r.width:G.W/2,cy=e?(e.clientY-r.top)*G.H/r.height:G.H/2,v=G.view;
+  const k=Math.min(3,Math.max(.4,v.k*f));v.x=cx-(cx-v.x)*k/v.k;v.y=cy-(cy-v.y)*k/v.k;v.k=k;applyView()}
+function renderPanel(){
+  const el=$("#nodePanel");if(!el)return;
+  if(!selNode||!G||!G.byId.get(selNode)){el.innerHTML=G&&G.nodes&&G.nodes.length?`<span class="maphint">點一個點，看它連到什麼</span>`:"";return}
+  const n=G.byId.get(selNode),[type,id]=[n.type,n.id.slice(2)];
+  let es=[],extra="";
+  if(type==="p"){es=entriesOfPerson(id);const p=S.people.get(id);extra=`<p class="small muted">${esc(p?.relation||"")}${(p?.stages||[]).length?" · "+p.stages.join("、"):""}</p><div class="row"><button class="btn sm quiet" data-act="open-person" data-id="${id}">看這個人</button></div>`}
+  if(type==="t"){es=entriesOfTheme(id);const t=S.themes.get(id);extra=`<p class="small muted">狀態：${(TSTATUS.find(s=>s[0]===(t?.status||"facing"))||[])[1]}</p><div class="row"><button class="btn sm quiet" data-act="open-theme" data-id="${id}">看這個課題</button><button class="btn sm ghost" data-act="open-method" data-id="c_pattern">把重複的模式擺在一起</button></div>`}
+  if(type==="m"){const ids=new Set(steps().filter(s=>s.methodId===id).map(s=>s.entryId));es=entries().filter(e=>ids.has(e.id));extra=`<div class="row"><button class="btn sm quiet" data-act="open-method" data-id="${id}">看這個方法</button></div>`}
+  if(type==="e"){es=[S.entries.get(id)].filter(Boolean)}
+  el.innerHTML=`<div class="panel"><div class="spread"><h3 style="font-size:19px;color:${color(type)}">${esc(n.label)}</h3><span class="row"><span class="tiny muted">${{p:"人物",t:"課題",m:"方法",e:"紀錄"}[type]}</span><button class="btn sm ghost" data-act="unsel" aria-label="關閉">×</button></span></div>${extra}
+   <div class="stack">${es.slice(0,12).map(e=>`<button type="button" class="mini-e" data-act="open-entry" data-id="${e.id}"><span>${fmtD(e.date)}</span>${esc(entryTitle(e))}</button>`).join("")||'<p class="small muted">還沒有相關紀錄。</p>'}</div></div>`}
+
+/* ============================================================
+   sheets
+   ============================================================ */
+let sheet=null; // {kind, id, ...}
+function openSheet(s){sheet=s;drawSheet();document.documentElement.style.overflow="hidden"}
+function closeSheet(){if(sheet&&sheet.kind==="edit"&&(sheet.newMedia||[]).length)sheet.newMedia.forEach(delMedia);if(sheet&&sheet.kind==="edit"&&dict&&dict.active())dict.stop().catch(()=>{});if(sheet&&sheet.kind==="batch"&&batchCtl)batchCtl.abort();sheet=null;$("#sheetRoot").innerHTML="";document.documentElement.style.overflow=""}
+function refreshSheet(){if(!sheet||sheet.kind==="edit"||sheet.busy)return;const a=document.activeElement;if(a&&a.closest&&a.closest("#sheetRoot")&&/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)&&a.type!=="checkbox")return;drawSheet()}
+function drawSheet(){
+  if(!sheet)return;
+  const body={entry:shEntry,edit:shEdit,person:shPerson,theme:shTheme,method:shMethod,research:shResearch,help:shHelp,done:shDone,data:shData,import:shImport,batch:shBatch,quotes:shQuotes,prep:shPrep,settings:shSettings,welcome:shWelcome,assistant:shAssistant,pastechat:shPasteChat}[sheet.kind]();
+  if(body===null){closeSheet();return}
+  const sc=$("#sheetRoot .sheet")?.scrollTop||0;
+  $("#sheetRoot").innerHTML=`<div class="sheet-wrap" data-act="sheet-bg"><div class="sheet" role="dialog" aria-modal="true">${body}</div></div>`;
+  const s=$("#sheetRoot .sheet");if(s&&sheet.keepScroll!==false)s.scrollTop=sc;
+  if(sheet.kind==="edit"){bindEditor();renderDraftMedia()}
+  if(sheet.kind==="entry"){const en=S.entries.get(sheet.id),box=$("#entryMedia");if(en&&box)hydrateMedia(box,en.media)}
+}
+const top_=(title,right="")=>sheet&&sheet.confirmClose?`<div class="sheet-top"><h2 class="small">還沒儲存，要放棄這次的內容嗎？</h2><div class="row"><button class="btn sm danger" data-act="discard">放棄</button><button class="btn sm" data-act="keep">繼續寫</button></div></div>`:`<div class="sheet-top"><h2>${title}</h2><div class="row">${right}<button class="btn sm ghost" data-act="close">關閉</button></div></div>`;
+
+/* ---- entry detail ---- */
+function shEntry(){
+  const e=S.entries.get(sheet.id);if(!e)return null;const mo=moodOf(e.mood);
+  const fields=e.type==="session"?`<div class="kv">
+     ${e.talk?`<div><b>今天談了什麼</b><p class="prose">${esc(e.talk)}</p></div>`:""}
+     ${e.said?`<div><b>諮商師說的關鍵一句</b><p class="quote">${esc(e.said)}</p></div>`:""}
+     ${e.insight?`<div><b>我的領悟</b><p class="prose">${esc(e.insight)}</p></div>`:""}
+     ${e.homework?`<div><b>回家作業</b><p class="prose">${esc(e.homework)}</p></div>`:""}
+     ${e.next?`<div><b>下次想談</b><p class="prose">${esc(e.next)}</p></div>`:""}</div>`
+    :`<p class="prose">${esc(e.text)}</p>`;
+  const linked=steps().filter(s=>s.entryId===e.id);
+  return top_(esc(entryTitle(e)),`${e.type==="letter"?`<button class="btn sm ghost" data-act="tear-entry" data-id="${e.id}">撕掉</button>`:""}<button class="btn sm quiet" data-act="edit" data-id="${e.id}">編輯</button>`)+`<div class="sheet-body">
+   <div class="row"><span class="badge ${e.type}">${e.type==="session"?`諮商 · 第 ${e.no||"?"} 次`:typeLabel(e)}</span>${e.ex?'<span class="badge ex">範例</span>':""}<span class="small muted">${esc(e.date)}</span>${mo?`<span class="row small"><span class="mood" style="background:${mo[2]}"></span>${mo[1]}</span>`:""}${e.stage?`<span class="chip s">${e.stage}</span>`:""}</div>
+   <div class="row">${(e.people||[]).map(p=>`<button class="chip p" data-act="open-person" data-id="${p}">${esc(pName(p))}</button>`).join("")}${(e.themes||[]).map(t=>`<button class="chip t" data-act="open-theme" data-id="${t}">${esc(tName(t))}</button>`).join("")}</div>
+   ${e.mood&&e.mood<=2&&keptQuotes().length?(()=>{const k=keptQuotes(),q=k[[...e.id].reduce((a,c)=>a+c.charCodeAt(0),0)%k.length];return `<div class="quotebox"><span class="label">你曾經寫過</span><p>「${esc(q.text)}」</p></div>`})():""}
+   <div class="quotable">${fields}</div>
+   ${(e.media||[]).length?`<div class="mgal" id="entryMedia">${mediaThumbs(e.media,false)}</div>`:""}
+   ${linked.length?`<div class="stack"><p class="label">從這篇出發的下一步</p>${linked.map(s=>`<div class="step"><span class="dot"></span><div><b>${esc(methodById(s.methodId)?.name||"自訂")}</b><span class="sub">${s.status==="done"?`做完了${s.help?` · 幫助程度 ${s.help}/5`:""}${s.reflection?` · ${esc(s.reflection)}`:""}`:"還沒做"}</span></div>${s.status==="done"?"":`<button class="btn sm quiet" data-act="done-step" data-id="${s.id}">做完了</button>`}</div>`).join("")}</div>`:""}
+   ${anaBlock(e)}
+   <div class="row" style="justify-content:space-between;margin-top:6px">${sheet.confirmDel?`<span class="small">確定要刪除這篇？刪除後無法復原。</span><span class="row"><button class="btn sm danger" data-act="del-entry" data-id="${e.id}">刪除</button><button class="btn sm ghost" data-act="cancel-del">取消</button></span>`:`<button class="linkbtn" style="color:var(--warn)" data-act="ask-del">刪除這篇</button>`}</div>
+  </div>`}
+function anaBlock(e){
+  if(e.type==="letter"&&!e.analysis&&!sheet.letterAna&&!sheet.busy)return `<div class="linked"><p class="small">信預設不會拿去給 AI 整理。</p><div><button class="linkbtn" data-act="letter-ana">還是想整理這封信</button></div></div>`;
+  if(sheet.busy)return `<div class="ana"><div class="thinking"><i></i>正在整理這篇紀錄，通常需要半分鐘左右……</div><div><button class="btn sm ghost" data-act="stop-ana">停止</button></div></div>`;
+  const a=e.analysis;
+  if(!a){return `<div class="ana"><h3>幫我整理</h3><p class="small muted">AI 會把這篇拆成事件、想法、情緒、身體和反應，找出背後的課題和人物，建議可以試的方法，並列出可以帶去問諮商師的問題。會用你自己選的 AI 來整理，送出前人名會換成代號。</p>
+    ${sheet.err?`<p class="notice warn">${esc(sheet.err)}</p>`:""}
+    <div><button class="btn" data-act="analyze" data-id="${e.id}" ${sample?"":"disabled"}>幫我整理</button></div><p class="tiny muted">整理方式可以在右上角「設定」切換。</p></div>`}
+  const ch=a.chain||{};
+  const pend=!e.applied;
+  return `<div class="ana">
+   <div class="spread"><h3>整理</h3>${e.ex?'<span class="badge ex">範例整理</span>':""}</div>
+   ${a.risk?`<div class="risk"><b>你寫到的內容讓人擔心你現在的安全。</b><p class="small">如果你正在想傷害自己，或處在危險中，請現在就打電話：安心專線 1925、生命線 1995，緊急時撥 119。也請盡快告訴你的諮商師。</p></div>`:""}
+   ${a.summary?`<p class="need">${esc(a.summary)}</p>`:""}
+   <div class="chain">${[["事件",ch.event],["想法",ch.thought],["情緒",(ch.emotion||[]).join("、")],["身體",ch.body],["反應",ch.behavior]].filter(x=>x[1]).map(x=>`<div class="link"><b>${x[0]}</b><span>${esc(x[1])}</span></div>`).join("")}</div>
+   ${a.need?`<div><p class="label">背後的需要</p><p>${esc(a.need)}</p></div>`:""}
+   ${(a.themes||[]).length?`<div class="stack"><p class="label">可能的課題</p>${a.themes.map(t=>`<p class="small"><span class="chip t">${esc(t.name)}</span> ${esc(t.why||"")}</p>`).join("")}</div>`:""}
+   ${(a.people||[]).length?`<div class="stack"><p class="label">文中的人物</p>${a.people.map(p=>`<p class="small"><span class="chip p">${esc(p.name)}</span> ${esc([p.relation,p.stage,p.role].filter(Boolean).join(" · "))}</p>`).join("")}</div>`:""}
+   ${a.pattern?`<div><p class="label">可能的連結</p><p class="small">${esc(a.pattern)}</p></div>`:""}
+   ${linkedBlock(e,pend)}
+   ${(a.methods||[]).length?`<div class="stack"><p class="label">可以試試的方法</p><div class="sug">${a.methods.filter(m=>methodById(m.id)).map(m=>`<div class="s"><div><b>${methodById(m.id).name}</b><p class="small muted">${esc(m.why||"")}</p></div><div class="row"><button class="btn sm ghost" data-act="open-method" data-id="${m.id}">看做法</button><button class="btn sm" data-act="pick-step" data-m="${m.id}" data-e="${e.id}">選為下一步</button></div></div>`).join("")}</div></div>`:""}
+   ${(a.questions||[]).length?`<div class="stack"><p class="label">可以帶去問諮商師的</p><div class="qlist">${a.questions.map((q,i)=>`<label class="q ${(e.asked||{})[i]?"done":""}"><input type="checkbox" data-act="ask" data-id="${e.id}" data-i="${i}" ${(e.asked||{})[i]?"checked":""}><span>${esc(q)}</span></label>`).join("")}</div></div>`:""}
+   <div class="row"><button class="linkbtn" data-act="analyze" data-id="${e.id}" ${sample?"":"disabled"}>重新整理</button><span class="tiny muted">AI 的整理僅供參考，不是診斷。</span></div>
+  </div>`}
+function linkedBlock(e,pend){
+  if(pend)return `<div class="linked"><p class="small">這篇的人物和課題還沒連到地圖。</p><button class="btn sm" data-act="apply-all" data-id="${e.id}">連到地圖</button></div>`;
+  const ps=(e.people||[]).filter(x=>S.people.has(x)),ts=(e.themes||[]).filter(x=>S.themes.has(x));
+  if(!ps.length&&!ts.length)return "";
+  return `<div class="linked"><p class="label">已連到地圖</p><div class="row">${ps.map(x=>`<span class="chip p">${esc(pName(x))}<button class="x" data-act="unlink" data-id="${e.id}" data-k="people" data-v="${x}" aria-label="取消連結 ${esc(pName(x))}">×</button></span>`).join("")}${ts.map(x=>`<span class="chip t">${esc(tName(x))}<button class="x" data-act="unlink" data-id="${e.id}" data-k="themes" data-v="${x}" aria-label="取消連結 ${esc(tName(x))}">×</button></span>`).join("")}</div><p class="tiny muted">連錯了就按 ×。</p></div>`}
+function applyBlock(e){
+  const a=e.analysis;const ps=(a.people||[]),ts=(a.themes||[]);if(!ps.length&&!ts.length)return "";
+  const match=n=>people().find(p=>p.name===n);const tmatch=n=>themes().find(t=>t.name===n);
+  return `<div class="card stack" style="box-shadow:none"><p class="label">收進我的地圖</p><p class="small muted">勾選要連到這篇紀錄的人物和課題。新的會自動建立，之後都可以改名或刪除。</p>
+   <div class="applyl">${ps.map((p,i)=>`<label><input type="checkbox" data-ap="p" data-i="${i}" checked><span class="chip p">${esc(p.name)}</span>${match(p.name)?'<span class="tiny muted">已在人物裡</span>':'<span class="tiny muted">新增</span>'}</label>`).join("")}
+   ${ts.map((t,i)=>`<label><input type="checkbox" data-ap="t" data-i="${i}" checked><span class="chip t">${esc(t.name)}</span>${tmatch(t.name)?'<span class="tiny muted">已有的課題</span>':'<span class="tiny muted">新課題</span>'}</label>`).join("")}</div>
+   <div><button class="btn sm" data-act="apply" data-id="${e.id}">收進地圖</button></div></div>`}
+
+/* ---- editor ---- */
+function shEdit(){
+  const d=sheet.draft,isS=d.type==="session";
+  const ta=(k,label,hint,big)=>`<div class="field"><label for="f-${k}">${label}</label>${hint?`<p class="hint">${hint}</p>`:""}<div class="ta-wrap"><textarea id="f-${k}" data-k="${k}" class="${big?"big":""}">${esc(d[k]||"")}</textarea>${dict?`<button type="button" class="mic" data-mic="${k}">口述</button>`:""}</div></div>`;
+  if(d.type==="letter"){const pp=S.people.get(d.to),m=methodById("r_letter");
+   return top_(`給${esc(pp?pp.name:"他")}的信`,`<button class="btn sm" data-act="save">封存</button>`)+`<div class="sheet-body">
+    <div class="research small"><b>慢慢寫，不用寄出</b><ol class="steps" style="margin-top:6px">${m.steps.map(x=>`<li>${x}</li>`).join("")}</ol></div>
+    ${ta("text","信的內容","",true)}<p class="partial" id="partial" aria-live="polite"></p>
+    <div class="row"><button class="btn" data-act="save">封存這封信</button><button class="btn ghost" data-act="tear">撕掉它</button></div>
+    <p class="tiny muted">封存：信會留在他的頁面裡，只有你看得到。撕掉：做一個撕碎、數到十的小儀式，然後把信刪掉。</p></div>`}
+  return top_(sheet.id?"編輯紀錄":isS?"記錄這次諮商":"寫下此刻",`<button class="btn sm" data-act="save">儲存</button>`)+`<div class="sheet-body">
+   <div class="row"><div class="seg"><button type="button" data-act="etype" data-t="journal" aria-pressed="${!isS}">日記</button><button type="button" data-act="etype" data-t="session" aria-pressed="${isS}">諮商</button></div>
+    <input class="inp" type="date" id="f-date" value="${esc(d.date)}" style="width:auto">${isS?`<label class="row small">第 <input class="inp" type="number" id="f-no" min="1" value="${esc(d.no||"")}" style="width:72px"> 次</label>`:""}</div>
+   <div class="field"><label for="f-title">標題 <span class="hint">（可以不填）</span></label><input class="inp" id="f-title" data-k="title" value="${esc(d.title||"")}" placeholder="${isS?"例如：談到爸爸的那次":"例如：被主管念了一句"}"></div>
+   ${isS?ta("talk","今天談了什麼","想到什麼寫什麼，剛走出諮商室時用口述最方便。",true)+ta("said","諮商師說的關鍵一句","讓你印象最深、想記住的那句話。")+ta("insight","我的領悟","")+ta("homework","回家作業","")+ta("next","下次想談的","")
+     :ta("text","發生了什麼？心裡有什麼？","不用管格式。可以寫事情經過、腦中的想法、身體的感覺，或你想對誰說的話。",true)}
+   <p class="partial" id="partial" aria-live="polite"></p>
+   <div class="field"><span class="lab">照片與錄音</span>
+    <div class="row"><button type="button" class="btn sm quiet" data-act="pick-photo">加入照片</button><button type="button" class="btn sm quiet" data-act="pick-audio">加入錄音檔</button></div>
+    <input type="file" id="f-photo" accept="image/*" multiple hidden><input type="file" id="f-audio" accept="audio/*" hidden>
+    <p class="hint">照片會自動壓縮，一篇最多 ${MAX_PHOTOS} 張。錄音請先用手機的錄音程式錄好再加入（3 MB 以內，約 3 分鐘）。</p>
+    <p class="small muted" id="mediaProg" aria-live="polite"></p><div class="mgal" id="draftMedia"></div></div>
+   <div class="field"><span class="lab">現在的心情</span><div class="moods">${MOODS.map(m=>`<button type="button" data-act="emood" data-v="${m[0]}" aria-pressed="${d.mood===m[0]}"><span class="mood" style="background:${m[2]}"></span>${m[1]}</button>`).join("")}</div></div>
+   <div class="field"><span class="lab">跟誰有關？</span><div class="row" id="ppick">${people().map(p=>`<button type="button" class="pick p" data-act="eperson" data-id="${p.id}" aria-pressed="${(d.people||[]).includes(p.id)}">${esc(p.name)}</button>`).join("")||'<span class="small muted">還沒有人物</span>'}</div>
+    <div class="row"><input class="inp" id="np-name" placeholder="新增一個人，例如：爸爸" style="flex:1;min-width:0"><button type="button" class="btn sm quiet" data-act="eaddp">新增</button></div><p class="hint">點名字就能選取或取消。不確定也沒關係，「幫我整理」時會自動找出文中的人。</p></div>
+   <div class="field"><span class="lab">這件事發生在人生哪個階段？</span><div class="row">${STAGES.map(s=>`<button type="button" class="pick" data-act="estage" data-s="${s}" aria-pressed="${d.stage===s}">${s}</button>`).join("")}</div></div>
+   <div class="row"><button class="btn" data-act="save">儲存</button><button class="btn ghost" data-act="save" data-then="analyze" ${sample?"":"hidden"}>儲存並整理</button></div>
+  </div>`}
+function bindEditor(){
+  $$("#sheetRoot [data-k]").forEach(el=>el.addEventListener("input",()=>{sheet.draft[el.dataset.k]=el.value;sheet.dirty=true}));
+  const dt=$("#f-date");if(dt)dt.onchange=()=>sheet.draft.date=dt.value;
+  const no=$("#f-no");if(no)no.oninput=()=>sheet.draft.no=+no.value||"";
+}
+let micTarget=null,micBound=false;
+function bindMic(){
+  if(micBound||!dict)return;micBound=true;
+  dict.onPartial(({text})=>{const p=$("#partial");if(p)p.textContent=text?`聽到：${text}`:""});
+  dict.onFinal(({text})=>{if(!micTarget||!sheet||sheet.kind!=="edit")return;const ta=$("#f-"+micTarget);let v=sheet.draft[micTarget]||"";const add=v?text:text.replace(/^\s+/,"");v+=add;sheet.draft[micTarget]=v;if(ta)ta.value=v});
+  dict.onState(({state,reason})=>{$$(".mic").forEach(b=>{const on=state!=="idle"&&b.dataset.mic===micTarget;b.classList.toggle("on",on);b.textContent=on?"停止":"口述"});
+    if(state==="idle"){const p=$("#partial");if(p)p.textContent="";if(reason==="not_granted")toast("口述沒有開啟。可以在這個頁面的權限選單裡打開。");if(reason==="unavailable")$$(".mic").forEach(b=>b.hidden=true)}});
+}
+
+/* ---- person ---- */
+function shPerson(){
+  const p=sheet.id?S.people.get(sheet.id):null;if(sheet.id&&!p)return null;
+  const d=sheet.pd||(sheet.pd=p?clone(p):{name:"",relation:"",stages:[],feeling:""});
+  const es=p?entriesOfPerson(p.id):[];
+  const tc={};es.forEach(e=>(e.themes||[]).forEach(t=>tc[t]=(tc[t]||0)+1));
+  const mood=es.filter(e=>e.mood).map(e=>e.mood);const avg=mood.length?mood.reduce((a,b)=>a+b,0)/mood.length:0;
+  return top_(p?esc(p.name):"新增人物",`<button class="btn sm" data-act="save-person">儲存</button>`)+`<div class="sheet-body">
+   <div class="addp" style="grid-template-columns:1fr 1fr"><div class="field"><label for="pp-name">名字或稱呼</label><input class="inp" id="pp-name" value="${esc(d.name)}"></div><div class="field"><label for="pp-rel">關係</label><input class="inp" id="pp-rel" value="${esc(d.relation||"")}" placeholder="父親、前任、主管……"></div></div>
+   <div class="field"><span class="lab">出現在人生的哪些階段</span><div class="row">${STAGES.map(s=>`<button type="button" class="pick" data-act="pp-stage" data-s="${s}" aria-pressed="${(d.stages||[]).includes(s)}">${s}</button>`).join("")}</div></div>
+   <div class="field"><label for="pp-feel">我對他的感受，和這段關係的樣子</label><textarea id="pp-feel">${esc(d.feeling||"")}</textarea></div>
+   <div class="field"><label for="pp-know">我希望他知道的</label><textarea id="pp-know" placeholder="例如：我不是不願意，是真的沒有能量了">${esc(d.wantKnow||"")}</textarea></div>
+   <div class="field"><label for="pp-bound">我的界線</label><textarea id="pp-bound" placeholder="例如：睡前時間是我休息的時間">${esc(d.boundary||"")}</textarea></div>
+   ${p?unsaidBlock(p):`<p class="small muted">儲存後，就可以記下還沒說出口的話，也可以寫信給他。</p>`}
+   ${p?`<div class="stack"><p class="label">跟他有關的課題</p><div class="row">${Object.entries(tc).sort((a,b)=>b[1]-a[1]).map(([t,n])=>`<button class="chip t" data-act="open-theme" data-id="${t}">${esc(tName(t))} · ${n}</button>`).join("")||'<span class="small muted">還沒有</span>'}</div>
+    ${avg?`<p class="small muted">提到他的紀錄，平均心情：${moodOf(Math.round(avg))[1]}</p>`:""}</div>
+   <div class="stack"><div class="spread"><p class="label">給他的信</p><button class="btn sm" data-act="new-letter" data-id="${p.id}">寫一封不寄出的信</button></div>
+    ${es.filter(e=>e.type==="letter").map(e=>`<button type="button" class="mini-e" data-act="open-entry" data-id="${e.id}"><span>${fmtD(e.date)}</span>${esc(entryTitle(e))}</button>`).join("")||'<p class="small muted">還沒有</p>'}</div>
+   <div class="stack"><p class="label">${es.filter(e=>e.type!=="letter").length} 篇相關紀錄</p>${es.filter(e=>e.type!=="letter").map(e=>`<button type="button" class="mini-e" data-act="open-entry" data-id="${e.id}"><span>${fmtD(e.date)}</span>${esc(entryTitle(e))}</button>`).join("")}</div>
+   <div class="row">${sheet.confirmDel?`<span class="small">刪除人物後，紀錄會保留，但不再連到他。</span><button class="btn sm danger" data-act="del-person" data-id="${p.id}">確定刪除</button><button class="btn sm ghost" data-act="cancel-del">取消</button>`:`<button class="linkbtn" style="color:var(--warn)" data-act="ask-del">刪除這個人物</button>`}</div>`:""}
+  </div>`}
+
+function unsaidBlock(p){
+  const un=p.unsaid||[],open=un.filter(u=>!u.said),said=un.filter(u=>u.said);
+  return `<div class="card stack" style="box-shadow:none"><p class="label">還沒說出口的話</p>
+   ${open.map(u=>`<div class="unsaid"><span>${esc(u.text)}</span>${sheet.saying===u.id?`<div class="row" style="width:100%"><input class="inp" id="us-react" placeholder="他的反應，或你說完的感受（可以不填）" style="flex:1;min-width:0"><button class="btn sm" data-act="us-confirm" data-uid="${u.id}">記下</button><button class="btn sm ghost" data-act="us-cancel">取消</button></div>`:`<span class="row"><button class="btn sm quiet" data-act="us-said" data-uid="${u.id}">說出口了</button><button class="linkbtn" data-act="us-del" data-uid="${u.id}" style="color:var(--muted)">刪除</button></span>`}</div>`).join("")||'<p class="small muted">還沒有</p>'}
+   <div class="row"><input class="inp" id="us-new" placeholder="一句還說不出口的話" style="flex:1;min-width:0"><button class="btn sm quiet" data-act="us-add">加入</button></div>
+   ${said.length?`<details><summary class="small" style="cursor:pointer;color:var(--accent)">已經說出口的 ${said.length} 句</summary><div class="stack" style="margin-top:8px">${said.map(u=>`<div class="unsaid done"><span>${esc(u.text)}<br><span class="tiny muted">${esc(u.saidAt||"")} 說出口${u.reaction?"　"+esc(u.reaction):""}</span></span></div>`).join("")}</div></details>`:""}
+  </div>`}
+function capturePD(){const d=sheet&&sheet.pd;if(!d)return;[["pp-name","name"],["pp-rel","relation"],["pp-feel","feeling"],["pp-know","wantKnow"],["pp-bound","boundary"]].forEach(([i,k])=>{const el=$("#"+i);if(el)d[k]=el.value})}
+async function updPerson(fn){capturePD();const cur=S.people.get(sheet.id);if(!cur)return;const q=clone(cur);q.unsaid=q.unsaid||[];fn(q);await put("people",q)}
+
+/* ---- letters: tear ritual ---- */
+function tearRitual(text,done){
+  const r=$("#photoRoot"),snip=esc(String(text||"").slice(0,160));
+  r.innerHTML=`<div class="ritual" role="dialog" aria-label="撕掉這封信"><div class="paper"><div class="half l">${snip}</div><div class="half r">${snip}</div></div><p class="rcount" id="rcount" aria-live="polite">深呼吸</p></div>`;
+  const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+  setTimeout(()=>{const pp=r.querySelector(".paper");if(pp)pp.classList.add("torn")},reduce?0:700);
+  let n=0;const tick=()=>{n++;const c=$("#rcount");if(!c)return;c.textContent=n<=10?String(n):"這件事，可以結束了";if(n<=10)setTimeout(tick,700);else setTimeout(()=>{r.innerHTML="";done&&done()},2000)};
+  setTimeout(tick,1800)}
+
+/* ---- my own words ---- */
+const keptQuotes=()=>[...S.quotes.values()].filter(q=>q.status!=="candidate").sort((a,b)=>String(b.date||"").localeCompare(String(a.date||"")));
+const candQuotes=()=>[...S.quotes.values()].filter(q=>q.status==="candidate").sort((a,b)=>String(a.date||"").localeCompare(String(b.date||"")));
+function homeQuote(){const k=keptQuotes(),c=candQuotes();
+  if(k.length){const day=Math.floor(Date.now()/864e5),q=k[day%k.length];return `<button type="button" class="quotecard" data-act="open-quotes"><span class="label">給今天的你</span><b>「${esc(q.text)}」</b><span class="tiny muted">${esc(q.date||"")} 的你寫的</span></button>`}
+  if(c.length)return `<button type="button" class="quotecard" data-act="open-quotes"><span class="label">我自己說過的話</span><b>從你的日記裡挑了 ${c.length} 句話，看看要不要收藏</b></button>`;
+  return ""}
+function shQuotes(){
+  const k=keptQuotes(),c=candQuotes();
+  const src=q=>q.entryId&&S.entries.has(q.entryId)?`<button class="linkbtn" data-act="open-entry" data-id="${q.entryId}">看原文</button>`:"";
+  return top_("我自己說過的話")+`<div class="sheet-body">
+   <p class="small muted">打開任何一篇紀錄，選取一段文字，就會出現「收藏這句」。首頁每天會換一句給你看。</p>
+   ${c.length?`<div class="stack"><p class="label">從你的日記挑出來的，留下有感覺的</p>${c.map(q=>`<div class="qitem"><p>「${esc(q.text)}」</p><div class="spread"><span class="row tiny muted">${esc(q.date||"")} ${src(q)}</span><span class="row"><button class="btn sm" data-act="q-keep" data-id="${q.id}">留下</button><button class="btn sm ghost" data-act="q-del" data-id="${q.id}">不要</button></span></div></div>`).join("")}</div>`:""}
+   <div class="stack"><p class="label">收藏的話 ${k.length}</p>${k.map(q=>`<div class="qitem kept"><p>「${esc(q.text)}」</p><div class="spread"><span class="row tiny muted">${esc(q.date||"")} ${src(q)}</span><button class="linkbtn" style="color:var(--muted)" data-act="q-del" data-id="${q.id}">移除</button></div></div>`).join("")||'<p class="small muted">還沒有</p>'}</div>
+   <div class="field"><label for="q-new">自己加一句</label><textarea id="q-new" style="min-height:70px"></textarea><div><button class="btn sm quiet" data-act="q-add">加入</button></div></div>
+  </div>`}
+let quoteSel="";
+document.addEventListener("selectionchange",()=>{const fab=$("#quoteFab");if(!fab)return;const sel=window.getSelection();const t=String(sel||"").trim();
+  const node=sel&&sel.anchorNode,el=node&&(node.nodeType===1?node:node.parentElement);
+  const ok=!!(sheet&&sheet.kind==="entry"&&t.length>=4&&t.length<=300&&el&&el.closest&&el.closest("#sheetRoot .quotable"));
+  if(ok)quoteSel=t;fab.hidden=!ok});
+
+/* ---- counseling prep ---- */
+const prepDoc=()=>S.meta.get("prep")||{id:"prep"};
+async function savePrep(fn){const p=clone(prepDoc());fn(p);p.id="prep";await put("meta",p)}
+function prepData(){
+  const pr=prepDoc(),lastS=sessions()[0];
+  const since=entries().filter(e=>e.type!=="letter"&&(!lastS||(e.id!==lastS.id&&(e.date||"")>=(lastS.date||""))));
+  const tc={},pc={};since.forEach(e=>{(e.themes||[]).forEach(t=>tc[t]=(tc[t]||0)+1);(e.people||[]).forEach(x=>pc[x]=(pc[x]||0)+1)});
+  const qs=[];since.forEach(e=>(e.analysis?.questions||[]).forEach((q,i)=>qs.push({e,q,i,done:!!(e.asked||{})[i]})));
+  const dropped=new Set(pr.dropped||[]),picked=(pr.picked||[]).filter(id=>S.entries.has(id));
+  const score=e=>(e.people||[]).length+(e.themes||[]).length+(e.mood&&e.mood<=2?2:0)+(e.analysis?.risk?3:0);
+  const auto=since.filter(e=>!dropped.has(e.id)&&!picked.includes(e.id)&&score(e)>0).sort((a,b)=>score(b)-score(a)).slice(0,3).map(e=>e.id);
+  return{pr,lastS,since,tc,pc,qs,bring:[...picked,...auto].map(id=>S.entries.get(id)).filter(Boolean)}}
+function prepCard(){const {pr,lastS,since,qs}=prepData();const open=qs.filter(x=>!x.done).length+(pr.myQs||[]).filter(x=>!x.done).length;
+  return `<div class="card stack"><div class="spread"><h2 style="font-size:20px">準備下次諮商</h2>${pr.nextDate?`<span class="tiny muted">${esc(pr.nextDate)}</span>`:""}</div>
+   <p class="small muted">${lastS?`上次是第 ${esc(lastS.no||"?")} 次（${fmtD(lastS.date)}），之後寫了 ${since.length} 篇`:"還沒有諮商紀錄"}${open?`，有 ${open} 個想問的問題`:""}</p>
+   <div><button class="btn sm" data-act="open-prep">打開準備頁</button></div></div>`}
+let prepBusy=false,prepErr="";
+function shPrep(){
+  const {pr,lastS,since,tc,pc,qs,bring}=prepData();
+  const days=lastS?Math.round((Date.parse(today())-Date.parse(lastS.date))/864e5):0;
+  const others=entries().filter(e=>e.type!=="letter"&&!bring.includes(e)).slice(0,40);
+  return top_("準備下次諮商")+`<div class="sheet-body">
+   <div class="spread"><span class="small">${lastS?`上次：第 ${esc(lastS.no||"?")} 次 · ${esc(lastS.date)}（${days} 天前）`:"還沒有諮商紀錄"}</span><label class="row small" for="pr-date">下次諮商 <input type="date" class="inp" id="pr-date" value="${esc(pr.nextDate||"")}" style="width:auto"></label></div>
+   <div class="stack"><p class="label">這段時間</p><p>寫了 ${since.length} 篇紀錄</p>
+    <div class="row">${Object.entries(tc).filter(([t])=>S.themes.has(t)).sort((a,b)=>b[1]-a[1]).slice(0,6).map(([t,n])=>`<button class="chip t" data-act="open-theme" data-id="${t}">${esc(tName(t))} · ${n}</button>`).join("")}</div>
+    <div class="row">${Object.entries(pc).filter(([x])=>S.people.has(x)).sort((a,b)=>b[1]-a[1]).slice(0,6).map(([x,n])=>`<button class="chip p" data-act="open-person" data-id="${x}">${esc(pName(x))} · ${n}</button>`).join("")}</div></div>
+   ${lastS&&lastS.homework?`<div class="card stack" style="box-shadow:none"><p class="label">上次的回家作業</p><p class="prose">${esc(lastS.homework)}</p>
+    <label class="row small" for="pr-hw"><input type="checkbox" id="pr-hw" ${pr.hwDone?"checked":""} style="accent-color:var(--accent)">做了</label>
+    <textarea id="pr-hwnote" placeholder="做的時候有什麼感受？做不到的話，卡在哪裡？" style="min-height:70px">${esc(pr.hwNote||"")}</textarea></div>`:""}
+   <div class="stack"><p class="label">想問的問題</p><div class="qlist">
+    ${qs.map(x=>`<label class="q ${x.done?"done":""}"><input type="checkbox" data-act="ask" data-id="${x.e.id}" data-i="${x.i}" ${x.done?"checked":""}><span>${esc(x.q)}</span></label>`).join("")}
+    ${(pr.myQs||[]).map(x=>`<div class="q ${x.done?"done":""}"><input type="checkbox" data-act="myq-done" data-qid="${x.id}" ${x.done?"checked":""} aria-label="問過了"><span style="flex:1">${esc(x.text)}</span><button class="linkbtn" style="color:var(--muted)" data-act="myq-del" data-qid="${x.id}">刪除</button></div>`).join("")}
+    ${!qs.length&&!(pr.myQs||[]).length?'<p class="small muted">還沒有</p>':""}</div>
+    <div class="row"><input class="inp" id="pr-q" placeholder="新增一個想問的問題" style="flex:1;min-width:0"><button class="btn sm quiet" data-act="myq-add">加入</button></div></div>
+   <div class="stack"><p class="label">想帶去的紀錄</p>
+    ${bring.map(e=>`<div class="row" style="flex-wrap:nowrap"><button type="button" class="mini-e" style="flex:1;min-width:0" data-act="open-entry" data-id="${e.id}"><span>${fmtD(e.date)}</span>${esc(entryTitle(e))}</button><button class="btn sm ghost" data-act="prep-drop" data-id="${e.id}" aria-label="不帶這篇">×</button></div>`).join("")||'<p class="small muted">還沒有</p>'}
+    <select class="inp" id="pr-add"><option value="">加入其他紀錄……</option>${others.map(e=>`<option value="${e.id}">${fmtD(e.date)} ${esc(entryTitle(e))}</option>`).join("")}</select></div>
+   ${lastS&&lastS.next?`<p class="small">上次你說下次想談：<b>${esc(lastS.next)}</b></p>`:""}
+   <div class="field"><label for="pr-focus">這次最想談的是什麼？</label><textarea id="pr-focus" style="min-height:80px">${esc(pr.focus||"")}</textarea></div>
+   <div class="stack">${prepBusy?`<div class="thinking"><i></i>正在濃縮……</div>`:pr.summary?`<div class="research"><b>開場可以這樣說</b><br>${esc(pr.summary).replace(/\n/g,"<br>")}</div>`:""}
+    ${prepErr?`<p class="notice warn">${esc(prepErr)}</p>`:""}
+    <div class="row"><button class="btn sm ghost" data-act="prep-sum" ${sample&&!prepBusy?"":"disabled"}>${pr.summary?"重新濃縮":"幫我濃縮成三句話"}</button><span class="tiny muted">會用你的 AI 整理一次</span></div></div>
+   <div class="row"><button class="btn" data-act="prep-session">諮商結束，記錄這次</button></div>
+  </div>`}
+async function prepSummary(){
+  if(!sample||prepBusy)return;const {pr,lastS,qs,bring}=prepData();prepBusy=true;prepErr="";drawSheet();
+  const lines=[pr.focus&&`這次最想談：${pr.focus}`,lastS&&lastS.homework&&`上次的回家作業：${lastS.homework}（${pr.hwDone?"做了":"還沒做"}${pr.hwNote?"，"+pr.hwNote:""}）`,
+    [...qs.filter(x=>!x.done).map(x=>x.q),...(pr.myQs||[]).filter(x=>!x.done).map(x=>x.text)].map(q=>`想問：${q}`).join("\n"),
+    bring.map(e=>`紀錄 ${e.date}：${e.analysis?.summary||entryTitle(e)}`).join("\n")].filter(Boolean).join("\n");
+  try{const r=await sample(`你在幫使用者準備下一次心理諮商。根據以下他整理的內容，用繁體中文寫出三句他可以在諮商開場時直接說出口的話：第一句說最近發生的重點，第二句說他的感受或卡住的地方，第三句說他這次最想談或想問的事。用第一人稱、口語、溫和，不要診斷，不要加編號以外的任何說明。\n\n${lines.slice(0,8000)}`,{cache:false});
+    await savePrep(p=>{p.summary=String(r.text||"").trim()})}
+  catch(e){prepErr=e&&e.code==="cancelled"?"":errMsg(e&&e.code)}
+  prepBusy=false;if(sheet&&sheet.kind==="prep")drawSheet()}
+
+/* ---- theme ---- */
+function shTheme(){
+  const t=S.themes.get(sheet.id);if(!t)return null;const es=entriesOfTheme(t.id);
+  const pc={};es.forEach(e=>(e.people||[]).forEach(p=>pc[p]=(pc[p]||0)+1));
+  return top_(esc(t.name))+`<div class="sheet-body">
+   <div class="field"><span class="lab">現在的狀態</span><div class="row">${TSTATUS.map(s=>`<button type="button" class="pick" data-act="tstatus" data-id="${t.id}" data-s="${s[0]}" aria-pressed="${(t.status||"facing")===s[0]}">${s[1]}</button>`).join("")}</div></div>
+   <div class="field"><label for="th-name">名稱</label><div class="row"><input class="inp" id="th-name" value="${esc(t.name)}" style="flex:1"><button class="btn sm quiet" data-act="rename-theme" data-id="${t.id}">改名</button></div></div>
+   <div class="field"><label for="th-note">我對這個課題的理解</label><textarea id="th-note">${esc(t.note||"")}</textarea><div><button class="btn sm quiet" data-act="note-theme" data-id="${t.id}">儲存</button></div></div>
+   <div class="stack"><p class="label">牽涉到的人</p><div class="row">${Object.entries(pc).sort((a,b)=>b[1]-a[1]).map(([p,n])=>`<button class="chip p" data-act="open-person" data-id="${p}">${esc(pName(p))} · ${n}</button>`).join("")||'<span class="small muted">還沒有</span>'}</div></div>
+   <div class="stack"><p class="label">${es.length} 篇相關紀錄</p>${es.map(e=>`<button type="button" class="mini-e" data-act="open-entry" data-id="${e.id}"><span>${fmtD(e.date)}</span>${esc(entryTitle(e))}</button>`).join("")}</div>
+   ${es.length>=2?`<div><button class="btn sm ghost" data-act="open-method" data-id="c_pattern">把這些事擺在一起看</button></div>`:""}
+   <div class="row">${sheet.confirmDel?`<span class="small">刪除後，紀錄會保留，但不再連到這個課題。</span><button class="btn sm danger" data-act="del-theme" data-id="${t.id}">確定刪除</button><button class="btn sm ghost" data-act="cancel-del">取消</button>`:`<button class="linkbtn" style="color:var(--warn)" data-act="ask-del">刪除這個課題</button>`}</div>
+  </div>`}
+
+/* ---- method ---- */
+function shMethod(){
+  const m=methodById(sheet.id);if(!m)return null;
+  const es=entries().slice(0,20);
+  return top_(m.name)+`<div class="sheet-body">
+   <div class="row"><span class="label" style="color:var(--method)">${CATS.find(c=>c[0]===m.cat)[1]}</span>${evTag(m.ev)}<span class="tiny muted">${EVID[m.ev][0]}</span></div>
+   <p>${m.what}</p>
+   <div><p class="label">適合的時候</p><p>${m.when}</p></div>
+   ${m.withCounselor?`<p class="notice warn">這個練習可能引發強烈的情緒，建議在諮商時跟諮商師一起做。</p>`:""}
+   <div><p class="label">怎麼做</p><ol class="steps">${m.steps.map(s=>`<li>${s}</li>`).join("")}</ol></div>
+   <div class="research stack"><b>依據</b>${m.refs.length?m.refs.map(researchById).filter(Boolean).map(r=>`<button type="button" class="rref" data-act="open-research" data-id="${r.id}"><b>${r.title}</b><span>${r.cite}</span></button>`).join(""):`<p class="small">這是${m.cat==="relate"&&m.id==="p_ineed"?"Marshall Rosenberg 非暴力溝通":"心理治療中常用"}的臨床做法，目前沒有針對這個單一練習的大型研究。</p>`}</div>
+   <div class="card stack" style="box-shadow:none"><p class="label">選為我的下一步</p>
+    <div class="field"><label for="st-entry">從哪篇紀錄出發？</label><select class="inp" id="st-entry"><option value="">不連到特定紀錄</option>${es.map(e=>`<option value="${e.id}" ${sheet.entryId===e.id?"selected":""}>${fmtD(e.date)} ${esc(entryTitle(e))}</option>`).join("")}</select></div>
+    <div class="field"><label for="st-note">想怎麼做？（可以不填）</label><input class="inp" id="st-note" placeholder="例如：這週日晚上寫給爸爸"></div>
+    <div><button class="btn" data-act="add-step" data-m="${m.id}">放進我的下一步</button></div></div>
+  </div>`}
+
+/* ---- step done ---- */
+function shDone(){
+  const s=S.steps.get(sheet.id);if(!s)return null;const m=methodById(s.methodId);
+  return top_("做完了："+esc(m?.name||"下一步"))+`<div class="sheet-body">
+   <div class="field"><span class="lab">對你有幫助嗎？</span><div class="moods">${[1,2,3,4,5].map(v=>`<button type="button" data-act="help-v" data-v="${v}" aria-pressed="${sheet.help===v}">${["沒什麼幫助","一點點","普通","有幫助","很有幫助"][v-1]}</button>`).join("")}</div></div>
+   <div class="field"><label for="dn-ref">做的時候發現了什麼？</label><textarea id="dn-ref" placeholder="例如：寫到一半哭了，但寫完覺得比較輕">${esc(sheet.ref||"")}</textarea></div>
+   <div class="row"><button class="btn" data-act="finish-step" data-id="${s.id}">記下來</button></div>
+  </div>`}
+
+/* ---- research ---- */
+function shResearch(){
+  const r=researchById(sheet.id);if(!r)return null;const ms=allMethods().filter(m=>m.refs.includes(r.id));
+  return top_(r.title)+`<div class="sheet-body">
+   <div class="row"><span class="label" style="color:var(--theme)">${r.area}</span>${evTag(r.ev)}<span class="tiny muted">${EVID[r.ev][0]}</span></div>
+   <p class="small muted">${r.cite}</p>
+   <div><p class="label">研究發現</p><p>${r.finding}</p></div>
+   <div class="research"><b>對你的意義</b><br>${r.meaning}</div>
+   <div><p class="label">要注意的限制</p><p class="small">${r.limits}</p></div>
+   ${r.weekly?`<p class="tiny muted">${r.issue} 每週新知${r.published?" · 研究發表於 "+r.published:""}</p>`:""}${r.url?`<p><a href="${r.url}" target="_blank" rel="noopener" style="color:var(--accent)">閱讀原文或摘要 ↗</a></p>`:""}
+   ${ms.length?`<div class="stack"><p class="label">根據這篇研究的方法</p>${ms.map(m=>`<button type="button" class="mini-e" data-act="open-method" data-id="${m.id}"><span>${CATS.find(c=>c[0]===m.cat)[1]}</span>${m.name}</button>`).join("")}</div>`:""}
+  </div>`}
+
+/* ---- help ---- */
+function shHelp(){
+  return top_("你不需要一個人撐著")+`<div class="sheet-body">
+   <p>如果你現在很難受、撐不下去，請直接打電話，說「我現在很難受」就可以了。</p>
+   <div class="lines"><div><b>1925</b>衛福部安心專線<span class="tiny muted">24 小時免付費</span></div><div><b>1995</b>生命線<span class="tiny muted">24 小時</span></div><div><b>1980</b>張老師專線</div><div><b>113</b>保護專線<span class="tiny muted">家暴、性侵、兒少保護</span></div></div>
+   <p class="notice warn">有立即的生命危險，請撥 <b>119</b> 或 <b>110</b>，或前往最近的急診。也請讓你的諮商師知道。</p>
+  </div>`}
+
+/* ---- import / export fallback ---- */
+function shData(){
+  return top_(sheet.title)+`<div class="sheet-body">${sheet.html}</div>`}
+
+/* ============================================================
+   AI analysis
+   ============================================================ */
+let anaCtl=null;
+function buildPrompt(e){
+  const ps=people().map(p=>`- ${p.name}（${p.relation||"關係未填"}；${(p.stages||[]).join("、")||"階段未填"}）`).join("\n")||"（尚無）";
+  const ts=themes().map(t=>`- ${t.name}`).join("\n")||"（尚無）";
+  const recent=entries().filter(x=>x.id!==e.id&&x.type!=="letter"&&(x.date||"")<=(e.date||"")).slice(0,15).map(x=>`- ${x.date}｜${x.analysis?.summary||entryTitle(x)}｜人物：${(x.people||[]).map(pName).join("、")||"無"}｜課題：${(x.themes||[]).map(tName).join("、")||"無"}`).join("\n")||"（尚無）";
+  const ms=allMethods().map(m=>`- ${m.id}：［${CATS.find(c=>c[0]===m.cat)[1]}］${m.name}（適合：${m.when}）`).join("\n");
+  const body=(e.type==="session"?"類型：諮商紀錄\n":"類型：日記\n")+`日期：${e.date}\n人生階段：${e.stage||"未標記"}\n心情：${moodOf(e.mood)?.[1]||"未標記"}\n使用者標記的人物：${(e.people||[]).map(pName).join("、")||"無"}\n內容：\n${entryText(e).slice(0,6000)}`;
+  return `你是協助使用者整理心理日記的助手，不是治療師，也不做診斷。使用者可能正在接受心理諮商，也可能只是想更了解自己；這個工具幫他把每篇紀錄整理成可以回顧、也可以帶去和專業人員討論的結構。他特別關注人際關係，以及童年、青少年、成年到現在的經驗如何彼此連結。
+
+請只根據紀錄裡寫出來的內容整理，不要臆測沒寫到的事；推論時用「可能」的語氣。使用繁體中文，語氣溫和、具體，盡量沿用使用者自己的用詞。不要使用診斷名詞（例如憂鬱症、焦慮症、人格違常）。
+
+【已知人物】
+${ps}
+
+【已知課題】
+${ts}
+
+【最近的紀錄摘要】
+${recent}
+
+【方法庫（只能從這裡選）】
+${ms}
+
+【這篇紀錄】
+${body}
+
+請只回覆一個 JSON 物件，格式如下，不要有其他文字：
+{"summary":"一句話說出這篇的核心（20字內）",
+ "chain":{"event":"發生了什麼（事實）","thought":"當下的想法","emotion":["情緒1","情緒2"],"body":"身體的反應，沒寫到就留空字串","behavior":"做了什麼或想做什麼"},
+ "need":"這個反應背後，可能在保護或渴望的需要（一句話）",
+ "people":[{"name":"人物名","relation":"關係","stage":"童年|青少年|成年|現在|未知","role":"他在這件事裡的角色（一句話）"}],
+ "themes":[{"name":"課題名稱","why":"為什麼這樣判斷（一句話）"}],
+ "pattern":"和最近紀錄或已知人物之間可能的重複模式；沒有就留空字串",
+ "methods":[{"id":"方法id","why":"為什麼適合這次（一句話）"}],
+ "questions":["可以帶去問諮商師的問題"],
+ "risk":false}
+
+規則：
+- people：只列文中具體出現的他人，不包含使用者自己；若和已知人物是同一人，name 必須和已知人物完全相同。
+- themes：1 到 3 個。優先沿用已知課題的名稱（完全相同）；新課題用 4 到 10 個字的中性描述，例如「害怕被否定」「界線難以說出口」「渴望被看見」。
+- methods：2 到 3 個，id 只能用方法庫裡的；依這篇的狀況選最合適的類別（例如人際衝突選人際與界線，反覆想同一件事選覺察想法或照顧身體，和童年有關的深層經驗可選處理過去）。
+- questions：2 到 3 個，具體、可以直接在諮商時問出口。
+- risk：只有在內容提到自傷、自殺念頭，或正處於被暴力傷害的立即危險時才設為 true。`}
+function cleanAnalysis(a){
+  if(!a||typeof a!=="object")throw{code:"invalid_json"};
+  return{summary:String(a.summary||""),chain:a.chain&&typeof a.chain==="object"?{event:String(a.chain.event||""),thought:String(a.chain.thought||""),emotion:Array.isArray(a.chain.emotion)?a.chain.emotion.map(String).slice(0,5):[],body:String(a.chain.body||""),behavior:String(a.chain.behavior||"")}:{},
+    need:String(a.need||""),people:(Array.isArray(a.people)?a.people:[]).slice(0,8).map(p=>({name:String(p&&p.name||"").trim(),relation:String(p&&p.relation||""),stage:String(p&&p.stage||""),role:String(p&&p.role||"")})).filter(p=>p.name),
+    themes:(Array.isArray(a.themes)?a.themes:[]).slice(0,3).map(t=>({name:String(t&&t.name||"").trim(),why:String(t&&t.why||"")})).filter(t=>t.name),
+    pattern:String(a.pattern||""),methods:(Array.isArray(a.methods)?a.methods:[]).map(m=>({id:String(m&&m.id||""),why:String(m&&m.why||"")})).filter(m=>methodById(m.id)).slice(0,3),
+    questions:(Array.isArray(a.questions)?a.questions:[]).map(String).slice(0,3),risk:a.risk===true,at:Date.now()}}
+async function analyzeCore(id,signal,tier){
+  const e=S.entries.get(id);if(!e||!sample)throw{code:"capability_disabled"};
+  const a=cleanAnalysis(await sample.json(buildPrompt(e),{signal,cache:false,modelTier:tier||"default"}));
+  const cur=clone(S.entries.get(id)||e);cur.analysis=a;cur.applied=false;cur.asked={};await put("entries",cur);return a}
+const errMsg=c=>({no_key:"還沒有填入 API 金鑰。請到右上角「設定」填入，或改用「複製貼上」。",auth:"API 金鑰不正確或已失效，請到設定檢查。",model:"模型名稱可能不正確，請到設定修改成該平台目前的模型名稱。",rate:"已達使用上限或請求太頻繁，請稍後再試，或檢查你的 AI 帳號額度。",network:"連不上 AI 服務，請檢查網路後再試。",invalid_json:"讀不出 AI 回覆的格式。請確認有把整段回覆貼回來（包含大括號 { } 的部分），或再試一次。",refused:"AI 沒有回覆內容。可以改寫一部分後再試，或直接帶去跟專業的人討論。",capability_disabled:"AI 整理還沒準備好，請稍後再試。"})[c]||"整理沒有完成，請再試一次。";
+async function analyze(id){
+  if(!S.entries.get(id)||!sample)return;
+  if(anaCtl)anaCtl.abort();anaCtl=new AbortController();
+  sheet.busy=true;sheet.err="";drawSheet();
+  try{const a=await analyzeCore(id,anaCtl.signal);await applyCore(id,a.people.map((_,i)=>i),a.themes.map((_,i)=>i));sheet.busy=false}
+  catch(err){sheet.busy=false;const c=err&&err.code;sheet.err=c==="cancelled"?"":errMsg(c)}
+  anaCtl=null;if(sheet&&sheet.kind==="entry")drawSheet();
+}
+async function applyCore(id,pIdx,tIdx){
+  const e=clone(S.entries.get(id));if(!e||!e.analysis)return;const a=e.analysis;
+  const pset=new Set(e.people||[]),tset=new Set(e.themes||[]);
+  for(const i of pIdx){const sp=a.people[i];if(!sp)continue;let p=people().find(x=>x.name===sp.name);
+    if(!p){p={id:uid(),name:sp.name,relation:sp.relation||"",stages:STAGES.includes(sp.stage)?[sp.stage]:[],feeling:"",createdAt:Date.now()};await put("people",p)}
+    else if(STAGES.includes(sp.stage)&&!(p.stages||[]).includes(sp.stage)){const q=clone(p);q.stages=[...(q.stages||[]),sp.stage];await put("people",q)}
+    pset.add(p.id)}
+  for(const i of tIdx){const st=a.themes[i];if(!st)continue;let t=themes().find(x=>x.name===st.name);
+    if(!t){t={id:uid(),name:st.name,status:"facing",note:"",createdAt:Date.now()};await put("themes",t)}tset.add(t.id)}
+  const cur=clone(S.entries.get(id));cur.people=[...pset];cur.themes=[...tset];cur.applied=true;
+  if(!cur.stage){const st=a.people.map(p=>p.stage).find(s=>STAGES.includes(s));if(st)cur.stage=st}
+  await put("entries",cur)}
+async function applyAnalysis(id){
+  const pick=k=>$$(`#sheetRoot [data-ap="${k}"]`).filter(x=>x.checked).map(x=>+x.dataset.i);
+  await applyCore(id,pick("p"),pick("t"));toast("已經收進地圖")}
+
+/* ============================================================
+   import old diaries
+   ============================================================ */
+async function readFileText(f){
+  const buf=new Uint8Array(await f.arrayBuffer());
+  if(buf[0]===0xFF&&buf[1]===0xFE)return new TextDecoder("utf-16le").decode(buf);
+  if(buf[0]===0xFE&&buf[1]===0xFF)return new TextDecoder("utf-16be").decode(buf);
+  try{return new TextDecoder("utf-8",{fatal:true}).decode(buf)}catch(e){}
+  try{return new TextDecoder("big5").decode(buf)}catch(e){return new TextDecoder("utf-8").decode(buf)}}
+const DRE=/^\s*[-–—•*·]*\s*[\[(（【〔]?\s*(?:民國\s*)?(\d{2,4})\s*[\/\-.．年]\s*(\d{1,2})\s*[\/\-.．月]\s*(\d{1,2})\s*[日號]?\s*[\])）】〕]?\s*\s*(?:[（(]\s*(?:星期|週|周|禮拜)?[一二三四五六日天]\s*[）)]|(?:星期|週|周|禮拜)[一二三四五六日天])?/;
+function toISO(y,m,d){y=+y;m=+m;d=+d;if(y<1000)y+=1911;if(m<1||m>12||d<1||d>31||y<1950||y>2100)return null;return `${y}-${pad(m)}-${pad(d)}`}
+function isoOf(ts){const d=new Date(ts);return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`}
+function parseDiary(text,fallback,fname){
+  const lines=text.replace(/\r\n?/g,"\n").split("\n");const out=[];let cur=null;
+  const push=()=>{if(!cur)return;cur.text=cur.lines.join("\n").trim();delete cur.lines;if(!cur.text&&cur.title){cur.text=cur.title;cur.title=""}if(cur.text)out.push(cur)};
+  for(const ln of lines){const m=ln.match(DRE);const iso=m&&toISO(m[1],m[2],m[3]);
+    if(iso){push();const rest=ln.slice(m[0].length).replace(/^[\s:：,，、\-—]+/,"").trim();
+      cur={date:iso,title:rest.length<=30?rest:"",lines:rest.length>30?[rest]:[],file:fname,dated:true}}
+    else{if(!cur)cur={date:fallback,title:"",lines:[],file:fname,dated:false};cur.lines.push(ln)}}
+  push();return out}
+function prepItems(list){
+  const seen=new Set(entries().map(e=>(e.date||"")+"|"+entryText(e).slice(0,40)));
+  return list.map(x=>Object.assign(x,{id:uid(),sel:true,dup:seen.has(x.date+"|"+x.text.slice(0,40))})).map(x=>(x.dup&&(x.sel=false),x))}
+async function onImportFiles(files){
+  const all=[];for(const f of files){const t=await readFileText(f);all.push(...parseDiary(t,isoOf(f.lastModified||Date.now()),f.name))}
+  sheet.items=prepItems(all);sheet.step="preview";drawSheet()}
+function shImport(){
+  const st=sheet.step||"pick";
+  if(st==="pick")return top_("匯入舊日記")+`<div class="sheet-body">
+   <p>把以前寫在記事本裡的日記放進心路，之後可以一起整理、找出跨時間的關聯。</p>
+   <div class="field"><label for="imp-files">選擇檔案</label><input type="file" id="imp-files" accept=".txt,.md,.text,text/plain" multiple class="inp"><p class="hint">可以一次選很多個 .txt 檔。繁體中文的舊檔案（Big5 編碼）也讀得出來。</p></div>
+   <div class="field"><label for="imp-paste">或直接貼上內容</label><textarea id="imp-paste" class="big" placeholder="2019/3/5\n今天……\n\n2019/3/8\n……"></textarea><div><button class="btn sm quiet" data-act="imp-paste">讀取貼上的內容</button></div></div>
+   <div class="research small"><b>怎麼分成一篇一篇</b><br>以日期開頭的那一行，會被當成新的一篇，例如「2019/3/5」「2019-03-05」「2019年3月5日」「108/3/5」（民國年）。日期後面同一行的短句會當成標題。<br>沒有日期的檔案，會整份當成一篇，日期用檔案的修改日期，匯入前都可以修改。</div>
+  </div>`;
+  if(st==="preview"){const it=sheet.items||[],n=it.filter(x=>x.sel).length,dated=it.filter(x=>x.dated).map(x=>x.date).sort();
+   return top_("確認要匯入的日記",`<button class="btn sm" data-act="imp-do" ${n?"":"disabled"}>匯入 ${n} 篇</button>`)+`<div class="sheet-body">
+    ${it.length?`<p>找到 <b>${it.length}</b> 篇${dated.length?`，日期從 ${dated[0]} 到 ${dated[dated.length-1]}`:""}。${it.some(x=>x.dup)?"標示「已存在」的篇章預設不勾選。":""}</p>
+    <div class="row"><button class="linkbtn" data-act="imp-all" data-v="1">全選</button><button class="linkbtn" data-act="imp-all" data-v="0">全不選</button><button class="linkbtn" data-act="imp-back">重新選檔</button></div>
+    <div class="implist">${it.slice(0,400).map((x,i)=>`<div class="improw"><input type="checkbox" data-act="imp-toggle" data-i="${i}" ${x.sel?"checked":""} aria-label="匯入這篇"><input type="date" class="inp" data-imp-date="${i}" value="${x.date}"><div class="impbody"><b>${esc(x.title||x.text.slice(0,24))}</b>${x.dup?' <span class="badge ex">已存在</span>':""}${x.dated?"":' <span class="tiny muted">日期取自檔案</span>'}<span class="tiny muted">${esc(x.file)} · ${x.text.length} 字</span><span class="clamp small muted">${esc(x.text.slice(0,140))}</span></div></div>`).join("")}</div>
+    ${it.length>400?`<p class="small muted">只顯示前 400 篇，其餘篇章也會依勾選狀態匯入。</p>`:""}`
+    :`<p>沒有讀到內容。請確認檔案是純文字（.txt）。</p><div><button class="btn sm quiet" data-act="imp-back">重新選檔</button></div>`}
+    <p class="small muted" id="impProg"></p></div>`}
+  const n=sheet.count||0;
+  return top_("匯入完成")+`<div class="sheet-body"><p>已經把 <b>${n}</b> 篇舊日記放進心路，標示為「匯入」。</p>
+   <div class="stack"><div class="card stack" style="box-shadow:none"><b>下一步一：批次整理</b><p class="small muted">讓 AI 一篇一篇整理，找出人物、課題，自動收進地圖。每篇都會用你的 AI 整理一次。</p><div><button class="btn sm" data-act="batch" data-scope="import">開始批次整理</button></div></div>
+   <div class="card stack" style="box-shadow:none"><b>下一步二：整體回顧</b><p class="small muted">一次讀完所有紀錄的摘要，找出跨時間重複出現的模式。建議先批次整理，回顧會更準確。</p><div><button class="btn sm ghost" data-act="go-review">去做整體回顧</button></div></div></div></div>`}
+async function runImportOld(){
+  const it=(sheet.items||[]).filter(x=>x.sel);sheet.busy=true;let k=0;
+  for(const x of it){await put("entries",{id:uid(),type:"journal",date:x.date,title:x.title||"",text:x.text.slice(0,30000),mood:0,people:[],stage:"",themes:[],asked:{},source:"import",file:x.file,createdAt:Date.now()});
+    k++;const p=$("#impProg");if(p)p.textContent=`正在匯入 ${k} / ${it.length}`}
+  sheet.busy=false;sheet.step="done";sheet.count=k;drawSheet()}
+
+/* ============================================================
+   batch analysis
+   ============================================================ */
+let batchCtl=null;
+const unanalyzed=scope=>entries().filter(e=>!e.analysis&&e.type!=="letter"&&(scope==="all"||e.source==="import")).sort((a,b)=>(a.date||"").localeCompare(b.date||""));
+function shBatch(){
+  const b=sheet,list=unanalyzed(b.scope);const total=b.running?b.total:list.length;
+  return top_("批次整理")+`<div class="sheet-body">
+   <div class="seg"><button type="button" data-act="bscope" data-s="import" aria-pressed="${b.scope==="import"}" ${b.running?"disabled":""}>匯入的舊日記</button><button type="button" data-act="bscope" data-s="all" aria-pressed="${b.scope==="all"}" ${b.running?"disabled":""}>所有未整理的</button></div>
+   <p>${b.running?"":`有 <b>${list.length}</b> 篇還沒整理，會從最早的開始。`}每篇都會用你的 AI 整理一次；用「複製貼上」的話要一篇一篇貼，篇數多時建議在「設定」改用 API 金鑰。可以隨時停止，已整理的會保留。</p>
+   <label class="row small"><input type="checkbox" id="b-auto" ${b.auto?"checked":""} ${b.running?"disabled":""} style="accent-color:var(--accent)">整理完自動收進地圖（人物和課題都會建立連結）</label>
+   <label class="row small"><input type="checkbox" id="b-quick" ${b.quick?"checked":""} ${b.running?"disabled":""} style="accent-color:var(--accent)">快速模式：比較快、比較省額度，但整理得比較簡略</label>
+   <div class="prog"><i id="b-bar" style="width:${total?b.done/total*100:0}%"></i></div>
+   <p class="small muted" id="b-status">${b.status||""}</p>
+   <div class="row">${b.running?`<button class="btn danger" data-act="batch-stop">停止</button>`:`<button class="btn" data-act="batch-start" ${list.length&&sample?"":"disabled"}>${b.done?"繼續整理":"開始整理"}</button>`}</div>
+   <div class="stack" id="b-log">${(b.log||[]).slice(-6).map(l=>`<p class="small">${l}</p>`).join("")}</div>
+  </div>`}
+function batchUI(){const b=sheet;if(!b||b.kind!=="batch")return;const bar=$("#b-bar"),st=$("#b-status"),lg=$("#b-log");
+  if(bar)bar.style.width=(b.total?b.done/b.total*100:0)+"%";if(st)st.textContent=b.status||"";if(lg)lg.innerHTML=(b.log||[]).slice(-6).map(l=>`<p class="small">${l}</p>`).join("")}
+async function runBatch(){
+  const b=sheet;b.auto=$("#b-auto").checked;b.quick=$("#b-quick").checked;
+  const list=unanalyzed(b.scope);b.running=true;b.busy=true;b.total=list.length;b.done=0;b.log=[];batchCtl=new AbortController();drawSheet();
+  for(const e of list){
+    if(batchCtl.signal.aborted)break;
+    b.status=`正在整理第 ${b.done+1} / ${b.total} 篇：${entryTitle(e)}（${e.date}）`;batchUI();
+    try{const a=await analyzeCore(e.id,batchCtl.signal,b.quick?"quick":"default");
+      if(b.auto)await applyCore(e.id,a.people.map((_,i)=>i),a.themes.map((_,i)=>i));
+      b.log.push(`✓ ${esc(e.date)} ${esc(entryTitle(e))}${a.themes.length?"：<span style=\"color:var(--theme)\">"+a.themes.map(t=>esc(t.name)).join("、")+"</span>":""}${a.risk?' <b style="color:var(--warn)">（內容提到安全疑慮，請記得照顧自己）</b>':""}`)}
+    catch(err){const c=err&&err.code;if(c==="cancelled")break;
+      b.log.push(`✕ ${esc(e.date)} ${esc(entryTitle(e))}：${esc(errMsg(c))}`);
+      if(["not_granted","sampling_disabled","rate_limited","session_expired","capability_disabled"].includes(c)){b.status=errMsg(c);break}}
+    b.done++;batchUI()}
+  const stopped=batchCtl&&batchCtl.signal.aborted;batchCtl=null;b.running=false;b.busy=false;
+  if(!b.status||b.status.startsWith("正在"))b.status=stopped?`已停止，整理了 ${b.done} 篇。`:`完成，整理了 ${b.done} 篇。可以去「地圖」看看，或做一次整體回顧。`;
+  if(sheet===b)drawSheet()}
+
+/* ============================================================
+   whole-journey review
+   ============================================================ */
+let reviewBusy=false,reviewErr="",reviewSel=null,reviewCtl=null;
+function reviewPrompt(){
+  const es=entries().filter(e=>e.type!=="letter").slice(0,300).reverse();
+  const lines=es.map((e,i)=>`E${i+1}｜${e.date}｜${e.type==="session"?"諮商":"日記"}｜階段：${e.stage||"-"}｜人物：${(e.people||[]).map(pName).join("、")||"-"}｜課題：${(e.themes||[]).map(tName).join("、")||"-"}｜${(e.analysis?.summary||"")+" "+entryText(e).replace(/\s+/g," ").slice(0,e.analysis?90:160)}`).join("\n");
+  const ps=people().map(p=>`- ${p.name}（${p.relation||"關係未填"}；${(p.stages||[]).join("、")||"-"}）${p.feeling?"："+p.feeling.slice(0,80):""}`).join("\n")||"（尚無）";
+  return {es,prompt:`你是協助使用者回顧自己心路歷程的助手，不是治療師，也不做診斷。使用者可能正在接受心理諮商，也可能只是想更了解自己，他特別關注人際關係，以及童年、青少年、成年到現在的經驗如何彼此連結。
+
+以下是他所有紀錄的摘要（依時間排列，E 編號是紀錄代號），以及他記下的人物。請找出跨越不同時間、不同人物而重複出現的模式，幫助他看見自己一路走過的路。只根據紀錄內容推論，用「可能」的語氣；使用繁體中文，溫和、具體，盡量沿用他的用詞；不要使用診斷名詞。
+
+【人物】
+${ps}
+
+【紀錄】
+${lines}
+
+請只回覆一個 JSON 物件，不要有其他文字：
+{"overview":"整體來看，這段時間的心路（2 到 3 句）",
+ "patterns":[{"name":"模式名稱（4 到 12 字）","description":"這個模式通常怎麼發生：什麼情境觸發、出現什麼想法和情緒、通常怎麼反應","refs":["E3","E12"],"people":["人物名"],"since":"最早出現的時期或日期"}],
+ "people":[{"name":"人物名","insight":"這段關係在紀錄中呈現的樣子，以及它和其他關係的相似處"}],
+ "changes":"隨時間出現的變化或進步；看不出來就留空字串",
+ "strengths":"他一路以來展現的力量或資源",
+ "questions":["可以帶去和諮商師討論的問題"],
+ "risk":false}
+
+規則：patterns 2 到 5 個，每個至少引用 2 篇紀錄，refs 只能用上面出現的 E 編號；people 只寫紀錄中重要的 2 到 5 人；questions 2 到 4 個；只有在內容顯示目前有自傷、自殺念頭或立即危險時，risk 才設為 true。`}}
+async function runReview(){
+  if(!sample||reviewBusy)return;reviewBusy=true;reviewErr="";reviewCtl=new AbortController();render();
+  try{const {es,prompt}=reviewPrompt();
+    const a=await sample.json(prompt,{signal:reviewCtl.signal,cache:false,modelTier:"default"});
+    if(!a||typeof a!=="object")throw{code:"invalid_json"};
+    const ref=r=>{const m=String(r).match(/(\d+)/);const e=m&&es[+m[1]-1];return e?e.id:null};
+    const data={overview:String(a.overview||""),changes:String(a.changes||""),strengths:String(a.strengths||""),risk:a.risk===true,
+      patterns:(Array.isArray(a.patterns)?a.patterns:[]).slice(0,6).map(p=>({name:String(p&&p.name||""),description:String(p&&p.description||""),since:String(p&&p.since||""),people:(Array.isArray(p&&p.people)?p.people:[]).map(String),entries:[...new Set((Array.isArray(p&&p.refs)?p.refs:[]).map(ref).filter(Boolean))]})).filter(p=>p.name),
+      people:(Array.isArray(a.people)?a.people:[]).slice(0,6).map(p=>({name:String(p&&p.name||""),insight:String(p&&p.insight||"")})).filter(p=>p.name),
+      questions:(Array.isArray(a.questions)?a.questions:[]).map(String).slice(0,4)};
+    const rv={id:uid(),at:Date.now(),n:es.length,from:es[0]?.date||"",to:es[es.length-1]?.date||"",data};
+    reviewSel=rv.id;await put("reviews",rv)}
+  catch(err){const c=err&&err.code;reviewErr=c==="cancelled"?"":errMsg(c)}
+  reviewBusy=false;reviewCtl=null;render()}
+function vReview(){
+  const rs=[...S.reviews.values()].sort((a,b)=>b.at-a.at);const r=S.reviews.get(reviewSel)||rs[0];const n=entries().length;
+  const pchip=name=>{const p=people().find(x=>x.name===name);return p?`<button class="chip p" data-act="open-person" data-id="${p.id}">${esc(name)}</button>`:`<span class="chip p">${esc(name)}</span>`};
+  const head=`<div class="card stack"><div class="spread"><div><h2 style="font-size:20px">整體回顧</h2><p class="small muted">一次讀完所有紀錄（最多最近 300 篇）的摘要，找出跨越不同時期、不同人物的重複模式。會把所有紀錄的摘要交給你的 AI 一次，人名同樣會換成代號。</p></div>
+    ${reviewBusy?`<button class="btn sm danger" data-act="review-stop">停止</button>`:`<button class="btn" data-act="review-run" ${sample&&n>=3?"":"disabled"}>${rs.length?"再做一次回顧":"做一次整體回顧"}</button>`}</div>
+    ${reviewBusy?`<div class="thinking"><i></i>正在讀你走過的路，可能需要一兩分鐘……</div>`:""}${reviewErr?`<p class="notice warn">${esc(reviewErr)}</p>`:""}
+    ${n<3?`<p class="small muted">至少要有 3 篇紀錄才能回顧。可以先寫幾篇，或匯入舊日記。</p>`:""}
+    ${unanalyzed("all").length?`<p class="small">還有 ${unanalyzed("all").length} 篇沒整理。<button class="linkbtn" data-act="batch" data-scope="all">先批次整理</button>，回顧會更準確。</p>`:""}</div>`;
+  if(!r)return head;const d=r.data;
+  return head+`<div class="stack">
+   <div class="spread"><p class="small muted">${new Date(r.at).toLocaleDateString("zh-TW")} 的回顧 · ${r.n} 篇紀錄（${esc(r.from)} 到 ${esc(r.to)}）</p>
+    ${rs.length>1?`<select class="inp" id="rv-pick" style="width:auto">${rs.map(x=>`<option value="${x.id}" ${x.id===r.id?"selected":""}>${new Date(x.at).toLocaleDateString("zh-TW")}（${x.n} 篇）</option>`).join("")}</select>`:""}</div>
+   ${d.risk?`<div class="risk"><b>回顧中有些內容讓人擔心你的安全。</b><p class="small">如果你現在正想傷害自己，請打安心專線 1925 或生命線 1995，緊急時撥 119，也請告訴你的諮商師。</p></div>`:""}
+   ${d.overview?`<p class="need" style="font-size:20px">${esc(d.overview)}</p>`:""}
+   <div class="stack"><p class="label">重複出現的模式</p>${d.patterns.map(p=>`<div class="card stack" style="box-shadow:none"><div class="spread"><h3 style="font-size:19px;color:var(--theme)">${esc(p.name)}</h3>${p.since?`<span class="tiny muted">最早：${esc(p.since)}</span>`:""}</div>
+     <p>${esc(p.description)}</p><div class="row">${p.people.map(pchip).join("")}</div>
+     <div class="row">${p.entries.map(id=>S.entries.get(id)).filter(Boolean).map(e=>`<button class="chip s" data-act="open-entry" data-id="${e.id}">${fmtD(e.date)} ${esc(entryTitle(e).slice(0,12))}</button>`).join("")}</div></div>`).join("")||'<p class="small muted">這次沒有找到明顯的模式。</p>'}</div>
+   ${d.people.length?`<div class="stack"><p class="label">關係裡的樣子</p>${d.people.map(p=>`<p class="small">${pchip(p.name)} ${esc(p.insight)}</p>`).join("")}</div>`:""}
+   ${d.changes?`<div><p class="label">走過的變化</p><p>${esc(d.changes)}</p></div>`:""}
+   ${d.strengths?`<div class="research"><b>你一路展現的力量</b><br>${esc(d.strengths)}</div>`:""}
+   ${d.questions.length?`<div class="stack"><p class="label">可以帶去和諮商師討論的</p><ul style="margin:0;padding-left:1.2em">${d.questions.map(q=>`<li>${esc(q)}</li>`).join("")}</ul></div>`:""}
+   <p class="tiny muted">AI 的回顧是根據文字的歸納，不是診斷。哪些模式真的貼近你，請和諮商師一起確認。</p></div>`}
+
+/* ============================================================
+   examples, export, import
+   ============================================================ */
+async function loadExamples(){
+  const P=[["ex-p1","爸爸","父親",["童年","現在"]],["ex-p2","媽媽","母親",["童年","現在"]],["ex-p3","王經理","主管",["現在"]],["ex-p4","小雨","前任",["成年"]]];
+  const T=[["ex-t1","害怕被否定","facing"],["ex-t2","界線難以說出口","progress"],["ex-t3","渴望被看見","facing"]];
+  for(const[id,name,relation,stages]of P)await put("people",{id,name,relation,stages,feeling:"",ex:true,createdAt:Date.now()});
+  for(const[id,name,status]of T)await put("themes",{id,name,status,note:"",ex:true,createdAt:Date.now()});
+  const E=[
+   {id:"ex-e1",type:"session",no:1,date:daysAgo(21),stage:"童年",mood:3,people:["ex-p1"],themes:["ex-t1"],talk:"聊到小時候考試考不好，爸爸只會問為什麼不是一百分。我說我早就不在意了，但講的時候喉嚨很緊。",said:"你現在對自己的嚴格，聽起來很像當年爸爸的聲音。",insight:"我對自己說話的方式，其實是學來的。",homework:"這週留意自己罵自己的時刻，記下來。",next:"為什麼被主管念一句，就整天心情不好？",applied:true},
+   {id:"ex-e2",type:"journal",date:daysAgo(12),stage:"現在",mood:1,people:["ex-p3"],themes:["ex-t1"],title:"被主管念了一句",text:"今天開會時王經理說我的報告不夠完整。我整個下午都很沮喪，一直覺得自己很沒用。回家後什麼都不想做，晚餐也沒吃。",applied:true,
+    analysis:{summary:"一句批評，被聽成對整個人的否定",chain:{event:"王經理在會議上說報告不夠完整",thought:"我很沒用",emotion:["沮喪","羞愧"],body:"沒有食慾、整晚提不起勁",behavior:"回家後什麼都不想做"},need:"想確認自己是有能力、被認可的",people:[{name:"王經理",relation:"主管",stage:"現在",role:"說出批評的人"}],themes:[{name:"害怕被否定",why:"一句針對報告的話，被感受成對自己整個人的評價"}],pattern:"和第一次諮商談到的、爸爸對成績的要求，可能是同一種感受",methods:[{id:"c_evidence",why:"檢驗「我很沒用」這個想法有多少事實根據"},{id:"k_three",why:"自責很強的時候，先對自己溫柔一點"}],questions:["為什麼別人說的是報告，我聽到的卻是我這個人？","這種「我很沒用」的感覺，最早是什麼時候出現的？"],risk:false,at:Date.now()}},
+   {id:"ex-e3",type:"journal",date:daysAgo(6),stage:"成年",mood:2,people:["ex-p4"],themes:["ex-t2"],title:"又回了很長的訊息",text:"小雨傳訊息問我最近好嗎。我明明不想聊，卻還是回了很長一段，結束後覺得好累，也有點氣自己。",applied:true},
+   {id:"ex-e4",type:"session",no:2,date:daysAgo(4),stage:"現在",mood:4,people:["ex-p1","ex-p3"],themes:["ex-t1","ex-t3"],talk:"談了主管那件事，諮商師問我被批評的那一刻，腦中出現的是誰的臉。我愣了一下，是爸爸。",said:"被批評時，你聽到的不是主管，是小時候的那個聲音。",insight:"主管說的是報告，不是我這個人。",homework:"寫一封不寄出的信，給小時候考試的那個自己。",next:"想談談跟媽媽的相處。",applied:true,
+    analysis:{summary:"看見主管的話和爸爸的聲音疊在一起",chain:{event:"諮商中回顧被主管批評的經驗",thought:"原來我聽到的是爸爸",emotion:["驚訝","鬆了一口氣"],body:"",behavior:"決定寫信給小時候的自己"},need:"想被當年的大人肯定，而不是只被要求",people:[{name:"爸爸",relation:"父親",stage:"童年",role:"當年對成績要求很高的人"},{name:"王經理",relation:"主管",stage:"現在",role:"觸發舊感受的人"}],themes:[{name:"害怕被否定",why:"批評喚起了童年的感受"},{name:"渴望被看見",why:"希望努力本身被肯定"}],pattern:"「被評價 → 覺得自己不夠好」在爸爸和主管身上都出現過",methods:[{id:"k_inner",why:"諮商師給的作業，正好是寫給小時候的自己"},{id:"r_letter",why:"把一直沒對爸爸說的話寫下來"}],questions:["寫給小時候的自己時，如果情緒很強，我可以怎麼照顧自己？","我想試著跟爸爸談，但不知道現在適不適合。"],risk:false,at:Date.now()}},
+   {id:"ex-e5",type:"journal",date:daysAgo(1),stage:"現在",mood:2,people:["ex-p2"],themes:["ex-t2","ex-t3"],title:"說不出口的累",text:"媽媽打電話來，說我很少回家。我其實很想跟她說我最近很累，但說不出口，只說「最近比較忙」。掛掉電話後一直覺得悶悶的。",applied:true}
+  ];
+  for(const e of E)await put("entries",Object.assign({ex:true,createdAt:Date.now(),asked:{}},e));
+  await put("steps",{id:"ex-s1",methodId:"k_inner",entryId:"ex-e4",note:"諮商師給的作業",status:"todo",ex:true,createdAt:Date.now()});
+  await put("steps",{id:"ex-s2",methodId:"c_evidence",entryId:"ex-e2",note:"",status:"done",help:4,reflection:"寫下證據後發現，上個月主管才稱讚過我的分析",ex:true,createdAt:Date.now()-1000,doneAt:Date.now()});
+  toast("範例已載入，看看地圖吧");
+}
+async function clearExamples(){for(const c of COLS)for(const x of [...S[c].values()])if(x.ex)await del(c,x.id);toast("範例已清除")}
+function exportJSON(){const o={app:"心路",format:"xinlu-backup",version:1,exportedAt:new Date().toISOString(),stages:STAGES,methods:METHODS.map(m=>({id:m.id,name:m.name,category:m.cat}))};COLS.forEach(c=>o[c]=[...S[c].values()]);return JSON.stringify(o,null,2)}
+async function doExport(){
+  const o=JSON.parse(exportJSON());o.media=[];const metas=[];entries().forEach(e=>(e.media||[]).forEach(m=>metas.push(m)));
+  if(metas.length)toast(`正在打包 ${metas.length} 個照片和錄音……`);
+  for(const m of metas){try{o.media.push({id:m.id,data:await getMedia(m)})}catch(e){}}
+  const json=JSON.stringify(o),name=`心路備份-${today().replace(/-/g,"")}.json`;
+  try{downloadText(name,json);local.set("xinlu-lastbackup",Date.now());toast("已匯出備份，請存到你的雲端硬碟");schedule();return}catch(e){}
+  openSheet({kind:"data",title:"匯出備份",html:`<p class="small muted">這個畫面沒辦法直接下載檔案。請全選下面的內容，複製後貼到一個文字檔，存成 .json。</p><textarea class="big" readonly style="min-height:320px;font-family:ui-monospace,monospace;font-size:12px">${esc(json)}</textarea><div><button class="btn sm" data-act="copy-json">複製全部</button></div>`});
+}
+async function doImport(file){
+  let o;try{o=JSON.parse(await file.text())}catch(e){toast("這個檔案讀不出來，請確認是心路匯出的備份。");return}
+  if(!o||o.format!=="xinlu-backup"){toast("這不是心路的備份檔。");return}
+  const n=COLS.reduce((s,c)=>s+(Array.isArray(o[c])?o[c].length:0),0);
+  openSheet({kind:"data",title:"匯入備份",html:`<p>這個備份有 ${n} 筆資料（${o.exportedAt?.slice(0,10)||"日期不明"}）。相同的紀錄會被備份裡的版本取代，其他現有資料會保留。</p><div class="row"><button class="btn" data-act="do-import">開始匯入</button></div><p class="small muted" id="impProg"></p>`});
+  pendingImport=o;
+}
+let pendingImport=null;
+async function runImport(){const o=pendingImport;if(!o)return;let k=0,n=COLS.reduce((s,c)=>s+(o[c]||[]).length,0);
+  for(const c of COLS)for(const x of (o[c]||[])){if(!x||!x.id)continue;await put(c,x);k++;const p=$("#impProg");if(p)p.textContent=`已匯入 ${k} / ${n}`}
+  if(canMedia())for(const md of (o.media||[])){const meta=findMeta(md.id);if(meta&&typeof md.data==="string"&&/^data:(image|audio)\//.test(md.data)){try{await putMedia(Object.assign({},meta),md.data)}catch(e){}}}
+  pendingImport=null;closeSheet();toast(`匯入完成，共 ${k} 筆`)}
+async function migrate(){const lo=local.get(LKEY,null);if(!lo)return;let k=0;for(const c of COLS)for(const x of (lo[c]||[])){await put(c,x);k++}
+  try{localStorage.removeItem(LKEY)}catch(e){}toast(`已上傳 ${k} 筆到雲端`);schedule()}
+
+/* ============================================================
+   events
+   ============================================================ */
+/* ============================================================
+   photos & audio — kept in the private subtree as chunked data URLs
+   ============================================================ */
+const CHUNK=200000,MAX_AUDIO=3*1024*1024,MAX_PHOTOS=8;
+const mediaCache=new Map();
+const canMedia=()=>mode==="device";
+async function putMedia(meta,dataUrl){meta.n=1;await IDB.set("media",meta.id,dataUrl);mediaCache.set(meta.id,dataUrl);return meta}
+async function getMedia(meta){if(mediaCache.has(meta.id))return mediaCache.get(meta.id);if(mode!=="device")throw{code:"local"};const u=await IDB.get("media",meta.id);if(!u)throw{code:"missing"};mediaCache.set(meta.id,u);return u}
+async function delMedia(meta){mediaCache.delete(meta.id);if(mode==="device"){try{await IDB.del("media",meta.id)}catch(e){}}}
+function compressImage(file){return new Promise((res,rej)=>{const u=URL.createObjectURL(file),img=new Image();
+  img.onload=()=>{URL.revokeObjectURL(u);let max=1600,q=.82,out="",w=0,h=0;
+    for(let k=0;k<8;k++){const sc=Math.min(1,max/Math.max(img.naturalWidth,img.naturalHeight));w=Math.max(1,Math.round(img.naturalWidth*sc));h=Math.max(1,Math.round(img.naturalHeight*sc));
+      const c=document.createElement("canvas");c.width=w;c.height=h;c.getContext("2d").drawImage(img,0,0,w,h);out=c.toDataURL("image/jpeg",q);
+      if(out.length<=600000)break;if(q>.6)q-=.1;else max=Math.round(max*.8)}
+    res({url:out,w,h})};
+  img.onerror=()=>{URL.revokeObjectURL(u);rej({code:"decode"})};img.src=u})}
+function readDataURL(file){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(String(r.result));r.onerror=()=>rej({code:"read"});r.readAsDataURL(file)})}
+function mediaProg(t){const p=$("#mediaProg");if(p)p.textContent=t}
+async function addFiles(files,kind){
+  if(!canMedia()){toast("這個瀏覽器無法儲存照片和錄音。");return}
+  const d=sheet.draft;d.media=d.media||[];sheet.newMedia=sheet.newMedia||[];
+  for(const f of files){
+    if(kind==="image"&&d.media.filter(m=>m.kind==="image").length>=MAX_PHOTOS){toast(`一篇最多 ${MAX_PHOTOS} 張照片`);break}
+    if(kind==="audio"&&f.size>MAX_AUDIO){toast(`「${f.name}」超過 3 MB，請剪短一點再加入。`);continue}
+    const meta={id:uid(),kind,name:f.name||"",at:Date.now()};
+    mediaProg(`正在加入 ${f.name||(kind==="image"?"照片":"錄音")}……`);
+    try{
+      if(kind==="image"){const r=await compressImage(f);meta.mime="image/jpeg";meta.w=r.w;meta.h=r.h;await putMedia(meta,r.url)}
+      else{const u=await readDataURL(f);if(!/^data:audio\//.test(u)){toast(`「${f.name}」不是錄音檔`);continue}meta.mime=u.slice(5,u.indexOf(";"));meta.size=f.size;await putMedia(meta,u)}
+      if(!sheet||sheet.kind!=="edit"){delMedia(meta);break}
+      d.media.push(meta);sheet.newMedia.push(meta);sheet.dirty=true;
+    }catch(e){toast(e&&e.code==="quota_exceeded"?"雲端空間已滿，請先刪除一些照片或錄音。":e&&e.code==="decode"?"這張照片讀不出來，請換成 JPG 或 PNG。":"加入沒有成功，請再試一次。")}
+  }
+  mediaProg("");renderDraftMedia()}
+function mediaThumbs(list,editable){
+  return (list||[]).map(m=>m.kind==="image"
+    ?`<div class="mthumb"><button type="button" class="mimg" data-act="view-photo" data-mid="${esc(m.id)}" aria-label="放大照片"><img data-mid="${esc(m.id)}" alt="${esc(m.name||"照片")}"></button>${editable?`<button type="button" class="mx" data-act="rm-media" data-mid="${esc(m.id)}" aria-label="移除這張照片">×</button>`:""}</div>`
+    :`<div class="maudio"><span class="small muted">${esc(m.name||"錄音")}</span><audio controls preload="none" data-mid="${esc(m.id)}"></audio>${editable?`<button type="button" class="mx" data-act="rm-media" data-mid="${esc(m.id)}" aria-label="移除這段錄音">×</button>`:""}</div>`).join("")}
+function hydrateMedia(scope,list){(list||[]).forEach(m=>{const els=$$("img,audio",scope).filter(el=>el.dataset.mid===m.id);if(!els.length)return;
+  getMedia(m).then(u=>els.forEach(el=>{el.src=u})).catch(()=>els.forEach(el=>{if(el.tagName==="IMG")el.alt="照片讀取失敗"}))})}
+function renderDraftMedia(){const box=$("#draftMedia");if(!box||!sheet||!sheet.draft)return;box.innerHTML=mediaThumbs(sheet.draft.media,true);hydrateMedia(box,sheet.draft.media)}
+function findMeta(mid){if(sheet&&sheet.draft)for(const m of sheet.draft.media||[])if(m.id===mid)return m;for(const e of S.entries.values())for(const m of e.media||[])if(m.id===mid)return m;return null}
+async function viewPhoto(mid){const m=findMeta(mid);if(!m)return;const r=$("#photoRoot");r.innerHTML=`<div class="photo-ov" data-act="close-photo" role="dialog" aria-label="照片"><img alt="${esc(m.name||"照片")}"><span class="tiny" style="color:#fff">點一下關閉</span></div>`;
+  try{r.querySelector("img").src=await getMedia(m)}catch(e){r.innerHTML="";toast("照片讀取失敗")}}
+
+function newDraft(type){const no=type==="session"?Math.max(0,...sessions().map(s=>+s.no||0))+1:"";return{type,date:today(),no,title:"",text:"",talk:"",said:"",insight:"",homework:"",next:"",mood:0,people:[],stage:"",themes:[]}}
+document.addEventListener("click",async ev=>{
+  const t=ev.target.closest("[data-act],[data-view],[data-goto]");if(!t)return;
+  if(t.dataset.view&&!t.dataset.act){go(t.dataset.view);return}
+  if(t.dataset.goto){go(t.dataset.goto);return}
+  const a=t.dataset.act,id=t.dataset.id;
+  switch(a){
+   case"sheet-bg":if(ev.target===t&&!(sheet&&sheet.kind==="edit"&&sheet.dirty)){if(sheet&&sheet.kind==="welcome")local.set("xinlu-welcomed",true);closeSheet()}break;
+   case"close":if(sheet&&sheet.kind==="welcome")local.set("xinlu-welcomed",true);if(sheet&&sheet.kind==="edit"&&sheet.dirty){sheet.confirmClose=true;drawSheet();break}closeSheet();break;
+   case"help":openSheet({kind:"help"});break;
+   case"new":openSheet({kind:"edit",draft:newDraft(t.dataset.type)});break;
+   case"edit":{const e=S.entries.get(id);if(e)openSheet({kind:"edit",id,draft:clone(e)});break}
+   case"open-entry":openSheet({kind:"entry",id});break;
+   case"open-person":openSheet({kind:"person",id});break;
+   case"new-person":openSheet({kind:"person",id:null});break;
+   case"open-theme":openSheet({kind:"theme",id});break;
+   case"open-method":openSheet({kind:"method",id,entryId:sheet&&sheet.kind==="entry"?sheet.id:""});break;
+   case"logf":logFilter=t.dataset.f;render();break;
+   case"mcat":methodCat=t.dataset.c;render();break;
+   case"mtab":methodTab=t.dataset.t;render();break;
+   case"rarea":researchArea=t.dataset.a;render();break;
+   case"open-weekly":view="methods";methodTab="research";researchArea="all";local.set("xinlu-view","methods");render();window.scrollTo(0,0);break;
+   case"open-research":openSheet({kind:"research",id});break;
+   case"import-old":openSheet({kind:"import",step:"pick"});break;
+   case"imp-paste":{const v=$("#imp-paste").value;if(!v.trim()){toast("請先貼上內容");break}sheet.items=prepItems(parseDiary(v,today(),"貼上的內容"));sheet.step="preview";drawSheet();break}
+   case"imp-back":sheet.step="pick";sheet.items=[];drawSheet();break;
+   case"imp-all":(sheet.items||[]).forEach(x=>x.sel=t.dataset.v==="1");drawSheet();break;
+   case"imp-toggle":sheet.items[+t.dataset.i].sel=t.checked;{const b=$("#sheetRoot [data-act=imp-do]"),n=sheet.items.filter(x=>x.sel).length;if(b){b.textContent=`匯入 ${n} 篇`;b.disabled=!n}}break;
+   case"imp-do":t.disabled=true;await runImportOld();break;
+   case"batch":openSheet({kind:"batch",scope:t.dataset.scope||"all",auto:true,quick:false,done:0,total:0,log:[]});break;
+   case"bscope":sheet.scope=t.dataset.s;drawSheet();break;
+   case"batch-start":runBatch();break;
+   case"batch-stop":if(batchCtl)batchCtl.abort();break;
+   case"go-review":closeSheet();view="map";mapMode="review";local.set("xinlu-view","map");render();window.scrollTo(0,0);break;
+   case"review-run":runReview();break;
+   case"review-stop":if(reviewCtl)reviewCtl.abort();break;
+   case"pstage":peopleStage=t.dataset.s;render();break;
+   case"mstage":mapStage=t.dataset.s;selNode=null;G=null;render();break;
+   case"mapmode":mapMode=t.dataset.m;render();break;
+   case"journey":view="map";mapMode="journey";local.set("xinlu-view","map");render();window.scrollTo(0,0);break;
+   case"zoom":zoomAt(+t.dataset.z);break;
+   case"examples":await loadExamples();break;
+   case"clear-ex":await clearExamples();break;
+   case"export":doExport();break;
+   case"import":$("#importFile")?.click();break;
+   case"do-import":t.disabled=true;await runImport();break;
+   case"copy-json":{const ta=$("#sheetRoot textarea");try{await navigator.clipboard.writeText(ta.value);toast("已複製")}catch(e){ta.select()}break}
+   case"migrate":await migrate();break;
+   case"ask":{const e=clone(S.entries.get(id));if(!e)break;e.asked=e.asked||{};e.asked[t.dataset.i]=t.checked;await put("entries",e);break}
+   case"tstatus":{const th=clone(S.themes.get(id));if(!th)break;th.status=t.dataset.s;await put("themes",th);break}
+   case"rename-theme":{const th=clone(S.themes.get(id));const v=$("#th-name").value.trim();if(th&&v){th.name=v;await put("themes",th);toast("已改名")}break}
+   case"note-theme":{const th=clone(S.themes.get(id));if(th){th.note=$("#th-note").value;await put("themes",th);toast("已儲存")}break}
+   case"ask-del":sheet.confirmDel=true;drawSheet();break;
+   case"cancel-del":sheet.confirmDel=false;drawSheet();break;
+   case"us-add":{const v=($("#us-new").value||"").trim();if(!v){toast("先寫下那句話");break}await updPerson(q=>q.unsaid.push({id:uid(),text:v,said:false,at:Date.now()}));drawSheet();break}
+   case"us-del":await updPerson(q=>{q.unsaid=q.unsaid.filter(u=>u.id!==t.dataset.uid)});drawSheet();break;
+   case"us-said":capturePD();sheet.saying=t.dataset.uid;drawSheet();$("#us-react")?.focus();break;
+   case"us-cancel":capturePD();sheet.saying=null;drawSheet();break;
+   case"us-confirm":{const r=($("#us-react").value||"").trim();sheet.saying=null;await updPerson(q=>{const u=q.unsaid.find(x=>x.id===t.dataset.uid);if(u){u.said=true;u.saidAt=today();u.reaction=r}});drawSheet();toast("說出口了，這是很大的一步。");break}
+   case"new-letter":{capturePD();const pp=S.people.get(id);if(!pp)break;openSheet({kind:"edit",draft:Object.assign(newDraft("letter"),{to:id,people:[id],text:`給${pp.name}：\n\n`})});break}
+   case"tear":{const text=sheet.draft.text,eid=sheet.id;sheet.newMedia=[];sheet.dirty=false;closeSheet();tearRitual(text,async()=>{if(eid&&S.entries.get(eid))await del("entries",eid);toast("這件事，可以結束了")});break}
+   case"tear-entry":{const en=S.entries.get(id);if(!en)break;closeSheet();tearRitual(en.text,async()=>{(en.media||[]).forEach(delMedia);await del("entries",id);toast("這件事，可以結束了")});break}
+   case"letter-ana":sheet.letterAna=true;drawSheet();break;
+   case"open-quotes":openSheet({kind:"quotes"});break;
+   case"q-keep":{const q=clone(S.quotes.get(id));if(q){q.status="kept";await put("quotes",q)}drawSheet();break}
+   case"q-del":await del("quotes",id);drawSheet();break;
+   case"q-add":{const v=($("#q-new").value||"").trim();if(!v){toast("先寫下那句話");break}await put("quotes",{id:uid(),text:v,status:"kept",date:today(),createdAt:Date.now()});drawSheet();toast("收藏了");break}
+   case"fab-quote":{const en=sheet&&S.entries.get(sheet.id);if(!quoteSel||!en)break;await put("quotes",{id:uid(),text:quoteSel,entryId:en.id,date:en.date,status:"kept",createdAt:Date.now()});try{getSelection().removeAllRanges()}catch(e){}$("#quoteFab").hidden=true;toast("收藏了");break}
+   case"open-prep":openSheet({kind:"prep"});break;
+   case"myq-add":{const v=($("#pr-q").value||"").trim();if(!v){toast("先寫下問題");break}await savePrep(p=>{(p.myQs=p.myQs||[]).push({id:uid(),text:v,done:false})});drawSheet();break}
+   case"myq-done":await savePrep(p=>{const q=(p.myQs||[]).find(x=>x.id===t.dataset.qid);if(q)q.done=t.checked});drawSheet();break;
+   case"myq-del":await savePrep(p=>{p.myQs=(p.myQs||[]).filter(x=>x.id!==t.dataset.qid)});drawSheet();break;
+   case"prep-drop":await savePrep(p=>{if((p.picked||[]).includes(id))p.picked=p.picked.filter(x=>x!==id);else(p.dropped=p.dropped||[]).push(id)});drawSheet();break;
+   case"prep-sum":prepSummary();break;
+   case"prep-session":{const {pr,qs}=prepData();const qsx=[...qs.filter(x=>!x.done).map(x=>x.q),...(pr.myQs||[]).filter(x=>!x.done).map(x=>x.text)];
+     const pre=[pr.focus?`【這次想談的】\n${pr.focus}`:"",qsx.length?`【想問的問題】\n${qsx.map(q=>"・"+q).join("\n")}`:"",pr.hwNote?`【回家作業】\n${pr.hwDone?"做了。":"還沒做。"}${pr.hwNote}`:""].filter(Boolean).join("\n\n");
+     openSheet({kind:"edit",draft:Object.assign(newDraft("session"),{talk:pre?pre+"\n\n【今天談了】\n":"",fromPrep:true})});break}
+   case"settings":openSheet({kind:"settings"});break;
+   case"set-mode":{const st=settings();st.aiMode=t.dataset.m;saveSettings(st);drawSheet();break}
+   case"save-key":{const st=settings();st.provider=$("#st-prov").value;st.remember=$("#st-remember").checked;st.preview=$("#st-preview").checked;st.models=st.models||{};st.models[st.provider]=($("#st-model").value||"").trim()||PROVIDERS[st.provider].model;saveSettings(st);setKey(st.provider,($("#st-key").value||"").trim(),st.remember);toast(st.remember?"已儲存在這台裝置":"已設定，關閉網頁後需要重新輸入");drawSheet();break}
+   case"clear-key":{const st=settings();setKey(st.provider,"",false);delete memKeys[st.provider];toast("金鑰已刪除");drawSheet();break}
+   case"save-mask":{const st=settings();st.maskWords=$("#st-mask").value;saveSettings(st);toast("已儲存");break}
+   case"wipe":sheet.confirmWipe=true;drawSheet();break;
+   case"wipe-no":sheet.confirmWipe=false;drawSheet();break;
+   case"wipe-yes":await wipeAll();break;
+   case"install":if(installEvt){installEvt.prompt();installEvt.userChoice.finally(()=>{installEvt=null;schedule()})}break;
+   case"welcome-ok":local.set("xinlu-welcomed",true);closeSheet();break;
+   case"welcome-ex":local.set("xinlu-welcomed",true);closeSheet();await loadExamples();break;
+   case"open-assistant":openSheet({kind:"assistant"});break;
+   case"copy-assist":{const txt=assistantPrompt();try{await navigator.clipboard.writeText(txt);toast("已複製助手指示")}catch(e){toast("複製失敗，請展開下方內容手動複製")}break}
+   case"dl-knowledge":downloadText("心路方法庫與研究庫.md",knowledgeMD(),"text/markdown");break;
+   case"paste-chat":openSheet({kind:"pastechat"});break;
+   case"pc-save":await savePastedChat();break;
+   case"ai-copy":{const q=aiReq;if(!q)break;try{await navigator.clipboard.writeText(q.pr.text);toast("已複製，去你的 AI 貼上吧")}catch(e){toast("複製失敗，請展開「看看實際送出的內容」手動複製")}break}
+   case"ai-done":{const q=aiReq;if(!q)break;const v=$("#ai-paste").value;if(!v.trim()){q.err="請先貼上 AI 的回覆。";drawAI();break}q.finish(v);break}
+   case"ai-send":sendAPI();break;
+   case"ai-switch-copy":if(aiReq){aiReq.mode="copy";aiReq.err="";drawAI()}break;
+   case"ai-cancel":{const q=aiReq;if(q){closeAI();q.reject({code:"cancelled"})}break}
+   case"pick-photo":$("#f-photo")?.click();break;
+   case"pick-audio":$("#f-audio")?.click();break;
+   case"rm-media":{const d=sheet.draft;const m=(d.media||[]).find(x=>x.id===t.dataset.mid);if(!m)break;d.media=d.media.filter(x=>x!==m);sheet.dirty=true;
+     if((sheet.newMedia||[]).includes(m)){sheet.newMedia=sheet.newMedia.filter(x=>x!==m);delMedia(m)}else(sheet.removed=sheet.removed||[]).push(m);renderDraftMedia();break}
+   case"view-photo":viewPhoto(t.dataset.mid);break;
+   case"close-photo":$("#photoRoot").innerHTML="";break;
+   case"del-entry":{const en=S.entries.get(id);(en&&en.media||[]).forEach(delMedia)}for(const s of steps().filter(s=>s.entryId===id))await del("steps",s.id);await del("entries",id);closeSheet();toast("已刪除");break;
+   case"del-person":{for(const e of entriesOfPerson(id)){const c=clone(e);c.people=c.people.filter(x=>x!==id);await put("entries",c)}await del("people",id);closeSheet();toast("已刪除");break}
+   case"del-theme":{for(const e of entriesOfTheme(id)){const c=clone(e);c.themes=c.themes.filter(x=>x!==id);await put("entries",c)}await del("themes",id);closeSheet();toast("已刪除");break}
+   case"analyze":await analyze(id);break;
+   case"stop-ana":if(anaCtl)anaCtl.abort();break;
+   case"apply":await applyAnalysis(id);break;
+   case"pick-step":openSheet({kind:"method",id:t.dataset.m,entryId:t.dataset.e});break;
+   case"add-step":{const st={id:uid(),methodId:t.dataset.m,entryId:$("#st-entry").value||"",note:$("#st-note").value.trim(),status:"todo",createdAt:Date.now()};await put("steps",st);closeSheet();toast("已放進「我的下一步」");break}
+   case"done-step":openSheet({kind:"done",id,help:0,ref:""});break;
+   case"help-v":sheet.help=+t.dataset.v;sheet.ref=$("#dn-ref").value;drawSheet();break;
+   case"finish-step":{const s=clone(S.steps.get(id));if(!s)break;s.status="done";s.help=sheet.help||0;s.reflection=$("#dn-ref").value.trim();s.doneAt=Date.now();await put("steps",s);closeSheet();toast("記下來了。做到了，就是往前一步。");break}
+   /* editor */
+   case"etype":sheet.draft.type=t.dataset.t;if(t.dataset.t==="session"&&!sheet.draft.no)sheet.draft.no=Math.max(0,...sessions().map(s=>+s.no||0))+1;sheet.dirty=true;drawSheet();break;
+   case"emood":sheet.draft.mood=sheet.draft.mood===+t.dataset.v?0:+t.dataset.v;sheet.dirty=true;$$("[data-act=emood]").forEach(b=>b.setAttribute("aria-pressed",+b.dataset.v===sheet.draft.mood));break;
+   case"estage":sheet.draft.stage=sheet.draft.stage===t.dataset.s?"":t.dataset.s;sheet.dirty=true;$$("[data-act=estage]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.s===sheet.draft.stage));break;
+   case"eperson":{const l=sheet.draft.people=sheet.draft.people||[];const i=l.indexOf(id);i>=0?l.splice(i,1):l.push(id);sheet.dirty=true;t.setAttribute("aria-pressed",i<0);break}
+   case"eaddp":{const n=$("#np-name").value.trim();if(!n){toast("請先輸入名字或稱呼");break}
+     let p=people().find(x=>x.name===n);if(!p){p={id:uid(),name:n,relation:"",stages:sheet.draft.stage?[sheet.draft.stage]:[],feeling:"",createdAt:Date.now()};await put("people",p)}
+     (sheet.draft.people=sheet.draft.people||[]).includes(p.id)||sheet.draft.people.push(p.id);sheet.dirty=true;
+     $("#ppick").innerHTML=people().map(q=>`<button type="button" class="pick p" data-act="eperson" data-id="${q.id}" aria-pressed="${sheet.draft.people.includes(q.id)}">${esc(q.name)}</button>`).join("");
+     $("#np-name").value="";$("#np-name").focus();break}
+   case"apply-all":{const e=S.entries.get(id);if(e&&e.analysis){await applyCore(id,e.analysis.people.map((_,i)=>i),e.analysis.themes.map((_,i)=>i));toast("已連到地圖")}break}
+   case"unlink":{const e=clone(S.entries.get(id));if(!e)break;e[t.dataset.k]=(e[t.dataset.k]||[]).filter(x=>x!==t.dataset.v);await put("entries",e);break}
+   case"discard":closeSheet();break;
+   case"keep":sheet.confirmClose=false;drawSheet();break;
+   case"unsel":selNode=null;highlight();renderPanel();break;
+   case"save":{const d=sheet.draft;const content=d.type==="session"?(d.talk||d.said||d.insight||d.homework||d.next):d.text;
+     if(!String(content||"").trim()&&!(d.media||[]).length){toast("先寫一點內容，或加入照片、錄音再儲存");break}
+     if(dict&&dict.active())await dict.stop().catch(()=>{});
+     const old=sheet.id?S.entries.get(sheet.id):null;
+     const e=Object.assign({},old?clone(old):{id:uid(),createdAt:Date.now(),themes:[],asked:{}},clone(d));
+     if(!e.date)e.date=today();const fromPrep=e.fromPrep;delete e.fromPrep;await put("entries",e);
+     if(fromPrep)await put("meta",{id:"prep"});
+     for(const m of sheet.removed||[])delMedia(m);sheet.newMedia=[];
+     const then=t.dataset.then;sheet={kind:"entry",id:e.id};drawSheet();toast("已儲存");if(then==="analyze")analyze(e.id);break}
+   /* person sheet */
+   case"pp-stage":{capturePD();const d=sheet.pd;const l=d.stages=d.stages||[];const i=l.indexOf(t.dataset.s);i>=0?l.splice(i,1):l.push(t.dataset.s);drawSheet();break}
+   case"save-person":{capturePD();const d=sheet.pd;d.name=d.name.trim();d.relation=(d.relation||"").trim();if(!d.name){toast("請輸入名字或稱呼");break}const curP=d.id&&S.people.get(d.id);if(curP)d.unsaid=curP.unsaid||[];
+     if(!d.id){d.id=uid();d.createdAt=Date.now()}await put("people",clone(d));sheet={kind:"person",id:d.id};drawSheet();toast("已儲存");break}
+  }
+});
+document.addEventListener("click",ev=>{const b=ev.target.closest("[data-mic]");if(!b||!dict)return;
+  bindMic();
+  if(dict.active()&&micTarget===b.dataset.mic){dict.stop().catch(()=>{});return}
+  micTarget=b.dataset.mic;
+  dict.start().catch(e=>{if(e&&e.code==="not_granted")toast("口述沒有開啟。可以在這個頁面的權限選單裡打開。");else if(e&&e.code==="unavailable")$$(".mic").forEach(x=>x.hidden=true);else if(e&&e.code!=="stopped"&&e.code!=="dismissed")toast("口述暫時無法使用，請改用打字。")})});
+document.addEventListener("input",ev=>{if(ev.target.id==="logq"){logQuery=ev.target.value;clearTimeout(vLog.t);vLog.t=setTimeout(()=>{const pos=ev.target.selectionStart;render();const q=$("#logq");if(q){q.focus();try{q.setSelectionRange(pos,pos)}catch(e){}}},250)}});
+document.addEventListener("change",ev=>{
+  if(ev.target.id==="showE"){showEntries=ev.target.checked;selNode=null;render()}
+  if(ev.target.id==="importFile"&&ev.target.files[0]){doImport(ev.target.files[0]);ev.target.value=""}
+  if(ev.target.id==="imp-files"&&ev.target.files.length){onImportFiles([...ev.target.files])}
+  if((ev.target.id==="f-photo"||ev.target.id==="f-audio")&&ev.target.files.length){const fs=[...ev.target.files];ev.target.value="";addFiles(fs,ev.target.id==="f-photo"?"image":"audio")}
+  if(ev.target.dataset&&ev.target.dataset.impDate!==undefined&&sheet&&sheet.items){sheet.items[+ev.target.dataset.impDate].date=ev.target.value}
+  if(ev.target.id==="rv-pick"){reviewSel=ev.target.value;render()}
+  const pv=ev.target.id;
+  if(pv==="pr-date")savePrep(p=>{p.nextDate=ev.target.value});
+  if(pv==="pr-hw")savePrep(p=>{p.hwDone=ev.target.checked});
+  if(pv==="pr-hwnote")savePrep(p=>{p.hwNote=ev.target.value});
+  if(pv==="pr-focus")savePrep(p=>{p.focus=ev.target.value});
+  if(pv==="pr-add"&&ev.target.value){const v=ev.target.value;savePrep(p=>{(p.picked=p.picked||[]).includes(v)||p.picked.push(v);p.dropped=(p.dropped||[]).filter(x=>x!==v)}).then(()=>drawSheet())}});
+document.addEventListener("keydown",ev=>{if(ev.key==="Enter"&&!ev.isComposing){const m={"np-name":"eaddp","us-new":"us-add","pr-q":"myq-add","us-react":"us-confirm"}[ev.target.id];if(m){ev.preventDefault();$(`#sheetRoot [data-act=${m}]`)?.click()}}});
+document.addEventListener("keydown",ev=>{if(ev.key==="Escape"&&$("#photoRoot").innerHTML){$("#photoRoot").innerHTML="";return}if(ev.key==="Escape"&&sheet&&!(sheet.kind==="edit"&&sheet.dirty))closeSheet()});
+let rz=0;addEventListener("resize",()=>{clearTimeout(rz);rz=setTimeout(()=>{if(view==="map"&&mapMode==="net")mountGraph()},200)});
+
+render();boot();
+})();
+</script>
+</body>
+</html>
