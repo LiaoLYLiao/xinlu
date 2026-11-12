@@ -774,11 +774,34 @@ function protect(text){
   const head=map.length?"（說明：文中的［人物A］這類代號代表真實人物，為了保護隱私已替換。請直接沿用代號，不要猜測真名。）\n\n":"";
   return{text:head+t,map,masked}}
 function restore(text,map){let t=String(text);map.slice().sort((a,b)=>b[0].length-a[0].length).forEach(([code,n])=>{t=t.split(code).join(n);const bare=code.slice(1,-1);t=t.split(bare).join(n)});return t}
+function lenientJSON(src,start){
+  const Q='"\u201C\u201D\u201E\u201F\uFF02\u300C\u300D';let i=start;const n=src.length;
+  const ws=()=>{while(i<n&&/[\s,，、\u00A0]/.test(src[i]))i++};
+  const isQ=c=>c&&'"\u201C\u201D\u201E\u201F\uFF02'.includes(c);
+  const nextNon=k=>{while(k<n&&/[\s\u00A0]/.test(src[k]))k++;return src[k]};
+  function str(){const open=src[i++];let out="";
+    while(i<n){const c=src[i];
+      if(c==="\\"&&i+1<n){const d=src[i+1];out+=({n:"\n",t:"\t",r:"",'"':'"',"\\":"\\","/":"/"})[d]??d;i+=2;continue}
+      if(isQ(c)){const nx=nextNon(i+1);if(nx===undefined||/[,:：，}\]]/.test(nx)||isQ(nx)||(open==="\u300C"&&false)){i++;return out}}
+      out+=c;i++}
+    return out}
+  function bare(){let s="";while(i<n&&!/[,:：，}\]\n]/.test(src[i]))s+=src[i++];s=s.trim();
+    if(s==="true")return true;if(s==="false")return false;if(s==="null")return null;if(s!==""&&!isNaN(+s))return +s;return s}
+  function val(){ws();const c=src[i];if(c==="{")return obj();if(c==="[")return arr();if(isQ(c))return str();return bare()}
+  function obj(){i++;const o={};for(;;){ws();if(i>=n||src[i]==="}"){i++;return o}
+    const k=isQ(src[i])?str():(()=>{let s="";while(i<n&&!/[:：}\s]/.test(src[i]))s+=src[i++];return s})();
+    while(i<n&&/[\s\u00A0]/.test(src[i]))i++;if(src[i]===":"||src[i]==="："){i++}
+    o[k]=val()}}
+  function arr(){i++;const a=[];for(;;){ws();if(i>=n||src[i]==="]"){i++;return a}if(src[i]==="}"){return a}a.push(val())}}
+  return obj()}
+
 function parseJSONLoose(s){
-  let m=String(s).replace(/```(?:json|JSON)?/g,"").replace(/[“”„‟＂]/g,'"').replace(/ /g," ");
-  const b=m.lastIndexOf("}");if(b<0)throw{code:"invalid_json"};
-  const fix=t=>t.replace(/,\s*([}\]])/g,"$1");
-  for(let a=m.indexOf("{");a>=0&&a<b;a=m.indexOf("{",a+1)){const c=m.slice(a,b+1);for(const t of [c,fix(c)]){try{const v=JSON.parse(t);if(v&&typeof v==="object")return v}catch(e){}}}
+  const raw=String(s).replace(/```(?:json|JSON)?/g,"");
+  const m=raw.replace(/[\u201C\u201D\u201E\u201F\uFF02]/g,'"').replace(/\u00A0/g," ");
+  const b=m.lastIndexOf("}");
+  if(b>=0)for(let a=m.indexOf("{");a>=0&&a<b;a=m.indexOf("{",a+1)){const c=m.slice(a,b+1);for(const t of [c,c.replace(/,\s*([}\]])/g,"$1")]){try{const v=JSON.parse(t);if(v&&typeof v==="object"&&!Array.isArray(v))return v}catch(e){}}}
+  const a=raw.indexOf("{");
+  if(a>=0){try{const v=lenientJSON(raw,a);if(v&&typeof v==="object"&&Object.keys(v).length)return v}catch(e){}}
   throw{code:"invalid_json"}}
 
 /* ============================================================
@@ -1653,7 +1676,7 @@ ${ms}
 【這篇紀錄】
 ${body}
 
-請只回覆一個 JSON 物件，格式如下，不要有其他文字：
+請只回覆一個 JSON 物件，放在 \`\`\`json 程式碼區塊裡，使用半形雙引號 "，欄位之間用逗號分隔，不要有其他文字。格式如下：
 {"summary":"一句話說出這篇的核心（20字內）",
  "chain":{"event":"發生了什麼（事實）","thought":"當下的想法","emotion":["情緒1","情緒2"],"body":"身體的反應，沒寫到就留空字串","behavior":"做了什麼或想做什麼"},
  "need":"這個反應背後，可能在保護或渴望的需要（一句話）",
@@ -1803,7 +1826,7 @@ ${ps}
 【紀錄】
 ${lines}
 
-請只回覆一個 JSON 物件，不要有其他文字：
+請只回覆一個 JSON 物件，放在 \`\`\`json 程式碼區塊裡，使用半形雙引號 "，欄位之間用逗號分隔，不要有其他文字：
 {"overview":"整體來看，這段時間的心路（2 到 3 句）",
  "patterns":[{"name":"模式名稱（4 到 12 字）","description":"這個模式通常怎麼發生：什麼情境觸發、出現什麼想法和情緒、通常怎麼反應","refs":["E3","E12"],"people":["人物名"],"since":"最早出現的時期或日期"}],
  "people":[{"name":"人物名","insight":"這段關係在紀錄中呈現的樣子，以及它和其他關係的相似處"}],
