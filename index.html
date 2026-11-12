@@ -791,7 +791,13 @@ function lenientJSON(src,start){
   function obj(){i++;const o={};for(;;){ws();if(i>=n||src[i]==="}"){i++;return o}
     const k=isQ(src[i])?str():(()=>{let s="";while(i<n&&!/[:：}\s]/.test(src[i]))s+=src[i++];return s})();
     while(i<n&&/[\s\u00A0]/.test(src[i]))i++;if(src[i]===":"||src[i]==="："){i++}
-    o[k]=val()}}
+    const sv=i;while(i<n&&/[\s\u00A0]/.test(src[i]))i++;
+    if(i>=n||/[,，}]/.test(src[i])){o[k]="";continue}i=sv;
+    let v=val();const more=[];
+    for(;;){const sp=i;ws();if(i>=n||src[i]==="}"||src[i]==="]"){i=sp;break}
+      if(src[i]==="{"||isQ(src[i])&&!isKey()){more.push(val());continue}i=sp;break}
+    o[k]=more.length?[v,...more]:v}}
+  function isKey(){const sp=i;try{str();const nx=nextNon(i);return nx===":"||nx==="："}finally{i=sp}}
   function arr(){i++;const a=[];for(;;){ws();if(i>=n||src[i]==="]"){i++;return a}if(src[i]==="}"){return a}a.push(val())}}
   return obj()}
 
@@ -1693,13 +1699,14 @@ ${body}
 - methods：2 到 3 個，id 只能用方法庫裡的；依這篇的狀況選最合適的類別（例如人際衝突選人際與界線，反覆想同一件事選覺察想法或照顧身體，和童年有關的深層經驗可選處理過去）。
 - questions：2 到 3 個，具體、可以直接在諮商時問出口。
 - risk：只有在內容提到自傷、自殺念頭，或正處於被暴力傷害的立即危險時才設為 true。`}
+const asArr=v=>Array.isArray(v)?v:v&&typeof v==="object"?[v]:typeof v==="string"&&v.trim()?v.split(/[、，,]\s*/).length>1&&v.length<40?v.split(/[、，,]\s*/):[v]:[];
 function cleanAnalysis(a){
   if(!a||typeof a!=="object")throw{code:"invalid_json"};
-  return{summary:String(a.summary||""),chain:a.chain&&typeof a.chain==="object"?{event:String(a.chain.event||""),thought:String(a.chain.thought||""),emotion:Array.isArray(a.chain.emotion)?a.chain.emotion.map(String).slice(0,5):[],body:String(a.chain.body||""),behavior:String(a.chain.behavior||"")}:{},
-    need:String(a.need||""),people:(Array.isArray(a.people)?a.people:[]).slice(0,8).map(p=>({name:String(p&&p.name||"").trim(),relation:String(p&&p.relation||""),stage:String(p&&p.stage||""),role:String(p&&p.role||"")})).filter(p=>p.name),
-    themes:(Array.isArray(a.themes)?a.themes:[]).slice(0,3).map(t=>({name:String(t&&t.name||"").trim(),why:String(t&&t.why||"")})).filter(t=>t.name),
-    pattern:String(a.pattern||""),methods:(Array.isArray(a.methods)?a.methods:[]).map(m=>({id:String(m&&m.id||""),why:String(m&&m.why||"")})).filter(m=>methodById(m.id)).slice(0,3),
-    questions:(Array.isArray(a.questions)?a.questions:[]).map(String).slice(0,3),risk:a.risk===true,at:Date.now()}}
+  return{summary:String(a.summary||""),chain:a.chain&&typeof a.chain==="object"?{event:String(a.chain.event||""),thought:String(a.chain.thought||""),emotion:asArr(a.chain.emotion).map(String).slice(0,5),body:String(a.chain.body||""),behavior:String(a.chain.behavior||"")}:{},
+    need:String(a.need||""),people:asArr(a.people).slice(0,8).map(p=>({name:String(p&&p.name||"").trim(),relation:String(p&&p.relation||""),stage:String(p&&p.stage||""),role:String(p&&p.role||"")})).filter(p=>p.name),
+    themes:asArr(a.themes).slice(0,3).map(t=>({name:String(t&&t.name||"").trim(),why:String(t&&t.why||"")})).filter(t=>t.name),
+    pattern:String(a.pattern||""),methods:asArr(a.methods).map(m=>({id:String(m&&m.id||""),why:String(m&&m.why||"")})).filter(m=>methodById(m.id)).slice(0,3),
+    questions:asArr(a.questions).map(String).slice(0,3),risk:a.risk===true,at:Date.now()}}
 const errMsg=c=>({no_key:"還沒有填入 API 金鑰。請到右上角「設定」填入，或改用「複製貼上」。",auth:"API 金鑰不正確或已失效，請到設定檢查。",model:"模型名稱可能不正確，請到設定修改成該平台目前的模型名稱。",rate:"已達使用上限或請求太頻繁，請稍後再試，或檢查你的 AI 帳號額度。",network:"連不上 AI 服務，請檢查網路後再試。",invalid_json:"讀不出 AI 回覆的格式。請確認有把整段回覆貼回來（包含大括號 { } 的部分），或再試一次。",refused:"AI 沒有回覆內容。可以改寫一部分後再試，或直接帶去跟專業的人討論。",capability_disabled:"AI 整理還沒準備好，請稍後再試。"})[c]||"整理沒有完成，請再試一次。";
 function analyze(id){const e=S.entries.get(id);if(!e)return;sheet&&(sheet.err="");startJob("analyze",buildPrompt(e),{entryId:id});if(sheet&&sheet.kind==="entry")drawSheet()}
 async function applyCore(id,pIdx,tIdx){
@@ -1841,9 +1848,9 @@ async function saveReview(a,refs){
   const es=refs.map(id=>S.entries.get(id));
   const ref=r=>{const m=String(r).match(/(\d+)/);const e=m&&es[+m[1]-1];return e?e.id:null};
   const data={overview:String(a.overview||""),changes:String(a.changes||""),strengths:String(a.strengths||""),risk:a.risk===true,
-    patterns:(Array.isArray(a.patterns)?a.patterns:[]).slice(0,6).map(p=>({name:String(p&&p.name||""),description:String(p&&p.description||""),since:String(p&&p.since||""),people:(Array.isArray(p&&p.people)?p.people:[]).map(String),entries:[...new Set((Array.isArray(p&&p.refs)?p.refs:[]).map(ref).filter(Boolean))]})).filter(p=>p.name),
-    people:(Array.isArray(a.people)?a.people:[]).slice(0,6).map(p=>({name:String(p&&p.name||""),insight:String(p&&p.insight||"")})).filter(p=>p.name),
-    questions:(Array.isArray(a.questions)?a.questions:[]).map(String).slice(0,4)};
+    patterns:asArr(a.patterns).slice(0,6).map(p=>({name:String(p&&p.name||""),description:String(p&&p.description||""),since:String(p&&p.since||""),people:(Array.isArray(p&&p.people)?p.people:[]).map(String),entries:[...new Set((Array.isArray(p&&p.refs)?p.refs:[]).map(ref).filter(Boolean))]})).filter(p=>p.name),
+    people:asArr(a.people).slice(0,6).map(p=>({name:String(p&&p.name||""),insight:String(p&&p.insight||"")})).filter(p=>p.name),
+    questions:asArr(a.questions).map(String).slice(0,4)};
   const ok=es.filter(Boolean);const rv={id:uid(),at:Date.now(),n:refs.length,from:ok[0]?.date||"",to:ok[ok.length-1]?.date||"",data};
   reviewSel=rv.id;await put("reviews",rv)}
 function vReview(){
