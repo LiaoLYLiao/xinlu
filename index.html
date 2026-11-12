@@ -264,7 +264,7 @@ select.inp{padding:9px 10px}
 /* map */
 .mapwrap{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;height:min(68vh,620px);min-height:380px;touch-action:none}
 .mapwrap svg{width:100%;height:100%;display:block;cursor:grab}
-#nodePanel{position:absolute;left:10px;right:10px;bottom:10px;max-height:58%;overflow:auto;touch-action:auto;pointer-events:none}
+#nodePanel{position:absolute;left:10px;right:10px;bottom:10px;max-height:44%;overflow:auto;touch-action:auto;pointer-events:none}
 #nodePanel>*{pointer-events:auto}
 #nodePanel .panel{box-shadow:var(--shadow);background:var(--raise)}
 .maphint{display:inline-block;background:var(--raise);border:1px solid var(--line);border-radius:999px;padding:3px 12px;font-size:13px;color:var(--muted)}
@@ -395,6 +395,97 @@ ol.steps{margin:0;padding-left:1.3em;display:grid;gap:6px}
 .prog{height:6px;border-radius:3px;background:var(--line);overflow:hidden}
 .prog i{display:block;height:100%;background:var(--accent);transition:width .4s}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+
+/* ===== v2 polish ===== */
+.insight{position:relative;display:grid;gap:10px;padding:22px 20px 18px;border-radius:22px;cursor:pointer;text-align:left;overflow:hidden;
+  background:radial-gradient(120% 140% at 100% 0%,color-mix(in srgb,var(--theme) 26%,transparent),transparent 60%),radial-gradient(90% 120% at 0% 100%,color-mix(in srgb,var(--person) 20%,transparent),transparent 60%),var(--surface);
+  border:1px solid color-mix(in srgb,var(--theme) 35%,var(--line));box-shadow:var(--shadow);transition:transform .25s}
+.insight:active{transform:scale(.985)}
+.insight .label{color:var(--theme)}
+.ins-head{display:flex;align-items:flex-end;justify-content:space-between;gap:12px}
+.ins-head h2{font-family:var(--f-display);font-size:28px;line-height:1.25}
+.ins-n{display:flex;align-items:baseline;gap:2px;color:var(--muted);font-size:14px;white-space:nowrap}
+.ins-n b{font-family:var(--f-display);font-size:46px;line-height:.9;color:var(--theme);font-weight:700}
+.ins-p{font-size:15px}
+.ins-p em{font-style:normal;color:var(--person);font-weight:600}
+.ins-need{font-size:14px;color:var(--muted);border-left:2px solid var(--m5);padding-left:10px}
+.ins-dates{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.ins-dates i{font-style:normal;font-size:12px;padding:2px 9px;border-radius:999px;background:var(--theme-soft);color:var(--theme)}
+.ins-dates span{margin-left:auto;font-size:13px;color:var(--accent)}
+.insight.empty{cursor:default}
+.ins-empty{color:var(--muted)}
+.hero-write{display:flex;align-items:center;justify-content:space-between;gap:14px;width:100%;text-align:left;cursor:pointer;border:0;border-radius:22px;padding:22px 20px;
+  background:linear-gradient(135deg,var(--accent),color-mix(in srgb,var(--accent) 55%,var(--person)));color:var(--on-accent);box-shadow:0 10px 30px color-mix(in srgb,var(--accent) 35%,transparent);transition:transform .2s}
+.hero-write:active{transform:scale(.985)}
+.hero-write i{display:block;font-style:normal;font-size:13px;letter-spacing:.14em;opacity:.8;margin-bottom:4px}
+.hero-write b{font-family:var(--f-display);font-size:21px;line-height:1.4;font-weight:600}
+.hw-go{flex:none;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font-size:20px;background:color-mix(in srgb,var(--on-accent) 16%,transparent)}
+.actions.three{grid-template-columns:repeat(3,1fr)}
+.actions.three .action{padding:14px 12px}
+.actions.three .action b{font-size:17px}
+/* analysis flow */
+.flow{display:grid}
+.fl{display:grid;grid-template-columns:20px 1fr;gap:10px;position:relative;padding-bottom:16px}
+.fl:last-child{padding-bottom:0}
+.fl:not(:last-child)::before{content:"";position:absolute;left:9px;top:16px;bottom:0;width:2px;border-radius:2px;background:linear-gradient(var(--c),color-mix(in srgb,var(--c) 15%,transparent));transform-origin:top}
+.fl-dot{width:14px;height:14px;margin:3px 3px 0;border-radius:50%;background:var(--c);box-shadow:0 0 0 4px color-mix(in srgb,var(--c) 22%,transparent),0 0 14px color-mix(in srgb,var(--c) 55%,transparent)}
+.fl b{display:block;font-size:12px;letter-spacing:.12em;color:var(--c);font-weight:600}
+.fl span{font-size:15px}
+.emos{display:flex;flex-wrap:wrap;gap:6px;margin-top:2px}
+.emos span{font-size:14px;padding:2px 10px;border-radius:999px;background:var(--person-soft);color:var(--person)}
+.needbox{border-radius:16px;padding:14px 16px;background:linear-gradient(135deg,color-mix(in srgb,var(--m5) 18%,var(--raise)),var(--raise));border:1px solid color-mix(in srgb,var(--m5) 40%,var(--line))}
+.needbox .label{color:var(--m5)}
+.needbox p:last-child{font-family:var(--f-display);font-size:19px;line-height:1.5}
+.similar{display:grid;gap:6px}
+.similar .mini-e small{display:block;font-size:12px;color:var(--muted);margin-top:2px}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes grow{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+.ana.reveal .fl,.ana.reveal .needbox,.ana.reveal .similar{opacity:0;animation:rise .55s cubic-bezier(.2,.7,.2,1) forwards;animation-delay:calc(var(--i)*.45s + .15s)}
+.ana.reveal .fl::before{transform:scaleY(0);animation:grow .45s ease forwards;animation-delay:calc(var(--i)*.45s + .5s)}
+.ana.reveal .needbox{animation-duration:.8s}
+/* map */
+.mapwrap.big{height:calc(100dvh - 290px);min-height:440px;max-height:none;
+  background:radial-gradient(70% 60% at 50% 45%,color-mix(in srgb,var(--theme) 10%,transparent),transparent 70%),var(--surface)}
+.maplegend{position:absolute;left:12px;top:12px;display:flex;gap:10px;font-size:12px;color:var(--muted);pointer-events:none}
+.maplegend i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px}
+.mapwrap circle.glow{filter:drop-shadow(0 0 6px currentColor)}
+.mapwrap .ring{fill:none;stroke-width:2;opacity:0;transform-box:fill-box;transform-origin:center}
+.mapwrap g.sel .ring{animation:pulse 1.8s ease-out infinite}
+@keyframes pulse{0%{opacity:.7;transform:scale(.85)}100%{opacity:0;transform:scale(1.5)}}
+.mapwrap line{transition:opacity .25s,stroke .25s}
+.mapwrap g[data-id]{transition:opacity .25s}
+.hscroll-row{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;margin:0 -16px;padding:2px 16px}
+.hscroll-row::-webkit-scrollbar{display:none}
+.hscroll-row>*{flex:none}
+/* people */
+.pcard{gap:10px;padding:16px}
+.pcard .nm{display:flex;align-items:center;gap:12px}
+.pcard .who{display:grid;gap:2px;flex:1;min-width:0}
+.pcard .av{width:44px;height:44px;font-size:18px}
+.pn{display:flex;align-items:baseline;gap:2px;font-size:12px;color:var(--muted)}
+.pn b{font-family:var(--f-display);font-size:24px;color:var(--person)}
+.pst{display:flex;gap:4px}
+.pst i{font-style:normal;font-size:11px;padding:2px 8px;border-radius:999px;border:1px solid var(--line);color:var(--muted);opacity:.55}
+.pst i.on{opacity:1;border-color:transparent;background:var(--person-soft);color:var(--person)}
+.ptheme{font-size:13px;color:var(--theme)}
+/* methods */
+.mrow{display:grid;gap:10px}
+.mrow h2{font-size:19px}
+.mrow.rec h2{color:var(--method)}
+.hscroll{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;margin:0 -16px;padding:2px 16px 8px;scrollbar-width:none}
+.hscroll::-webkit-scrollbar{display:none}
+.hscroll .mcard{flex:0 0 min(78%,280px);scroll-snap-align:start}
+.mrow.rec .mcard{border-color:color-mix(in srgb,var(--method) 45%,var(--line));background:linear-gradient(160deg,var(--method-soft),var(--surface) 70%)}
+/* editor */
+.datechip{position:relative;display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:999px;padding:7px 14px;font-size:14px;background:var(--raise);cursor:pointer}
+.datechip input{position:absolute;inset:0;opacity:0;width:100%;cursor:pointer}
+.focuswrite .fw-q{font-family:var(--f-display);font-size:22px;line-height:1.4;font-weight:600}
+textarea.xl{min-height:42vh;font-size:17px;line-height:1.75}
+.ghostin{border-style:dashed;background:transparent}
+details.more{border:1px solid var(--line);border-radius:14px;padding:4px 14px}
+details.more>summary{cursor:pointer;padding:10px 0;color:var(--accent);font-size:15px}
+details.more[open]>summary{margin-bottom:6px}
+@media (prefers-reduced-motion:reduce){.ana.reveal .fl,.ana.reveal .needbox,.ana.reveal .similar{animation:none;opacity:1}.ana.reveal .fl::before{animation:none;transform:none}.mapwrap g.sel .ring{animation:none;opacity:.6}}
 </style>
 </head>
 <body>
@@ -745,7 +836,7 @@ function loadWeekly(){fetch("weekly.json",{cache:"no-cache"}).then(r=>r.ok?r.jso
 let installEvt=null;
 addEventListener("beforeinstallprompt",e=>{e.preventDefault();installEvt=e;schedule()});
 if("serviceWorker" in navigator&&location.protocol==="https:")navigator.serviceWorker.register("sw.js").catch(()=>{});
-const APP_VER="2026.11.13-3";
+const APP_VER="2026.11.13-4";
 async function checkUpdate(){try{const r=await fetch("version.json?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.json()).v;
   if(v&&v!==APP_VER&&!$("#updBar")){const b=document.createElement("button");b.id="updBar";b.className="updbar";b.textContent="有新版本，點這裡更新";b.onclick=()=>{b.textContent="更新中……";location.reload()};document.body.appendChild(b)}}catch(e){}}
 setTimeout(checkUpdate,1500);document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
@@ -868,7 +959,7 @@ async function completeJob(id,raw,fromApi){
   try{val=j.json?parseJSONLoose(t):String(t).trim();if(j.json&&(!val||typeof val!=="object"))throw{code:"invalid_json"}}
   catch(e){j.err=errMsg("invalid_json");saveJobs();drawAI();throw e}
   if(j.kind==="analyze"){const a=cleanAnalysis(val);const cur=S.entries.get(j.entryId);
-    if(cur){const c=clone(cur);c.analysis=a;c.applied=false;c.asked={};await put("entries",c);await applyCore(j.entryId,a.people.map((_,i)=>i),a.themes.map((_,i)=>i))}}
+    if(cur){const c=clone(cur);c.analysis=a;c.applied=false;c.asked={};await put("entries",c);await applyCore(j.entryId,a.people.map((_,i)=>i),a.themes.map((_,i)=>i));revealId=j.entryId;setTimeout(()=>{if(revealId===j.entryId)revealId=null},5000)}}
   else if(j.kind==="review")await saveReview(val,j.refs||[]);
   else if(j.kind==="prep")await savePrep(p=>{p.summary=val});
   JOBS=JOBS.filter(x=>x.id!==id);saveJobs();
@@ -934,8 +1025,8 @@ function homeCalendar(){
    <div class="cal" aria-label="最近 12 週有寫紀錄的日子">${cells.join("")}</div><p class="tiny muted">每一格是一天，有寫紀錄的日子會亮起來。</p></div>`}
 function backupNote(){
   const n=entries().length;if(n<3)return "";const last=local.get("xinlu-lastbackup",0),d=last?Math.floor((Date.now()-last)/864e5):null;
-  if(d!==null&&d<14)return "";
-  return `<p class="notice warn">${d===null?"你還沒有備份過。":`上次備份是 ${d} 天前。`}資料只存在這台裝置，換手機或清除瀏覽器資料就會不見。<button class="linkbtn" data-act="export">現在備份</button></p>`}
+  if(d!==null&&d<14)return "";if(Date.now()<local.get("xinlu-backup-snooze",0))return "";
+  return `<p class="notice warn">${d===null?"你還沒有備份過。":`上次備份是 ${d} 天前。`}資料只存在這台裝置，換手機或清除瀏覽器資料就會不見。<span class="row" style="margin-top:6px"><button class="btn sm" data-act="export">現在備份</button><button class="linkbtn" data-act="snooze-backup">7 天後再提醒</button></span></p>`}
 async function wipeAll(){for(const c of COLS)S[c]=new Map();try{if(mode==="device"){await IDB.clear("cols");await IDB.clear("media")}}catch(e){}
   try{["xinlu-local-v1","xinlu-settings","xinlu-lastbackup","xinlu-key-openai","xinlu-key-anthropic","xinlu-key-gemini","xinlu-welcomed","xinlu-view"].forEach(k=>localStorage.removeItem(k))}catch(e){}
   memKeys={};mediaCache.clear();closeSheet();go("home");toast("所有資料都已刪除")}
@@ -1057,7 +1148,7 @@ function typeLabel(e){return e.type==="session"?"諮商":e.type==="letter"?"信"
 function entryTitle(e){
   if(e.type==="letter")return e.title||`給${pName(e.to)}的信`;
   if(e.title)return e.title;
-  if(e.type==="session")return `第 ${e.no||"?"} 次諮商`;
+  if(e.type==="session")return `第 ${e.no||sessionNo(e)} 次諮商`;
   const t=(e.text||"").trim().split(/\n/)[0];return t.length>24?t.slice(0,24)+"…":(t||"沒有標題的日記")}
 function entryText(e){
   if(e.type!=="session")return e.text||"";
@@ -1085,12 +1176,49 @@ function render(){
   if(mode==="loading"){$("#main").innerHTML=`<p class="loading">正在打開你的心路……</p>`;return}
   const html={home:vHome,log:vLog,map:vMap,people:vPeople,methods:vMethods,about:vAbout}[view]();
   const keepScroll=window.scrollY;
-  $("#main").innerHTML=html+vFoot();
+  $("#main").innerHTML=html+(view==="home"?vFoot():"");
   if(view==="map"&&mapMode==="net")mountGraph();
   window.scrollTo(0,keepScroll);
 }
 
-function statusNote(){return backupNote()}
+function statusNote(){return view==="home"?backupNote():""}
+
+
+/* ---------------- insight helpers ---------------- */
+let revealId=null;
+const PROMPTS=["今天有誰讓你心裡動了一下？","此刻身體哪裡最有感覺？","今天有沒有一句話，一直在腦中重播？","有什麼事，你其實想說但沒說出口？","今天哪個瞬間，你覺得被理解或被忽略？","如果把今天的心情畫成天氣，會是什麼樣子？","今天你替自己做了什麼？","有沒有一個反應，讓你覺得「我又這樣了」？","最近想到誰的時候，心裡會緊一下？","今天你最需要的是什麼？"];
+const promptOfDay=()=>{const d=new Date();return PROMPTS[(d.getFullYear()*372+d.getMonth()*31+d.getDate())%PROMPTS.length]};
+const fmtLong=s=>{if(!s)return "選日期";const[y,m,d]=s.split("-").map(Number);const w=new Date(y,m-1,d).getDay();return `${m} 月 ${d} 日 星期${"日一二三四五六"[w]}`};
+function sessionNo(e){const ss=entries().filter(x=>x.type==="session").sort((a,b)=>(a.date||"").localeCompare(b.date||"")||(a.createdAt||0)-(b.createdAt||0));const i=ss.findIndex(x=>x.id===e.id);return i<0?"":i+1}
+function recurInsight(){
+  const es=entries().filter(e=>e.type!=="letter"&&(e.themes||[]).length);if(!es.length)return null;
+  const c=new Date();c.setDate(c.getDate()-30);const ck=`${c.getFullYear()}-${pad(c.getMonth()+1)}-${pad(c.getDate())}`;
+  const pick=list=>{const m=new Map();list.forEach(e=>(e.themes||[]).forEach(t=>{if(S.themes.has(t))m.set(t,(m.get(t)||[]).concat(e))}));return [...m.entries()].sort((a,b)=>b[1].length-a[1].length)[0]};
+  let top=pick(es.filter(e=>(e.date||"")>=ck)),scope="這個月";
+  if(!top||top[1].length<2){top=pick(es);scope="到目前為止"}
+  if(!top||top[1].length<2)return null;
+  const [tid,list]=top;const cnt=(arr)=>{const m=new Map();arr.forEach(x=>m.set(x,(m.get(x)||0)+1));return [...m.entries()].sort((a,b)=>b[1]-a[1])};
+  const ps=cnt(list.flatMap(e=>(e.people||[]).filter(p=>S.people.has(p)))).slice(0,3);
+  const emo=cnt(list.flatMap(e=>e.analysis?.chain?.emotion||[])).slice(0,3).map(x=>x[0]);
+  const need=list.map(e=>e.analysis?.need).filter(Boolean)[0]||"";
+  return {tid,n:list.length,list:list.slice().sort((a,b)=>(b.date||"").localeCompare(a.date||"")),ps,emo,scope,need}}
+function homeInsight(){
+  const r=recurInsight();
+  if(!r){if(!entries().length)return "";const nu=unanalyzed("all").length;
+    return `<div class="insight empty"><span class="label">反覆出現的</span><p class="ins-empty">整理過幾篇紀錄後，這裡會告訴你，什麼在你心裡反覆出現、常和誰有關。</p>${nu?`<div><button class="btn sm" data-act="batch" data-scope="all">整理 ${nu} 篇紀錄</button></div>`:""}</div>`}
+  const all=r.ps.length&&r.ps[0][1]===r.n;
+  return `<div class="insight" role="button" tabindex="0" data-act="open-theme" data-id="${r.tid}">
+   <span class="label">${r.scope}反覆出現的</span>
+   <div class="ins-head"><h2>${esc(tName(r.tid))}</h2><span class="ins-n"><b>${r.n}</b>次</span></div>
+   ${r.ps.length||r.emo.length?`<p class="ins-p">${r.ps.length?`${all?"每次都和":"最常和"} ${r.ps.map(x=>`<em>${esc(pName(x[0]))}</em>`).join("、")} 有關`:""}${r.ps.length&&r.emo.length?"，":""}${r.emo.length?`常伴隨著${r.emo.map(esc).join("、")}`:""}。</p>`:""}
+   ${r.need?`<p class="ins-need">背後可能在渴望：${esc(r.need)}</p>`:""}
+   <div class="ins-dates">${r.list.slice(0,6).map(e=>`<i>${fmtD(e.date)}</i>`).join("")}${r.n>6?`<i>…</i>`:""}<span>看全部 →</span></div></div>`}
+function similarTo(e){const ts=new Set(e.themes||[]),ps=new Set(e.people||[]);if(!ts.size&&!ps.size)return [];
+  return entries().filter(x=>x.id!==e.id&&x.type!=="letter").map(x=>{const st=(x.themes||[]).filter(t=>ts.has(t)&&S.themes.has(t)),sp=(x.people||[]).filter(p=>ps.has(p)&&S.people.has(p));return{x,st,sp,s:st.length*2+sp.length}}).filter(o=>o.st.length).sort((a,b)=>b.s-a.s||(b.x.date||"").localeCompare(a.x.date||"")).slice(0,3)}
+function similarBlock(e,i){const l=similarTo(e);if(!l.length)return "";
+  return `<div class="similar" style="--i:${i}"><p class="label">和這篇很像的紀錄</p>${l.map(o=>`<button type="button" class="mini-e" data-act="open-entry" data-id="${o.x.id}"><span>${fmtD(o.x.date)}</span>${esc(entryTitle(o.x))}<small>都和「${esc(tName(o.st[0]))}」有關${o.sp.length?`，也都有${esc(pName(o.sp[0]))}`:""}</small></button>`).join("")}</div>`}
+function recommendedMethods(){const m=new Map();entries().slice(0,12).forEach((e,i)=>(e.analysis?.methods||[]).forEach(x=>{if(methodById(x.id))m.set(x.id,(m.get(x.id)||0)+12-i)}));
+  const done=new Set(steps().map(s=>s.methodId));return [...m.entries()].sort((a,b)=>b[1]-a[1]).map(x=>methodById(x[0])).filter(x=>x&&!done.has(x.id)).slice(0,6)}
 
 /* ---------------- home ---------------- */
 function vHome(){
@@ -1103,8 +1231,9 @@ function vHome(){
   const nu=unanalyzed("all").length;
   return `<section class="view">${statusNote()}
   <div class="hello"><p class="date">${d.getMonth()+1} 月 ${d.getDate()} 日 星期${"日一二三四五六"[d.getDay()]}</p><h1>${hello}</h1></div>
-  <div class="actions">
-    <button type="button" class="action" data-act="new" data-type="journal"><i>日記</i><b>寫下此刻</b></button>
+  ${homeInsight()}
+  <button type="button" class="hero-write" data-act="new" data-type="journal"><span><i>寫下此刻</i><b>${esc(promptOfDay())}</b></span><span class="hw-go" aria-hidden="true">→</span></button>
+  <div class="actions three">
     <button type="button" class="action session" data-act="new" data-type="session"><i>諮商</i><b>記錄諮商</b></button>
     <button type="button" class="action tool" data-act="import-old"><i>匯入</i><b>舊日記</b></button>
     <button type="button" class="action tool" data-act="${nu?"batch":"go-review"}" data-scope="all"><i>${nu?"AI 整理":"回顧"}</i><b>${nu?`整理 ${nu} 篇`:"整體回顧"}</b></button>
@@ -1117,13 +1246,13 @@ function vHome(){
   ${es.length?`<div class="cols">
    <div class="stack">
     <div class="card stack"><div class="spread"><h2 style="font-size:20px">我的下一步</h2><button class="linkbtn" data-goto="methods">方法庫</button></div>
-     ${todo.length?`<div class="steplist">${todo.map(s=>{const m=methodById(s.methodId),e=S.entries.get(s.entryId);return `<div class="step"><span class="dot"></span><div><b>${esc(m?.name||"自訂")}</b>${s.ex?' <span class="badge ex">範例</span>':""}<span class="sub">${e?esc(entryTitle(e)):esc(s.note||"")}</span></div><button class="btn sm quiet" data-act="done-step" data-id="${s.id}">做完了</button></div>`}).join("")}</div>`:`<p class="small muted">還沒有</p>`}
+     ${todo.length?`<div class="steplist">${todo.map(s=>{const m=methodById(s.methodId),e=S.entries.get(s.entryId);return `<div class="step"><span class="dot"></span><div><b>${esc(m?.name||"自訂")}</b>${s.ex?' <span class="badge ex">範例</span>':""}<span class="sub">${e?esc(entryTitle(e)):esc(s.note||"")}</span></div><button class="btn sm quiet" data-act="done-step" data-id="${s.id}">做完了</button></div>`}).join("")}</div>`:`<p class="small muted">整理一篇紀錄後，可以從 AI 建議的方法裡，選一個當作下一步。</p><div><button class="btn sm quiet" data-goto="methods">逛逛方法庫</button></div>`}
     </div>
     ${prepCard()}
    </div>
    <div class="stack">
     <div class="card stack"><div class="spread"><h2 style="font-size:20px">正在面對的課題</h2><button class="linkbtn" data-act="journey">旅程</button></div>
-     ${ts.length?`<div class="themebar">${ts.map(x=>`<button type="button" class="tb" data-act="open-theme" data-id="${x.t.id}"><b style="color:var(--theme);font-weight:500">${esc(x.t.name)}</b><span>${x.n} 篇</span><span class="track"><i style="width:${x.n/max*100}%"></i></span></button>`).join("")}</div>`:`<p class="small muted">還沒有</p>`}
+     ${ts.length?`<div class="themebar">${ts.map(x=>`<button type="button" class="tb" data-act="open-theme" data-id="${x.t.id}"><b style="color:var(--theme);font-weight:500">${esc(x.t.name)}</b><span>${x.n} 篇</span><span class="track"><i style="width:${x.n/max*100}%"></i></span></button>`).join("")}</div>`:`<p class="small muted">整理紀錄後，反覆出現的課題會排在這裡。</p>`}
     </div>
     <div class="card stack"><div class="spread"><h2 style="font-size:20px">最近的紀錄</h2><button class="linkbtn" data-goto="log">全部</button></div>
      <div class="stack">${es.slice(0,4).map(e=>`<button type="button" class="mini-e" data-act="open-entry" data-id="${e.id}"><span>${fmtD(e.date)}</span>${esc(entryTitle(e))}</button>`).join("")}</div>
@@ -1186,12 +1315,16 @@ function vPeople(){
   const ps=people();
   const byStage=s=>ps.filter(p=>(p.stages||[]).includes(s));
   const none=ps.filter(p=>!(p.stages||[]).length);
-  const card=p=>{const n=entriesOfPerson(p.id).length;return `<button type="button" class="pcard" data-act="open-person" data-id="${p.id}"><span class="nm"><span class="av">${esc((p.name||"?").slice(0,1))}</span><span><b>${esc(p.name)}</b><br><span class="rel">${esc(p.relation||"")}</span></span></span><span class="meta">${n} 篇紀錄${p.ex?" · 範例":""}</span></button>`};
+  const card=p=>{const es=entriesOfPerson(p.id);const tc=new Map();es.forEach(e=>(e.themes||[]).forEach(t=>{if(S.themes.has(t))tc.set(t,(tc.get(t)||0)+1)}));const top=[...tc.entries()].sort((a,b)=>b[1]-a[1])[0];
+    return `<button type="button" class="pcard" data-act="open-person" data-id="${p.id}"><span class="nm"><span class="av">${esc((p.name||"?").slice(0,1))}</span><span class="who"><b>${esc(p.name)}</b><span class="rel">${esc(p.relation||"")}${p.ex?" · 範例":""}</span></span><span class="pn"><b>${es.length}</b>篇</span></span>
+     ${(p.stages||[]).length?`<span class="pst">${STAGES.map(s=>`<i class="${(p.stages||[]).includes(s)?"on":""}">${s}</i>`).join("")}</span>`:""}
+     ${top&&top[1]>=1?`<span class="ptheme">常和「${esc(tName(top[0]))}」一起出現</span>`:""}</button>`};
+  const sorted=ps.slice().sort((a,b)=>entriesOfPerson(b.id).length-entriesOfPerson(a.id).length);
   const stages=peopleStage==="all"?STAGES:[peopleStage];
   return `<section class="view">${statusNote()}<div class="head spread"><div><h1>人物</h1><p class="muted">在你的生命裡，對你影響深的人。</p></div><button class="btn sm" data-act="new-person">新增人物</button></div>
-  <div class="row">${["all",...STAGES].map(s=>`<button type="button" class="pick" data-act="pstage" data-s="${s}" aria-pressed="${peopleStage===s}">${s==="all"?"全部階段":s}</button>`).join("")}</div>
-  ${ps.length?`<div class="stagegrid">${stages.map(s=>{const l=byStage(s);return `<div class="stage"><h3>${s}<span>${STAGE_HINT[s]} · ${l.length} 人</span></h3>${l.length?`<div class="pgrid">${l.map(card).join("")}</div>`:`<p class="small muted" style="margin-top:6px">還沒有這個階段的人物。</p>`}</div>`}).join("")}
-   ${peopleStage==="all"&&none.length?`<div class="stage"><h3>還沒標記階段</h3><div class="pgrid">${none.map(card).join("")}</div></div>`:""}</div>`
+  <div class="hscroll-row">${["all",...STAGES].map(s=>`<button type="button" class="pick" data-act="pstage" data-s="${s}" aria-pressed="${peopleStage===s}">${s==="all"?"全部階段":s}</button>`).join("")}</div>
+  ${ps.length?(()=>{const l=peopleStage==="all"?sorted:sorted.filter(p=>(p.stages||[]).includes(peopleStage));
+    return `${peopleStage==="all"?"":`<p class="small muted">${STAGE_HINT[peopleStage]} · ${l.length} 人</p>`}${l.length?`<div class="pgrid">${l.map(card).join("")}</div>`:`<p class="small muted">還沒有這個階段的人物。</p>`}`})()
    :`<div class="card"><p class="muted">還沒有人物。寫紀錄時可以直接新增，整理紀錄時 AI 也會找出文中提到的人。</p></div>`}
   </section>`}
 
@@ -1223,9 +1356,13 @@ function vMethods(){
     <div class="mgrid">${list.map(r=>`<button type="button" class="mcard rcard" data-act="open-research" data-id="${r.id}"><span class="row" style="justify-content:space-between"><span class="cat" style="color:var(--theme)">${r.area}</span>${evTag(r.ev)}</span><b>${r.weekly&&isFresh(r.issue)?'<span class="badge">新</span> ':""}${r.title}</b><p class="clamp">${r.finding}</p><span class="tiny muted">${r.cite}</span></button>`).join("")}</div></section>`}
   const list=allMethods().filter(m=>methodCat==="all"||m.cat===methodCat);
   return `<section class="view"><div class="head spread"><div><h1>方法庫</h1><p class="muted">面對一件事時，你可以選擇的辦法。分成十類，每個方法都標示它的依據。</p></div>${seg}</div>
-  <div class="row">${[["all","全部"],...CATS].map(c=>`<button type="button" class="pick" data-act="mcat" data-c="${c[0]}" aria-pressed="${methodCat===c[0]}">${c[1]}${c[0]==="all"?"":` <span class="tiny">${allMethods().filter(m=>m.cat===c[0]).length}</span>`}</button>`).join("")}</div>
-  <div class="mgrid">${list.map(m=>`<button type="button" class="mcard" data-act="open-method" data-id="${m.id}"><span class="row" style="justify-content:space-between"><span class="cat">${CATS.find(c=>c[0]===m.cat)[1]}</span>${evTag(m.ev)}</span><b>${m.name}</b><p>${m.when}</p>${m.withCounselor?'<span class="with">建議跟諮商師一起做</span>':""}</button>`).join("")}</div>
+  <div class="hscroll-row">${[["all","全部"],...CATS].map(c=>`<button type="button" class="pick" data-act="mcat" data-c="${c[0]}" aria-pressed="${methodCat===c[0]}">${c[1]}${c[0]==="all"?"":` <span class="tiny">${allMethods().filter(m=>m.cat===c[0]).length}</span>`}</button>`).join("")}</div>
+  ${methodCat==="all"?(()=>{const rec=recommendedMethods();
+    return `${rec.length?`<section class="mrow rec"><div class="spread"><h2>依照你最近的紀錄</h2><span class="tiny muted">AI 整理時建議過</span></div><div class="hscroll">${rec.map(mcardH).join("")}</div></section>`:""}
+    ${CATS.map(c=>{const l=allMethods().filter(m=>m.cat===c[0]);return l.length?`<section class="mrow"><div class="spread"><h2>${c[1]}</h2><button class="linkbtn" data-act="mcat" data-c="${c[0]}">全部 ${l.length} →</button></div><div class="hscroll">${l.slice(0,8).map(mcardH).join("")}</div></section>`:""}).join("")}`})()
+  :`<div class="mgrid">${list.map(mcardH).join("")}</div>`}
   </section>`}
+const mcardH=m=>`<button type="button" class="mcard" data-act="open-method" data-id="${m.id}"><span class="row" style="justify-content:space-between"><span class="cat">${CATS.find(c=>c[0]===m.cat)[1]}</span>${evTag(m.ev)}</span><b>${m.name}</b><p>${m.when}</p>${m.withCounselor?'<span class="with">建議跟諮商師一起做</span>':""}</button>`;
 
 /* ---------------- map + journey ---------------- */
 let mapStage="all", showEntries=false, selNode=null;
@@ -1234,10 +1371,9 @@ function vMap(){
   if(mapMode==="journey")return `<section class="view">${statusNote()}<div class="head spread"><h1>地圖</h1>${seg}</div>${vJourney()}</section>`;
   if(mapMode==="review")return `<section class="view">${statusNote()}<div class="head spread"><h1>地圖</h1>${seg}</div>${vReview()}</section>`;
   return `<section class="view">${statusNote()}<div class="head spread"><h1>地圖</h1>${seg}</div>
-  <div class="spread"><div class="row">${["all",...STAGES].map(s=>`<button type="button" class="pick" data-act="mstage" data-s="${s}" aria-pressed="${mapStage===s}">${s==="all"?"全部階段":s}</button>`).join("")}</div>
-  <label class="row small"><input type="checkbox" id="showE" ${showEntries?"checked":""} style="accent-color:var(--accent)">也顯示每篇紀錄</label></div>
-  <div class="legend"><span><i style="background:var(--person)"></i>人物</span><span><i style="background:var(--theme)"></i>課題</span><span><i style="background:var(--method)"></i>做過的方法</span>${showEntries?'<span><i style="background:var(--entry)"></i>紀錄</span>':""}<span>線越粗，連結越常出現</span></div>
-  <div class="mapwrap" id="mapwrap"><svg id="graph" role="img" aria-label="人物、課題與方法的關係圖"></svg>
+  <div class="hscroll-row">${["all",...STAGES].map(s=>`<button type="button" class="pick" data-act="mstage" data-s="${s}" aria-pressed="${mapStage===s}">${s==="all"?"全部階段":s}</button>`).join("")}<label class="pick" style="display:inline-flex;gap:6px;align-items:center"><input type="checkbox" id="showE" ${showEntries?"checked":""} style="accent-color:var(--accent);margin:0">每篇紀錄</label></div>
+  <div class="mapwrap big" id="mapwrap"><svg id="graph" role="img" aria-label="人物、課題與方法的關係圖"></svg>
+   <div class="maplegend"><span><i style="background:var(--person)"></i>人物</span><span><i style="background:var(--theme)"></i>課題</span><span><i style="background:var(--method)"></i>方法</span>${showEntries?'<span><i style="background:var(--entry)"></i>紀錄</span>':""}</div>
    <div class="mapctl"><button type="button" data-act="zoom" data-z="1.25" aria-label="放大">+</button><button type="button" data-act="zoom" data-z="0.8" aria-label="縮小">−</button><button type="button" data-act="zoom" data-z="0" aria-label="置中">◎</button></div><div id="nodePanel"></div></div>
 
   </section>`}
@@ -1254,7 +1390,7 @@ function vJourney(){
       <div class="row">${TSTATUS.filter(s=>s[0]!==k).map(s=>`<button class="chip s" data-act="tstatus" data-id="${x.t.id}" data-s="${s[0]}">移到「${s[1]}」</button>`).join("")}</div></div>`).join("")||'<p class="tiny muted">目前沒有</p>'}</div>`};
   return `<div class="stack"><h2 style="font-size:20px">人生的四個階段</h2><div class="lanes">${STAGES.map(lane).join("")}</div></div>
   <div class="stack"><h2 style="font-size:20px">課題的進展</h2><div class="board">${TSTATUS.map(col).join("")}</div></div>
-  <div class="stack"><h2 style="font-size:20px">諮商的歷程</h2>${ses.length?`<div class="tl">${ses.map(e=>`<button type="button" class="tli" data-act="open-entry" data-id="${e.id}"><b>第 ${e.no||"?"} 次 · ${esc(e.date||"")}</b><span>${esc(e.insight||e.talk||"")}</span></button>`).join("")}</div>`:'<p class="small muted">記錄諮商後，每一次都會排在這條路上。</p>'}</div>`}
+  <div class="stack"><h2 style="font-size:20px">諮商的歷程</h2>${ses.length?`<div class="tl">${ses.map(e=>`<button type="button" class="tli" data-act="open-entry" data-id="${e.id}"><b>第 ${e.no||sessionNo(e)} 次 · ${esc(e.date||"")}</b><span>${esc(e.insight||e.talk||"")}</span></button>`).join("")}</div>`:'<p class="small muted">記錄諮商後，每一次都會排在這條路上。</p>'}</div>`}
 
 function vFoot(){
   return `<footer class="foot shell"><div class="foot-head"><span class="label">我的資料</span><span class="sync"><i></i>只存在這台裝置</span></div>
@@ -1304,7 +1440,8 @@ function mountGraph(){
   const maxW=Math.max(1,...links.map(l=>l.w));
   links.forEach(l=>{const el=document.createElementNS(NS,"line");el.setAttribute("stroke","var(--muted)");el.setAttribute("stroke-opacity",String(.18+.4*l.w/maxW));el.setAttribute("stroke-width",String(1+2.6*l.w/maxW));el.setAttribute("stroke-linecap","round");lg.appendChild(el);l.el=el});
   nodes.forEach(n=>{const el=document.createElementNS(NS,"g");el.style.cursor="pointer";el.dataset.id=n.id;
-    const c=document.createElementNS(NS,"circle");c.setAttribute("r",n.r);c.setAttribute("fill",color(n.type));c.setAttribute("fill-opacity",n.type==="e"?".6":".92");
+    const ring=document.createElementNS(NS,"circle");ring.setAttribute("r",n.r+7);ring.setAttribute("class","ring");ring.setAttribute("stroke",color(n.type));el.appendChild(ring);
+    const c=document.createElementNS(NS,"circle");c.setAttribute("r",n.r);c.setAttribute("fill",color(n.type));if(n.type!=="e"&&n.deg>=2){c.setAttribute("class","glow");c.style.color=color(n.type)}c.setAttribute("fill-opacity",n.type==="e"?".6":".92");
     if(n.type==="t"){c.setAttribute("stroke","var(--surface)");c.setAttribute("stroke-width","3")}
     el.appendChild(c);
     if(n.type!=="e"||showEntries&&nodes.length<40){const t=document.createElementNS(NS,"text");t.setAttribute("class","nlabel"+(n.type==="t"&&n.deg>2?" big":""));t.setAttribute("text-anchor","middle");t.setAttribute("dy",String(n.r+15));t.textContent=n.label.length>12?n.label.slice(0,12)+"…":n.label;el.appendChild(t)}
@@ -1329,8 +1466,8 @@ function applyView(){const v=G.view;G.g.setAttribute("transform",`translate(${v.
 function highlight(){
   if(!G)return;const sel=selNode&&G.byId.get(selNode);const nb=new Set();
   if(sel){nb.add(sel.id);G.links.forEach(l=>{if(l.s===sel)nb.add(l.t.id);if(l.t===sel)nb.add(l.s.id)})}
-  G.nodes.forEach(n=>{n.el.style.opacity=!sel||nb.has(n.id)?"1":".18";n.circle.setAttribute("stroke",sel&&n===sel?"var(--ink)":n.type==="t"?"var(--surface)":"none");n.circle.setAttribute("stroke-width",sel&&n===sel?"2.5":n.type==="t"?"3":"0")});
-  G.links.forEach(l=>l.el.style.opacity=!sel||l.s===sel||l.t===sel?"1":".08")}
+  G.nodes.forEach(n=>{n.el.classList.toggle("sel",!!sel&&n===sel);n.el.style.opacity=!sel||nb.has(n.id)?"1":".14";n.circle.setAttribute("stroke",sel&&n===sel?"var(--ink)":n.type==="t"?"var(--surface)":"none");n.circle.setAttribute("stroke-width",sel&&n===sel?"2.5":n.type==="t"?"3":"0")});
+  G.links.forEach(l=>{const on=sel&&(l.s===sel||l.t===sel);l.el.style.opacity=!sel||on?"1":".06";l.el.setAttribute("stroke",on?color(sel.type):"var(--muted)")})}
 function bindGraph(svg){
   const pt=e=>{const r=svg.getBoundingClientRect(),v=G.view;return{x:((e.clientX-r.left)*G.W/r.width-v.x)/v.k,y:((e.clientY-r.top)*G.H/r.height-v.y)/v.k,sx:e.clientX,sy:e.clientY}};
   svg.onpointerdown=e=>{const ge=e.target.closest("g[data-id]");const p=pt(e);svg.setPointerCapture(e.pointerId);
@@ -1377,6 +1514,7 @@ function drawSheet(){
   const s=$("#sheetRoot .sheet");if(s&&sheet.keepScroll!==false)s.scrollTop=sc;
   if(sheet.kind==="edit"){bindEditor();renderDraftMedia()}
   if(sheet.kind==="entry"){const en=S.entries.get(sheet.id),box=$("#entryMedia");if(en&&box)hydrateMedia(box,en.media)}
+  {const rv=$("#sheetRoot .ana.reveal");if(rv&&sheet.rv!==revealId){sheet.rv=revealId;setTimeout(()=>rv.scrollIntoView({behavior:"smooth",block:"start"}),60)}}
 }
 const top_=(title,right="")=>sheet&&sheet.confirmClose?`<div class="sheet-top"><h2 class="small">還沒儲存，要放棄這次的內容嗎？</h2><div class="row"><button class="btn sm danger" data-act="discard">放棄</button><button class="btn sm" data-act="keep">繼續寫</button></div></div>`:`<div class="sheet-top"><h2>${title}</h2><div class="row">${right}<button class="btn sm ghost" data-act="close">關閉</button></div></div>`;
 
@@ -1392,7 +1530,7 @@ function shEntry(){
     :`<p class="prose">${esc(e.text)}</p>`;
   const linked=steps().filter(s=>s.entryId===e.id);
   return top_(esc(entryTitle(e)),`${e.type==="letter"?`<button class="btn sm ghost" data-act="tear-entry" data-id="${e.id}">撕掉</button>`:""}<button class="btn sm quiet" data-act="edit" data-id="${e.id}">編輯</button>`)+`<div class="sheet-body">
-   <div class="row"><span class="badge ${e.type}">${e.type==="session"?`諮商 · 第 ${e.no||"?"} 次`:typeLabel(e)}</span>${e.ex?'<span class="badge ex">範例</span>':""}<span class="small muted">${esc(e.date)}</span>${mo?`<span class="row small"><span class="mood" style="background:${mo[2]}"></span>${mo[1]}</span>`:""}${e.stage?`<span class="chip s">${e.stage}</span>`:""}</div>
+   <div class="row"><span class="badge ${e.type}">${e.type==="session"?`諮商 · 第 ${e.no||sessionNo(e)} 次`:typeLabel(e)}</span>${e.ex?'<span class="badge ex">範例</span>':""}<span class="small muted">${esc(e.date)}</span>${mo?`<span class="row small"><span class="mood" style="background:${mo[2]}"></span>${mo[1]}</span>`:""}${e.stage?`<span class="chip s">${e.stage}</span>`:""}</div>
    <div class="row">${(e.people||[]).map(p=>`<button class="chip p" data-act="open-person" data-id="${p}">${esc(pName(p))}</button>`).join("")}${(e.themes||[]).map(t=>`<button class="chip t" data-act="open-theme" data-id="${t}">${esc(tName(t))}</button>`).join("")}</div>
    ${e.mood&&e.mood<=2&&keptQuotes().length?(()=>{const k=keptQuotes(),q=k[[...e.id].reduce((a,c)=>a+c.charCodeAt(0),0)%k.length];return `<div class="quotebox"><span class="label">你曾經寫過</span><p>「${esc(q.text)}」</p></div>`})():""}
    <div class="quotable">${fields}</div>
@@ -1412,12 +1550,14 @@ function anaBlock(e){
     <div><button class="btn" data-act="analyze" data-id="${e.id}" ${sample?"":"disabled"}>幫我整理</button></div><p class="tiny muted">整理方式可以在右上角「設定」切換。</p></div>`}
   const ch=a.chain||{};
   const pend=!e.applied;
-  return `<div class="ana">
+  const FL=[["事件",ch.event,"var(--entry)"],["想法",ch.thought,"var(--theme)"],["情緒",(ch.emotion||[]).length?`<span class="emos">${ch.emotion.map(x=>`<span>${esc(x)}</span>`).join("")}</span>`:"","var(--person)",1],["身體",ch.body,"var(--m5)"],["反應",ch.behavior,"var(--method)"]].filter(x=>x[1]);
+  return `<div class="ana${revealId===e.id?" reveal":""}">
    <div class="spread"><h3>整理</h3>${e.ex?'<span class="badge ex">範例整理</span>':""}</div>
    ${a.risk?`<div class="risk"><b>你寫到的內容讓人擔心你現在的安全。</b><p class="small">如果你正在想傷害自己，或處在危險中，請現在就打電話：安心專線 1925、生命線 1995，緊急時撥 119。也請盡快告訴你的諮商師。</p></div>`:""}
    ${a.summary?`<p class="need">${esc(a.summary)}</p>`:""}
-   <div class="chain">${[["事件",ch.event],["想法",ch.thought],["情緒",(ch.emotion||[]).join("、")],["身體",ch.body],["反應",ch.behavior]].filter(x=>x[1]).map(x=>`<div class="link"><b>${x[0]}</b><span>${esc(x[1])}</span></div>`).join("")}</div>
-   ${a.need?`<div><p class="label">背後的需要</p><p>${esc(a.need)}</p></div>`:""}
+   ${FL.length?`<div class="flow">${FL.map((x,i)=>`<div class="fl" style="--i:${i};--c:${x[2]}"><span class="fl-dot"></span><div><b>${x[0]}</b><span>${x[3]?x[1]:esc(x[1])}</span></div></div>`).join("")}</div>`:""}
+   ${a.need?`<div class="needbox" style="--i:${FL.length}"><p class="label">背後的需要</p><p>${esc(a.need)}</p></div>`:""}
+   ${similarBlock(e,FL.length+1)}
    ${(a.themes||[]).length?`<div class="stack"><p class="label">可能的課題</p>${a.themes.map(t=>`<p class="small"><span class="chip t">${esc(t.name)}</span> ${esc(t.why||"")}</p>`).join("")}</div>`:""}
    ${(a.people||[]).length?`<div class="stack"><p class="label">文中的人物</p>${a.people.map(p=>`<p class="small"><span class="chip p">${esc(p.name)}</span> ${esc([p.relation,p.stage,p.role].filter(Boolean).join(" · "))}</p>`).join("")}</div>`:""}
    ${a.pattern?`<div><p class="label">可能的連結</p><p class="small">${esc(a.pattern)}</p></div>`:""}
@@ -1451,25 +1591,26 @@ function shEdit(){
     <p class="tiny muted">封存：信會留在他的頁面裡，只有你看得到。撕掉：做一個撕碎、數到十的小儀式，然後把信刪掉。</p></div>`}
   return top_(sheet.id?"編輯紀錄":isS?"記錄這次諮商":"寫下此刻",`<button class="btn sm" data-act="save">儲存</button>`)+`<div class="sheet-body">
    <div class="row"><div class="seg"><button type="button" data-act="etype" data-t="journal" aria-pressed="${!isS}">日記</button><button type="button" data-act="etype" data-t="session" aria-pressed="${isS}">諮商</button></div>
-    <input class="inp" type="date" id="f-date" value="${esc(d.date)}" style="width:auto">${isS?`<label class="row small">第 <input class="inp" type="number" id="f-no" min="1" value="${esc(d.no||"")}" style="width:72px"> 次</label>`:""}</div>
-   <div class="field"><label for="f-title">標題 <span class="hint">（可以不填）</span></label><input class="inp" id="f-title" data-k="title" value="${esc(d.title||"")}" placeholder="${isS?"例如：談到爸爸的那次":"例如：被主管念了一句"}"></div>
-   ${isS?ta("talk","今天談了什麼","想到什麼寫什麼，剛走出諮商室時用口述最方便。",true)+ta("said","諮商師說的關鍵一句","讓你印象最深、想記住的那句話。")+ta("insight","我的領悟","")+ta("homework","回家作業","")+ta("next","下次想談的","")
-     :ta("text","發生了什麼？心裡有什麼？","不用管格式。可以寫事情經過、腦中的想法、身體的感覺，或你想對誰說的話。",true)}
+    <label class="datechip"><span>${fmtLong(d.date)}</span><input type="date" id="f-date" value="${esc(d.date)}" aria-label="日期"></label>${isS?`<label class="row small">第 <input class="inp" type="number" id="f-no" min="1" value="${esc(d.no||"")}" style="width:72px"> 次</label>`:""}</div>
+   ${isS?`<div class="field"><label for="f-title">標題 <span class="hint">（可以不填）</span></label><input class="inp" id="f-title" data-k="title" value="${esc(d.title||"")}" placeholder="例如：談到爸爸的那次"></div>`+ta("talk","今天談了什麼","想到什麼寫什麼，剛走出諮商室時用口述最方便。",true)+ta("said","諮商師說的關鍵一句","讓你印象最深、想記住的那句話。")+ta("insight","我的領悟","")+ta("homework","回家作業","")+ta("next","下次想談的","")
+     :`<div class="field focuswrite"><label for="f-text" class="fw-q">${esc(sheet.prompt||(sheet.prompt=promptOfDay()))}</label><p class="hint">也可以寫任何此刻在心裡的事。不用管格式。</p><div class="ta-wrap"><textarea id="f-text" data-k="text" class="big xl" placeholder="從一個畫面、一句話，或身體的感覺開始……">${esc(d.text||"")}</textarea>${dict?`<button type="button" class="mic" data-mic="text">口述</button>`:""}</div></div>
+      <input class="inp ghostin" id="f-title" data-k="title" value="${esc(d.title||"")}" placeholder="幫這篇取個標題（可以不填）">`}
    <p class="partial" id="partial" aria-live="polite"></p>
+   <details class="more" ${(d.media||[]).length||(sheet.newMedia||[]).length||d.stage?"open":""}><summary>照片、錄音、人生階段</summary>
    <div class="field"><span class="lab">照片與錄音</span>
     <div class="row"><button type="button" class="btn sm quiet" data-act="pick-photo">加入照片</button><button type="button" class="btn sm quiet" data-act="pick-audio">加入錄音檔</button></div>
     <input type="file" id="f-photo" accept="image/*" multiple hidden><input type="file" id="f-audio" accept="audio/*" hidden>
     <p class="hint">照片會自動壓縮，一篇最多 ${MAX_PHOTOS} 張。錄音請先用手機的錄音程式錄好再加入（3 MB 以內，約 3 分鐘）。</p>
     <p class="small muted" id="mediaProg" aria-live="polite"></p><div class="mgal" id="draftMedia"></div></div>
+   <div class="field"><span class="lab">這件事發生在人生哪個階段？</span><div class="row">${STAGES.map(s=>`<button type="button" class="pick" data-act="estage" data-s="${s}" aria-pressed="${d.stage===s}">${s}</button>`).join("")}</div></div></details>
    <div class="field"><span class="lab">現在的心情</span><div class="moods">${MOODS.map(m=>`<button type="button" data-act="emood" data-v="${m[0]}" aria-pressed="${d.mood===m[0]}"><span class="mood" style="background:${m[2]}"></span>${m[1]}</button>`).join("")}</div></div>
    <div class="field"><span class="lab">跟誰有關？</span><div class="row" id="ppick">${people().map(p=>`<button type="button" class="pick p" data-act="eperson" data-id="${p.id}" aria-pressed="${(d.people||[]).includes(p.id)}">${esc(p.name)}</button>`).join("")||'<span class="small muted">還沒有人物</span>'}</div>
     <div class="row"><input class="inp" id="np-name" placeholder="新增一個人，例如：爸爸" style="flex:1;min-width:0"><button type="button" class="btn sm quiet" data-act="eaddp">新增</button></div><p class="hint">點名字就能選取或取消。不確定也沒關係，「幫我整理」時會自動找出文中的人。</p></div>
-   <div class="field"><span class="lab">這件事發生在人生哪個階段？</span><div class="row">${STAGES.map(s=>`<button type="button" class="pick" data-act="estage" data-s="${s}" aria-pressed="${d.stage===s}">${s}</button>`).join("")}</div></div>
    <div class="row"><button class="btn" data-act="save">儲存</button><button class="btn ghost" data-act="save" data-then="analyze" ${sample?"":"hidden"}>儲存並整理</button></div>
   </div>`}
 function bindEditor(){
   $$("#sheetRoot [data-k]").forEach(el=>el.addEventListener("input",()=>{sheet.draft[el.dataset.k]=el.value;sheet.dirty=true}));
-  const dt=$("#f-date");if(dt)dt.onchange=()=>sheet.draft.date=dt.value;
+  const dt=$("#f-date");if(dt)dt.onchange=()=>{sheet.draft.date=dt.value;const sp=dt.previousElementSibling;if(sp)sp.textContent=fmtLong(dt.value)};
   const no=$("#f-no");if(no)no.oninput=()=>sheet.draft.no=+no.value||"";
 }
 let micTarget=null,micBound=false;
@@ -1558,7 +1699,7 @@ function prepData(){
   return{pr,lastS,since,tc,pc,qs,bring:[...picked,...auto].map(id=>S.entries.get(id)).filter(Boolean)}}
 function prepCard(){const {pr,lastS,since,qs}=prepData();const open=qs.filter(x=>!x.done).length+(pr.myQs||[]).filter(x=>!x.done).length;
   return `<div class="card stack"><div class="spread"><h2 style="font-size:20px">準備下次諮商</h2>${pr.nextDate?`<span class="tiny muted">${esc(pr.nextDate)}</span>`:""}</div>
-   <p class="small muted">${lastS?`上次是第 ${esc(lastS.no||"?")} 次（${fmtD(lastS.date)}），之後寫了 ${since.length} 篇`:"還沒有諮商紀錄"}${open?`，有 ${open} 個想問的問題`:""}</p>
+   <p class="small muted">${lastS?`上次是第 ${esc(lastS.no||sessionNo(lastS))} 次（${fmtD(lastS.date)}），之後寫了 ${since.length} 篇`:"還沒有諮商紀錄"}${open?`，有 ${open} 個想問的問題`:""}</p>
    <div><button class="btn sm" data-act="open-prep">打開準備頁</button></div></div>`}
 let prepBusy=false,prepErr="";
 function shPrep(){
@@ -1566,7 +1707,7 @@ function shPrep(){
   const days=lastS?Math.round((Date.parse(today())-Date.parse(lastS.date))/864e5):0;
   const others=entries().filter(e=>e.type!=="letter"&&!bring.includes(e)).slice(0,40);
   return top_("準備下次諮商")+`<div class="sheet-body">
-   <div class="spread"><span class="small">${lastS?`上次：第 ${esc(lastS.no||"?")} 次 · ${esc(lastS.date)}（${days} 天前）`:"還沒有諮商紀錄"}</span><label class="row small" for="pr-date">下次諮商 <input type="date" class="inp" id="pr-date" value="${esc(pr.nextDate||"")}" style="width:auto"></label></div>
+   <div class="spread"><span class="small">${lastS?`上次：第 ${esc(lastS.no||sessionNo(lastS))} 次 · ${esc(lastS.date)}（${days} 天前）`:"還沒有諮商紀錄"}</span><label class="row small" for="pr-date">下次諮商 <input type="date" class="inp" id="pr-date" value="${esc(pr.nextDate||"")}" style="width:auto"></label></div>
    <div class="stack"><p class="label">這段時間</p><p>寫了 ${since.length} 篇紀錄</p>
     <div class="row">${Object.entries(tc).filter(([t])=>S.themes.has(t)).sort((a,b)=>b[1]-a[1]).slice(0,6).map(([t,n])=>`<button class="chip t" data-act="open-theme" data-id="${t}">${esc(tName(t))} · ${n}</button>`).join("")}</div>
     <div class="row">${Object.entries(pc).filter(([x])=>S.people.has(x)).sort((a,b)=>b[1]-a[1]).slice(0,6).map(([x,n])=>`<button class="chip p" data-act="open-person" data-id="${x}">${esc(pName(x))} · ${n}</button>`).join("")}</div></div>
@@ -2020,6 +2161,7 @@ document.addEventListener("click",async ev=>{
    case"examples":await loadExamples();break;
    case"clear-ex":await clearExamples();break;
    case"export":doExport();break;
+   case"snooze-backup":local.set("xinlu-backup-snooze",Date.now()+7*864e5);render();break;
    case"import":$("#importFile")?.click();break;
    case"do-import":t.disabled=true;await runImport();break;
    case"copy-json":{const ta=$("#sheetRoot textarea");try{await navigator.clipboard.writeText(ta.value);toast("已複製")}catch(e){ta.select()}break}
