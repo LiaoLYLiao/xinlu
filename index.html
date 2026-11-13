@@ -486,6 +486,44 @@ details.more{border:1px solid var(--line);border-radius:14px;padding:4px 14px}
 details.more>summary{cursor:pointer;padding:10px 0;color:var(--accent);font-size:15px}
 details.more[open]>summary{margin-bottom:6px}
 @media (prefers-reduced-motion:reduce){.ana.reveal .fl,.ana.reveal .needbox,.ana.reveal .similar{animation:none;opacity:1}.ana.reveal .fl::before{animation:none;transform:none}.mapwrap g.sel .ring{animation:none;opacity:.6}}
+
+/* ===== practice / timeline / quick ===== */
+.practice{gap:18px}
+.pbar{display:flex;gap:6px}
+.pbar i{flex:1;height:4px;border-radius:4px;background:var(--line)}
+.pbar i.done{background:color-mix(in srgb,var(--method) 55%,var(--line))}
+.pbar i.on{background:var(--method);box-shadow:0 0 10px color-mix(in srgb,var(--method) 60%,transparent)}
+.pr-step{font-family:var(--f-display);font-size:23px;line-height:1.6;animation:rise .5s cubic-bezier(.2,.7,.2,1)}
+.pr-done{font-family:var(--f-display);font-size:24px;color:var(--method)}
+.pr-nav{margin-top:6px}.pr-nav .btn{flex:1}
+.breath{display:grid;justify-items:center;gap:6px;padding:10px 0}
+.breath span{width:120px;height:120px;border-radius:50%;background:radial-gradient(circle,color-mix(in srgb,var(--method) 55%,transparent),color-mix(in srgb,var(--method) 10%,transparent) 70%);animation:breathe 10s ease-in-out infinite}
+.breath b{font-family:var(--f-display);font-size:28px;margin-top:-82px;margin-bottom:46px}
+.breath small{color:var(--muted)}
+@keyframes breathe{0%,100%{transform:scale(.6)}40%,50%{transform:scale(1)}}
+.hdots{display:inline-flex;gap:3px}.hdots i{width:7px;height:7px;border-radius:50%;background:var(--line)}.hdots i.on{background:var(--method)}
+.effbox{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:14px;background:var(--method-soft)}
+.effbox .hdots{margin-top:7px}
+.mrow.eff h2{color:var(--method)}
+.mrow.eff .mcard{border-color:color-mix(in srgb,var(--method) 30%,var(--line))}
+.ptl{display:grid;gap:4px}
+.ptl-g{position:relative;padding-left:22px;padding-bottom:10px}
+.ptl-g::before{content:"";position:absolute;left:6px;top:8px;bottom:0;width:2px;background:linear-gradient(var(--person),color-mix(in srgb,var(--person) 15%,transparent))}
+.ptl-h{display:flex;align-items:baseline;gap:8px;margin:0 0 6px -22px}
+.ptl-h::before{content:"";width:14px;height:14px;border-radius:50%;background:var(--person);box-shadow:0 0 0 4px var(--person-soft);flex:none;align-self:center}
+.ptl-h b{font-family:var(--f-display);font-size:17px}
+.ptl-h span{font-size:12px;color:var(--muted)}
+.ptl-i{display:grid;grid-template-columns:12px 1fr;gap:10px;width:100%;text-align:left;border:0;background:var(--raise);border-radius:12px;padding:10px 12px;margin-bottom:6px;cursor:pointer;color:inherit;font:inherit}
+.ptl-d{width:9px;height:9px;border-radius:50%;margin-top:6px;background:var(--c,var(--person))}
+.ptl-t{display:grid;gap:3px}
+.ptl-t small{font-size:12px;color:var(--muted)}
+.ptl-t b{font-weight:500;font-size:15px}
+.ptl-th{font-size:12px;color:var(--theme)}
+.ptl-empty{margin:0 0 8px}
+.nudge{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;border-radius:14px;border:1px dashed color-mix(in srgb,var(--accent) 50%,var(--line));font-size:14px}
+.nudge .btn{flex:none}
+.quickhead b{font-family:var(--f-display);font-size:21px}
+@media (prefers-reduced-motion:reduce){.breath span,.pr-step{animation:none}}
 </style>
 </head>
 <body>
@@ -836,7 +874,7 @@ function loadWeekly(){fetch("weekly.json",{cache:"no-cache"}).then(r=>r.ok?r.jso
 let installEvt=null;
 addEventListener("beforeinstallprompt",e=>{e.preventDefault();installEvt=e;schedule()});
 if("serviceWorker" in navigator&&location.protocol==="https:")navigator.serviceWorker.register("sw.js").catch(()=>{});
-const APP_VER="2026.11.13-4";
+const APP_VER="2026.11.13-5";
 async function checkUpdate(){try{const r=await fetch("version.json?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.json()).v;
   if(v&&v!==APP_VER&&!$("#updBar")){const b=document.createElement("button");b.id="updBar";b.className="updbar";b.textContent="有新版本，點這裡更新";b.onclick=()=>{b.textContent="更新中……";location.reload()};document.body.appendChild(b)}}catch(e){}}
 setTimeout(checkUpdate,1500);document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
@@ -1152,7 +1190,7 @@ function entryTitle(e){
   const t=(e.text||"").trim().split(/\n/)[0];return t.length>24?t.slice(0,24)+"…":(t||"沒有標題的日記")}
 function entryText(e){
   if(e.type!=="session")return e.text||"";
-  return [e.talk&&`談了什麼：${e.talk}`,e.said&&`諮商師說：${e.said}`,e.insight&&`我的領悟：${e.insight}`,e.homework&&`回家作業：${e.homework}`,e.next&&`下次想談：${e.next}`].filter(Boolean).join("\n")}
+  return [e.talk&&`談了什麼：${e.talk}`,e.said&&`諮商師說：${e.said}`,e.feel&&`當下的感覺：${e.feel}`,e.insight&&`我的領悟：${e.insight}`,e.homework&&`回家作業：${e.homework}`,e.next&&`下次想談：${e.next}`].filter(Boolean).join("\n")}
 function themeStats(){
   return themes().map(t=>{const es=entriesOfTheme(t.id);return{t,n:es.length,last:es[0]?.date||""}}).sort((a,b)=>b.n-a.n)}
 
@@ -1220,6 +1258,38 @@ function similarBlock(e,i){const l=similarTo(e);if(!l.length)return "";
 function recommendedMethods(){const m=new Map();entries().slice(0,12).forEach((e,i)=>(e.analysis?.methods||[]).forEach(x=>{if(methodById(x.id))m.set(x.id,(m.get(x.id)||0)+12-i)}));
   const done=new Set(steps().map(s=>s.methodId));return [...m.entries()].sort((a,b)=>b[1]-a[1]).map(x=>methodById(x[0])).filter(x=>x&&!done.has(x.id)).slice(0,6)}
 
+
+/* ---------------- practice & effectiveness ---------------- */
+const HELPW=["沒什麼幫助","一點點","普通","有幫助","很有幫助"];
+function methodStats(){const m=new Map();steps().filter(s=>s.status==="done"&&s.help>0&&methodById(s.methodId)).forEach(s=>{const o=m.get(s.methodId)||{id:s.methodId,n:0,sum:0,last:null};o.n++;o.sum+=s.help;if(!o.last||(s.doneAt||0)>(o.last.doneAt||0))o.last=s;m.set(s.methodId,o)});
+  return [...m.values()].map(o=>({...o,avg:o.sum/o.n})).sort((a,b)=>b.avg-a.avg||b.n-a.n)}
+const helpDots=v=>`<span class="hdots" aria-label="${HELPW[Math.round(v)-1]||""}">${[1,2,3,4,5].map(i=>`<i class="${i<=Math.round(v)?"on":""}"></i>`).join("")}</span>`;
+function effectiveRow(){const st=methodStats();if(!st.length)return "";
+  return `<section class="mrow eff"><div class="spread"><h2>對你有效的</h2><span class="tiny muted">依你做完後的感受排序</span></div><div class="hscroll">${st.map(o=>{const m=methodById(o.id);return `<button type="button" class="mcard" data-act="open-method" data-id="${m.id}"><span class="row" style="justify-content:space-between"><span class="cat">${CATS.find(c=>c[0]===m.cat)[1]}</span>${helpDots(o.avg)}</span><b>${m.name}</b><p>做過 ${o.n} 次，平均覺得「${HELPW[Math.round(o.avg)-1]}」</p>${o.last&&o.last.reflection?`<p class="tiny muted">上次發現：${esc(o.last.reflection)}</p>`:""}</button>`}).join("")}</div></section>`}
+function shPractice(){
+  const m=methodById(sheet.id);if(!m)return null;const n=m.steps.length,i=sheet.i||0;
+  const bar=`<div class="pbar">${m.steps.map((_,k)=>`<i class="${k<i?"done":k===i?"on":""}"></i>`).join("")}<i class="${i>=n?"on":""}"></i></div>`;
+  if(i<n)return top_(esc(m.name))+`<div class="sheet-body practice">${bar}
+    ${i===0&&m.withCounselor?`<p class="notice warn">這個練習可能引發強烈的情緒，建議在諮商時跟諮商師一起做。覺得太難受就停下來。</p>`:""}
+    <p class="label">第 ${i+1} 步，共 ${n} 步</p>
+    <p class="pr-step" style="--k:${i}">${m.steps[i]}</p>
+    ${sheet.timer?`<div class="breath" aria-live="polite"><span></span><b id="brt">${sheet.left}</b><small>秒，跟著圓圈慢慢呼吸</small></div>`:`<div><button class="btn sm ghost" data-act="pr-timer">需要一點時間？開始 1 分鐘</button></div>`}
+    <div class="row pr-nav">${i>0?`<button class="btn ghost" data-act="pr-go" data-d="-1">上一步</button>`:""}<button class="btn" data-act="pr-go" data-d="1">${i===n-1?"做完了":"下一步"}</button></div></div>`;
+  return top_("做完了："+esc(m.name))+`<div class="sheet-body practice">${bar}
+    <p class="pr-done">做到了，就是往前一步。</p>
+    <div class="field"><span class="lab">對你有幫助嗎？</span><div class="moods">${[1,2,3,4,5].map(v=>`<button type="button" data-act="help-v" data-v="${v}" aria-pressed="${sheet.help===v}">${HELPW[v-1]}</button>`).join("")}</div></div>
+    <div class="field"><label for="dn-ref">做的時候發現了什麼？</label><textarea id="dn-ref" placeholder="例如：寫到一半哭了，但寫完覺得比較輕">${esc(sheet.ref||"")}</textarea></div>
+    <div class="row"><button class="btn" data-act="pr-save">記下來</button><button class="btn ghost" data-act="pr-go" data-d="-1">回到上一步</button></div></div>`}
+let prTimer=null;
+function stopPrTimer(){if(prTimer){clearInterval(prTimer);prTimer=null}}
+function personTimeline(p,es){
+  const nl=es.filter(e=>e.type!=="letter");if(!nl.length)return "";
+  const groups=[...STAGES,"未標記"].map(st=>({st,l:nl.filter(e=>(e.stage||"未標記")===st).sort((a,b)=>(a.date||"").localeCompare(b.date||""))})).filter(g=>g.l.length||(p.stages||[]).includes(g.st));
+  return `<div class="stack"><p class="label">我們之間的時間軸</p><div class="ptl">${groups.map(g=>`<div class="ptl-g"><div class="ptl-h"><b>${g.st}</b>${g.st!=="未標記"?`<span>${STAGE_HINT[g.st]}</span>`:"<span>還沒標記發生在哪個階段</span>"}</div>
+    ${g.l.length?g.l.map(e=>{const a=e.analysis||{},mo=e.mood?moodOf(e.mood):null;return `<button type="button" class="ptl-i" data-act="open-entry" data-id="${e.id}"><span class="ptl-d" style="${mo?`--c:${mo[2]||"var(--person)"}`:""}"></span><span class="ptl-t"><small>${esc(e.date||"")}${e.type==="session"?" · 諮商":""}</small><b>${esc(entryTitle(e))}</b>${(a.chain?.emotion||[]).length?`<span class="emos">${a.chain.emotion.slice(0,3).map(x=>`<span>${esc(x)}</span>`).join("")}</span>`:""}${(e.themes||[]).filter(t=>S.themes.has(t)).length?`<span class="ptl-th">${(e.themes||[]).filter(t=>S.themes.has(t)).map(t=>esc(tName(t))).join("・")}</span>`:""}</span></button>`}).join(""):`<p class="tiny muted ptl-empty">這個階段還沒有紀錄。</p>`}</div>`).join("")}</div></div>`}
+function quickNudge(){const q=sessions().filter(e=>!e.talk&&(e.said||e.feel)).sort((a,b)=>(b.date||"").localeCompare(a.date||""))[0];if(!q)return "";
+  return `<div class="nudge"><span>${fmtD(q.date)} 的諮商是快速記錄，有空時補上談了什麼、回家作業。</span><button class="btn sm quiet" data-act="edit" data-id="${q.id}">補上</button></div>`}
+
 /* ---------------- home ---------------- */
 function vHome(){
   const d=new Date(),h=d.getHours();
@@ -1232,6 +1302,7 @@ function vHome(){
   return `<section class="view">${statusNote()}
   <div class="hello"><p class="date">${d.getMonth()+1} 月 ${d.getDate()} 日 星期${"日一二三四五六"[d.getDay()]}</p><h1>${hello}</h1></div>
   ${homeInsight()}
+  ${quickNudge()}
   <button type="button" class="hero-write" data-act="new" data-type="journal"><span><i>寫下此刻</i><b>${esc(promptOfDay())}</b></span><span class="hw-go" aria-hidden="true">→</span></button>
   <div class="actions three">
     <button type="button" class="action session" data-act="new" data-type="session"><i>諮商</i><b>記錄諮商</b></button>
@@ -1358,7 +1429,7 @@ function vMethods(){
   return `<section class="view"><div class="head spread"><div><h1>方法庫</h1><p class="muted">面對一件事時，你可以選擇的辦法。分成十類，每個方法都標示它的依據。</p></div>${seg}</div>
   <div class="hscroll-row">${[["all","全部"],...CATS].map(c=>`<button type="button" class="pick" data-act="mcat" data-c="${c[0]}" aria-pressed="${methodCat===c[0]}">${c[1]}${c[0]==="all"?"":` <span class="tiny">${allMethods().filter(m=>m.cat===c[0]).length}</span>`}</button>`).join("")}</div>
   ${methodCat==="all"?(()=>{const rec=recommendedMethods();
-    return `${rec.length?`<section class="mrow rec"><div class="spread"><h2>依照你最近的紀錄</h2><span class="tiny muted">AI 整理時建議過</span></div><div class="hscroll">${rec.map(mcardH).join("")}</div></section>`:""}
+    return `${effectiveRow()}${rec.length?`<section class="mrow rec"><div class="spread"><h2>依照你最近的紀錄</h2><span class="tiny muted">AI 整理時建議過</span></div><div class="hscroll">${rec.map(mcardH).join("")}</div></section>`:""}
     ${CATS.map(c=>{const l=allMethods().filter(m=>m.cat===c[0]);return l.length?`<section class="mrow"><div class="spread"><h2>${c[1]}</h2><button class="linkbtn" data-act="mcat" data-c="${c[0]}">全部 ${l.length} →</button></div><div class="hscroll">${l.slice(0,8).map(mcardH).join("")}</div></section>`:""}).join("")}`})()
   :`<div class="mgrid">${list.map(mcardH).join("")}</div>`}
   </section>`}
@@ -1507,7 +1578,7 @@ function closeSheet(){if(sheet&&sheet.kind==="edit"&&(sheet.newMedia||[]).length
 function refreshSheet(){if(!sheet||sheet.kind==="edit"||sheet.busy)return;const a=document.activeElement;if(a&&a.closest&&a.closest("#sheetRoot")&&/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)&&a.type!=="checkbox")return;drawSheet()}
 function drawSheet(){
   if(!sheet)return;
-  const body={entry:shEntry,edit:shEdit,person:shPerson,theme:shTheme,method:shMethod,research:shResearch,help:shHelp,done:shDone,data:shData,import:shImport,batch:shBatch,quotes:shQuotes,prep:shPrep,jobs:shJobs,settings:shSettings,welcome:shWelcome,assistant:shAssistant,pastechat:shPasteChat}[sheet.kind]();
+  const body={entry:shEntry,edit:shEdit,person:shPerson,theme:shTheme,method:shMethod,research:shResearch,help:shHelp,done:shDone,practice:shPractice,data:shData,import:shImport,batch:shBatch,quotes:shQuotes,prep:shPrep,jobs:shJobs,settings:shSettings,welcome:shWelcome,assistant:shAssistant,pastechat:shPasteChat}[sheet.kind]();
   if(body===null){closeSheet();return}
   const sc=$("#sheetRoot .sheet")?.scrollTop||0;
   $("#sheetRoot").innerHTML=`<div class="sheet-wrap" data-act="sheet-bg"><div class="sheet" role="dialog" aria-modal="true">${body}</div></div>`;
@@ -1523,7 +1594,9 @@ function shEntry(){
   const e=S.entries.get(sheet.id);if(!e)return null;const mo=moodOf(e.mood);
   const fields=e.type==="session"?`<div class="kv">
      ${e.talk?`<div><b>今天談了什麼</b><p class="prose">${esc(e.talk)}</p></div>`:""}
-     ${e.said?`<div><b>諮商師說的關鍵一句</b><p class="quote">${esc(e.said)}</p></div>`:""}
+     ${!e.talk&&(e.said||e.feel)?`<div class="nudge"><span>這次是快速記錄，有空時可以補上談了什麼、領悟和回家作業。</span><button class="btn sm quiet" data-act="edit" data-id="${e.id}">補上</button></div>`:""}
+     ${e.said?`<div><b>${e.talk?"諮商師說的關鍵一句":"印象最深的一句話"}</b><p class="quote">${esc(e.said)}</p></div>`:""}
+     ${e.feel?`<div><b>當下的感覺</b><p class="prose">${esc(e.feel)}</p></div>`:""}
      ${e.insight?`<div><b>我的領悟</b><p class="prose">${esc(e.insight)}</p></div>`:""}
      ${e.homework?`<div><b>回家作業</b><p class="prose">${esc(e.homework)}</p></div>`:""}
      ${e.next?`<div><b>下次想談</b><p class="prose">${esc(e.next)}</p></div>`:""}</div>`
@@ -1562,7 +1635,7 @@ function anaBlock(e){
    ${(a.people||[]).length?`<div class="stack"><p class="label">文中的人物</p>${a.people.map(p=>`<p class="small"><span class="chip p">${esc(p.name)}</span> ${esc([p.relation,p.stage,p.role].filter(Boolean).join(" · "))}</p>`).join("")}</div>`:""}
    ${a.pattern?`<div><p class="label">可能的連結</p><p class="small">${esc(a.pattern)}</p></div>`:""}
    ${linkedBlock(e,pend)}
-   ${(a.methods||[]).length?`<div class="stack"><p class="label">可以試試的方法</p><div class="sug">${a.methods.filter(m=>methodById(m.id)).map(m=>`<div class="s"><div><b>${methodById(m.id).name}</b><p class="small muted">${esc(m.why||"")}</p></div><div class="row"><button class="btn sm ghost" data-act="open-method" data-id="${m.id}">看做法</button><button class="btn sm" data-act="pick-step" data-m="${m.id}" data-e="${e.id}">選為下一步</button></div></div>`).join("")}</div></div>`:""}
+   ${(a.methods||[]).length?`<div class="stack"><p class="label">可以試試的方法</p><div class="sug">${a.methods.filter(m=>methodById(m.id)).map(m=>`<div class="s"><div><b>${methodById(m.id).name}</b><p class="small muted">${esc(m.why||"")}</p></div><div class="row"><button class="btn sm" data-act="practice" data-id="${m.id}" data-e="${e.id}">現在就做</button><button class="btn sm ghost" data-act="pick-step" data-m="${m.id}" data-e="${e.id}">選為下一步</button></div></div>`).join("")}</div></div>`:""}
    ${(a.questions||[]).length?`<div class="stack"><p class="label">可以帶去問諮商師的</p><div class="qlist">${a.questions.map((q,i)=>`<label class="q ${(e.asked||{})[i]?"done":""}"><input type="checkbox" data-act="ask" data-id="${e.id}" data-i="${i}" ${(e.asked||{})[i]?"checked":""}><span>${esc(q)}</span></label>`).join("")}</div></div>`:""}
    <div class="row"><button class="linkbtn" data-act="analyze" data-id="${e.id}" ${sample?"":"disabled"}>重新整理</button><span class="tiny muted">AI 的整理僅供參考，不是診斷。</span></div>
   </div>`}
@@ -1592,7 +1665,8 @@ function shEdit(){
   return top_(sheet.id?"編輯紀錄":isS?"記錄這次諮商":"寫下此刻",`<button class="btn sm" data-act="save">儲存</button>`)+`<div class="sheet-body">
    <div class="row"><div class="seg"><button type="button" data-act="etype" data-t="journal" aria-pressed="${!isS}">日記</button><button type="button" data-act="etype" data-t="session" aria-pressed="${isS}">諮商</button></div>
     <label class="datechip"><span>${fmtLong(d.date)}</span><input type="date" id="f-date" value="${esc(d.date)}" aria-label="日期"></label>${isS?`<label class="row small">第 <input class="inp" type="number" id="f-no" min="1" value="${esc(d.no||"")}" style="width:72px"> 次</label>`:""}</div>
-   ${isS?`<div class="field"><label for="f-title">標題 <span class="hint">（可以不填）</span></label><input class="inp" id="f-title" data-k="title" value="${esc(d.title||"")}" placeholder="例如：談到爸爸的那次"></div>`+ta("talk","今天談了什麼","想到什麼寫什麼，剛走出諮商室時用口述最方便。",true)+ta("said","諮商師說的關鍵一句","讓你印象最深、想記住的那句話。")+ta("insight","我的領悟","")+ta("homework","回家作業","")+ta("next","下次想談的","")
+   ${isS&&sheet.quick?`<div class="quickhead"><b>剛走出諮商室？先記兩件事就好</b><p class="small muted">其他的之後再補。</p></div>`+ta("said","印象最深的一句話","諮商師說的，或你自己說出口的。",true)+ta("feel","我現在的感覺","身體、情緒，或腦中的一個畫面都可以。")+`<div><button type="button" class="linkbtn" data-act="quick-off">展開完整欄位（談了什麼、領悟、回家作業）</button></div>`
+     :isS?`<div class="field"><label for="f-title">標題 <span class="hint">（可以不填）</span></label><input class="inp" id="f-title" data-k="title" value="${esc(d.title||"")}" placeholder="例如：談到爸爸的那次"></div>`+ta("talk","今天談了什麼","想到什麼寫什麼，剛走出諮商室時用口述最方便。",true)+ta("said","諮商師說的關鍵一句","讓你印象最深、想記住的那句話。")+ta("insight","我的領悟","")+ta("homework","回家作業","")+ta("next","下次想談的","")
      :`<div class="field focuswrite"><label for="f-text" class="fw-q">${esc(sheet.prompt||(sheet.prompt=promptOfDay()))}</label><p class="hint">也可以寫任何此刻在心裡的事。不用管格式。</p><div class="ta-wrap"><textarea id="f-text" data-k="text" class="big xl" placeholder="從一個畫面、一句話，或身體的感覺開始……">${esc(d.text||"")}</textarea>${dict?`<button type="button" class="mic" data-mic="text">口述</button>`:""}</div></div>
       <input class="inp ghostin" id="f-title" data-k="title" value="${esc(d.title||"")}" placeholder="幫這篇取個標題（可以不填）">`}
    <p class="partial" id="partial" aria-live="polite"></p>
@@ -1632,6 +1706,7 @@ function shPerson(){
   return top_(p?esc(p.name):"新增人物",`<button class="btn sm" data-act="save-person">儲存</button>`)+`<div class="sheet-body">
    <div class="addp" style="grid-template-columns:1fr 1fr"><div class="field"><label for="pp-name">名字或稱呼</label><input class="inp" id="pp-name" value="${esc(d.name)}"></div><div class="field"><label for="pp-rel">關係</label><input class="inp" id="pp-rel" value="${esc(d.relation||"")}" placeholder="父親、前任、主管……"></div></div>
    <div class="field"><span class="lab">出現在人生的哪些階段</span><div class="row">${STAGES.map(s=>`<button type="button" class="pick" data-act="pp-stage" data-s="${s}" aria-pressed="${(d.stages||[]).includes(s)}">${s}</button>`).join("")}</div></div>
+   ${p?personTimeline(p,es):""}
    <div class="field"><label for="pp-feel">我對他的感受，和這段關係的樣子</label><textarea id="pp-feel">${esc(d.feeling||"")}</textarea></div>
    <div class="field"><label for="pp-know">我希望他知道的</label><textarea id="pp-know" placeholder="例如：我不是不願意，是真的沒有能量了">${esc(d.wantKnow||"")}</textarea></div>
    <div class="field"><label for="pp-bound">我的界線</label><textarea id="pp-bound" placeholder="例如：睡前時間是我休息的時間">${esc(d.boundary||"")}</textarea></div>
@@ -1640,7 +1715,6 @@ function shPerson(){
     ${avg?`<p class="small muted">提到他的紀錄，平均心情：${moodOf(Math.round(avg))[1]}</p>`:""}</div>
    <div class="stack"><div class="spread"><p class="label">給他的信</p><button class="btn sm" data-act="new-letter" data-id="${p.id}">寫一封不寄出的信</button></div>
     ${es.filter(e=>e.type==="letter").map(e=>`<button type="button" class="mini-e" data-act="open-entry" data-id="${e.id}"><span>${fmtD(e.date)}</span>${esc(entryTitle(e))}</button>`).join("")||'<p class="small muted">還沒有</p>'}</div>
-   <div class="stack"><p class="label">${es.filter(e=>e.type!=="letter").length} 篇相關紀錄</p>${es.filter(e=>e.type!=="letter").map(e=>`<button type="button" class="mini-e" data-act="open-entry" data-id="${e.id}"><span>${fmtD(e.date)}</span>${esc(entryTitle(e))}</button>`).join("")}</div>
    <div class="row">${sheet.confirmDel?`<span class="small">刪除人物後，紀錄會保留，但不再連到他。</span><button class="btn sm danger" data-act="del-person" data-id="${p.id}">確定刪除</button><button class="btn sm ghost" data-act="cancel-del">取消</button>`:`<button class="linkbtn" style="color:var(--warn)" data-act="ask-del">刪除這個人物</button>`}</div>`:""}
   </div>`}
 
@@ -1756,6 +1830,8 @@ function shMethod(){
   return top_(m.name)+`<div class="sheet-body">
    <div class="row"><span class="label" style="color:var(--method)">${CATS.find(c=>c[0]===m.cat)[1]}</span>${evTag(m.ev)}<span class="tiny muted">${EVID[m.ev][0]}</span></div>
    <p>${m.what}</p>
+   ${(()=>{const o=methodStats().find(x=>x.id===m.id);return o?`<div class="effbox">${helpDots(o.avg)}<span>你做過 ${o.n} 次，平均覺得「${HELPW[Math.round(o.avg)-1]}」${o.last&&o.last.reflection?`<br><span class="tiny muted">上次發現：${esc(o.last.reflection)}</span>`:""}</span></div>`:""})()}
+   <div><button class="btn" data-act="practice" data-id="${m.id}" data-e="${sheet.entryId||""}">現在就做，一步一步帶你</button></div>
    <div><p class="label">適合的時候</p><p>${m.when}</p></div>
    ${m.withCounselor?`<p class="notice warn">這個練習可能引發強烈的情緒，建議在諮商時跟諮商師一起做。</p>`:""}
    <div><p class="label">怎麼做</p><ol class="steps">${m.steps.map(s=>`<li>${s}</li>`).join("")}</ol></div>
@@ -2118,7 +2194,7 @@ function findMeta(mid){if(sheet&&sheet.draft)for(const m of sheet.draft.media||[
 async function viewPhoto(mid){const m=findMeta(mid);if(!m)return;const r=$("#photoRoot");r.innerHTML=`<div class="photo-ov" data-act="close-photo" role="dialog" aria-label="照片"><img alt="${esc(m.name||"照片")}"><span class="tiny" style="color:#fff">點一下關閉</span></div>`;
   try{r.querySelector("img").src=await getMedia(m)}catch(e){r.innerHTML="";toast("照片讀取失敗")}}
 
-function newDraft(type){const no=type==="session"?Math.max(0,...sessions().map(s=>+s.no||0))+1:"";return{type,date:today(),no,title:"",text:"",talk:"",said:"",insight:"",homework:"",next:"",mood:0,people:[],stage:"",themes:[]}}
+function newDraft(type){const no=type==="session"?Math.max(sessions().length,...sessions().map(s=>+s.no||0))+1:"";return{type,date:today(),no,title:"",text:"",talk:"",said:"",feel:"",insight:"",homework:"",next:"",mood:0,people:[],stage:"",themes:[]}}
 document.addEventListener("click",async ev=>{
   const t=ev.target.closest("[data-act],[data-view],[data-goto]");if(!t)return;
   if(t.dataset.view&&!t.dataset.act){go(t.dataset.view);return}
@@ -2128,7 +2204,8 @@ document.addEventListener("click",async ev=>{
    case"sheet-bg":if(ev.target===t&&!(sheet&&sheet.kind==="edit"&&sheet.dirty)){if(sheet&&sheet.kind==="welcome")local.set("xinlu-welcomed",true);closeSheet()}break;
    case"close":if(sheet&&sheet.kind==="welcome")local.set("xinlu-welcomed",true);if(sheet&&sheet.kind==="edit"&&sheet.dirty){sheet.confirmClose=true;drawSheet();break}closeSheet();break;
    case"help":openSheet({kind:"help"});break;
-   case"new":openSheet({kind:"edit",draft:newDraft(t.dataset.type)});break;
+   case"new":openSheet({kind:"edit",draft:newDraft(t.dataset.type),quick:t.dataset.type==="session"});break;
+   case"quick-off":sheet.quick=false;drawSheet();break;
    case"edit":{const e=S.entries.get(id);if(e)openSheet({kind:"edit",id,draft:clone(e)});break}
    case"open-entry":openSheet({kind:"entry",id});break;
    case"open-person":openSheet({kind:"person",id});break;
@@ -2235,6 +2312,11 @@ document.addEventListener("click",async ev=>{
    case"add-step":{const st={id:uid(),methodId:t.dataset.m,entryId:$("#st-entry").value||"",note:$("#st-note").value.trim(),status:"todo",createdAt:Date.now()};await put("steps",st);closeSheet();toast("已放進「我的下一步」");break}
    case"done-step":openSheet({kind:"done",id,help:0,ref:""});break;
    case"help-v":sheet.help=+t.dataset.v;sheet.ref=$("#dn-ref").value;drawSheet();break;
+   case"practice":stopPrTimer();openSheet({kind:"practice",id,entryId:t.dataset.e||"",i:0,help:0,ref:""});break;
+   case"pr-go":{stopPrTimer();sheet.timer=false;const m=methodById(sheet.id);sheet.i=Math.max(0,Math.min(m.steps.length,(sheet.i||0)+ +t.dataset.d));const r=$("#dn-ref");if(r)sheet.ref=r.value;drawSheet();const sb=$("#sheetRoot .sheet-body");if(sb)sb.scrollTop=0;break}
+   case"pr-timer":{sheet.timer=true;sheet.left=60;drawSheet();prTimer=setInterval(()=>{if(!sheet||sheet.kind!=="practice"){stopPrTimer();return}sheet.left--;const b=$("#brt");if(b)b.textContent=sheet.left;if(sheet.left<=0){stopPrTimer();sheet.timer=false;drawSheet();toast("一分鐘到了")}},1000);break}
+   case"pr-save":{const m=sheet.id,eid=sheet.entryId||"",ref=$("#dn-ref").value.trim();const ex=steps().find(x=>x.methodId===m&&x.status!=="done"&&(!eid||x.entryId===eid));
+     const st=ex?clone(ex):{id:uid(),methodId:m,entryId:eid,note:"",createdAt:Date.now()};Object.assign(st,{status:"done",help:sheet.help||0,reflection:ref,doneAt:Date.now()});await put("steps",st);closeSheet();toast("記下來了。之後在方法庫的「對你有效的」可以看到累積的感受。");break}
    case"finish-step":{const s=clone(S.steps.get(id));if(!s)break;s.status="done";s.help=sheet.help||0;s.reflection=$("#dn-ref").value.trim();s.doneAt=Date.now();await put("steps",s);closeSheet();toast("記下來了。做到了，就是往前一步。");break}
    /* editor */
    case"etype":sheet.draft.type=t.dataset.t;if(t.dataset.t==="session"&&!sheet.draft.no)sheet.draft.no=Math.max(0,...sessions().map(s=>+s.no||0))+1;sheet.dirty=true;drawSheet();break;
@@ -2251,7 +2333,7 @@ document.addEventListener("click",async ev=>{
    case"discard":closeSheet();break;
    case"keep":sheet.confirmClose=false;drawSheet();break;
    case"unsel":selNode=null;highlight();renderPanel();break;
-   case"save":{const d=sheet.draft;const content=d.type==="session"?(d.talk||d.said||d.insight||d.homework||d.next):d.text;
+   case"save":{const d=sheet.draft;const content=d.type==="session"?(d.talk||d.said||d.feel||d.insight||d.homework||d.next):d.text;
      if(!String(content||"").trim()&&!(d.media||[]).length){toast("先寫一點內容，或加入照片、錄音再儲存");break}
      if(dict&&dict.active())await dict.stop().catch(()=>{});
      const old=sheet.id?S.entries.get(sheet.id):null;
