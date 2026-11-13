@@ -641,6 +641,33 @@ details.more[open]>summary{margin-bottom:6px}
 .hr-go{color:var(--muted);font-size:22px;line-height:1}
 .hrecent{display:grid;gap:8px}
 .mini-e .un{float:right;margin-top:2px;font-size:11px;color:var(--accent);white-space:nowrap;padding-left:8px}
+
+/* ===== encouraging ===== */
+.cheer{margin-top:6px;font-size:16px;line-height:1.7;color:var(--ink);opacity:.9}
+.tp{display:grid;gap:8px;padding:18px;border-radius:20px;background:linear-gradient(150deg,var(--method-soft),var(--surface) 75%);border:1px solid color-mix(in srgb,var(--method) 30%,var(--line))}
+.tp .label{color:var(--method)}
+.tp-n{font-family:var(--f-display);font-size:22px}
+.gm{display:grid;gap:4px;width:100%;text-align:left;cursor:pointer;padding:16px 18px;border-radius:20px;border:1px solid color-mix(in srgb,var(--m5) 35%,var(--line));background:linear-gradient(150deg,color-mix(in srgb,var(--m5) 14%,var(--surface)),var(--surface) 75%);color:var(--ink);font:inherit}
+.gm .label{color:var(--m5)}
+.gm b{font-family:var(--f-display);font-size:18px;font-weight:500;line-height:1.6}
+.gm small{font-size:12px;color:var(--muted)}
+.deep{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;text-align:left;cursor:pointer;padding:14px 16px;border-radius:16px;border:1px dashed var(--line);background:transparent;color:var(--ink);font:inherit}
+.deep b{display:block;font-weight:500;font-size:15px}.deep small{font-size:13px;color:var(--muted)}.deep>span:last-child{color:var(--muted);font-size:22px}
+.needbox.bright{background:linear-gradient(135deg,color-mix(in srgb,var(--method) 16%,var(--raise)),var(--raise));border-color:color-mix(in srgb,var(--method) 40%,var(--line))}
+.needbox.bright .label{color:var(--method)}
+.wmodes{margin-bottom:4px}
+.wbank{border:1px solid var(--line);border-radius:14px;padding:4px 14px 12px}
+.wbank>summary{cursor:pointer;padding:10px 0;color:var(--accent);font-size:15px}
+.wb-tabs{margin:0 -14px 8px;padding:2px 14px}
+.wb-words{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+.wb-words .chip{cursor:pointer;font-size:14px;padding:5px 12px}
+.energy-intro{display:grid;gap:10px;padding:16px;border-radius:18px;background:var(--surface);border:1px solid var(--line)}
+.energy-intro .label{color:var(--method)}
+.ei-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.ei-grid div{display:grid;gap:4px;padding:10px;border-radius:12px;background:var(--method-soft)}
+.ei-grid b{font-family:var(--f-display);font-size:17px;color:var(--method)}
+.ei-grid span{font-size:12.5px;line-height:1.6}
+@media (max-width:420px){.ei-grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -689,11 +716,45 @@ function toast(msg){const r=$("#toastRoot");r.innerHTML=`<div class="toast" role
 /* ============================================================
    method library — rituals and psychology, each with its basis
    ============================================================ */
-const CATS=[["ritual","儀式感"],["aware","覺察想法"],["emotion","情緒調節"],["body","照顧身體"],["mind","正念"],["action","行動與價值"],["relate","人際與界線"],["kind","溫柔對待自己"],["meaning","正向與意義"],["past","處理過去"],["weekly","每週新增"]];
+const CATS=[["ritual","儀式感"],["aware","覺察想法"],["emotion","情緒調節"],["body","照顧身體"],["mind","正念"],["action","行動與價值"],["relate","人際與界線"],["kind","溫柔對待自己"],["energy","正能量"],["meaning","正向與意義"],["past","處理過去"],["weekly","每週新增"]];
 const EVID={strong:["多項統合分析支持","var(--ok)"],mid:["有實驗或臨床研究支持","var(--method)"],theory:["來自治療取向的臨床做法","var(--muted)"]};
 
 /* ---------- research library ---------- */
 const RESEARCH=[
+ {id:"R32",area:"正能量",ev:"strong",cite:"Carr 等（2021），The Journal of Positive Psychology",title:"正向心理練習的整體效果",
+  finding:"整合 347 個研究、超過 72,000 人、41 個國家。正向心理練習（例如感恩、品味、善意、運用優勢）平均約 6 週、10 次，能提升幸福感（g = 0.39）、優勢與生活品質，也能降低憂鬱（g = −0.39）、焦慮（g = −0.62）和壓力（g = −0.58），效果在三個月後仍在。組合多種練習、持續較久的效果更好。",
+  meaning:"正能量不是天生的個性，是可以練習的。一次做一點點，持續下去，累積起來就有差別。",limits:"各研究的做法差異很大；效果屬於小到中等，不是萬靈丹。",url:"https://stafforini.com/works/carr-2021-effectiveness-of-positive/"},
+ {id:"R33",area:"正能量",ev:"mid",cite:"Sturm 等（2020），Emotion",title:"「敬畏散步」能增加正向情緒",
+  finding:"52 位健康長者連續 8 週、每週至少散步 15 分鐘。被提醒在散步時留意讓人驚嘆的事物（天空、樹、光影）的那一組，日常的正向情緒增加、壓力降低，感恩和慈悲也變多；只散步、沒有留意驚嘆的那一組沒有這些變化。",
+  meaning:"同樣是走路，帶著「看看有什麼讓我驚嘆」的心情走，心會被打開。",limits:"樣本小、都是長者，還需要更多研究確認。",url:"https://www.eurekalert.org/news-releases/820476"},
+ {id:"R34",area:"正能量",ev:"strong",cite:"Curry 等（2018），Journal of Experimental Social Psychology",title:"對別人好，自己也會變好",
+  finding:"整合 27 個研究、4,045 人：做善意的行動（幫忙、送小禮物、說一句溫暖的話），做的人自己的幸福感會提升，效果小到中等（δ = 0.28）。不論性別、年齡、善意的種類，效果都差不多。",
+  meaning:"當自己沒什麼力氣時，給出一個很小的善意，常常也會把一點能量帶回自己身上。",limits:"效果中等偏小；多數研究追蹤時間不長。",url:"https://ora.ox.ac.uk/objects/uuid:4701365b-5760-4ece-a390-857a5f7b3c0c"},
+ {id:"R35",area:"正能量",ev:"mid",cite:"Epley & Schroeder（2014），Journal of Experimental Psychology: General",title:"和人多聊一句，比我們以為的更愉快",
+  finding:"在芝加哥的通勤火車上，被隨機分配去和陌生人聊天的乘客（97 人），覺得這趟通勤比獨自坐著的人更愉快，工作效率也沒有變差。但另一群人事先預測時，卻以為和陌生人聊天會比較不愉快。",
+  meaning:"我們常低估人與人之間的小連結能帶來多少好心情。和店員、鄰居、同事多說一句話，就是一個小小的能量來源。",limits:"在美國通勤情境做的研究，文化不同時感受可能不同。",url:"https://faculty.haas.berkeley.edu/jschroeder/Publications/Epley%26Schroeder2014.pdf"},
+ {id:"R36",area:"正能量",ev:"mid",cite:"Burton & King（2008），British Journal of Health Psychology",title:"兩分鐘寫下美好經驗，也有幫助",
+  finding:"49 位大學生被隨機分組，連續兩天、每天只寫 2 分鐘。寫美好經驗的那組，4 到 6 週後身體不適的抱怨比對照組少，寫完當下的正向情緒也比寫創傷經驗的那組高。",
+  meaning:"日記不一定要寫很長，也不一定要寫難受的事。偶爾花兩分鐘寫一段美好的時刻，就是在替自己充電。",limits:"樣本很小，是大學生，需要更多研究。",url:"https://wholebeinginstitute.com/wp-content/uploads/Burton_King_Effects-Brief-Writing-Healthpdf.pdf"},
+ {id:"R37",area:"正能量",ev:"mid",cite:"Ford 等（2018），Journal of Personality and Social Psychology",title:"接納負面情緒，反而比較健康",
+  finding:"三個研究、超過 1,300 位成人：習慣接納自己負面情緒的人，負面情緒比較少、心理健康比較好；在壓力情境中比較不痛苦；六個月後的情緒困擾症狀也比較少。反而「覺得自己不應該有這種感覺」的人，過得比較辛苦。",
+  meaning:"正能量不是要把難過趕走。允許自己難過，再慢慢照顧自己，才是能長久的正能量。",limits:"以相關研究為主，無法完全證明因果。",url:"https://www.sciencedaily.com/releases/2017/08/170810141729.htm"},
+ {id:"R38",area:"正能量",ev:"strong",cite:"Diniz 等（2023），Einstein（São Paulo）",title:"感恩練習能讓心理健康變好一點",
+  finding:"系統性回顧 64 個隨機試驗、統合分析 33 個：感恩練習後，心理健康、生活滿意度提高，焦慮（約低 7.8%）和憂鬱（約低 6.9%）症狀下降。",
+  meaning:"每天花一點時間注意值得感謝的人事物，是取得正能量最簡單的方式之一。",limits:"作者評估證據的確定性低到很低，效果比藥物小，適合當作輔助。",url:"https://pmc.ncbi.nlm.nih.gov/articles/PMC10393216/"},
+ {id:"R39",area:"正能量",ev:"strong",cite:"Carrillo 等（2019），PLoS ONE",title:"想像最好的未來自己，能提升樂觀",
+  finding:"統合 29 個研究、2,909 人：寫下或想像「一切都順利時的自己」，能提升幸福感（d = 0.33）、樂觀（d = 0.33），對正向情緒的效果最大（d = 0.51）。",
+  meaning:"看見一個值得期待的自己，能幫你在辛苦的時候記得：我要往哪裡去。",limits:"效果小到中等；長期效果的研究還不多。",url:"https://doaj.org/article/4b14181f7a814c15bec99ec196571624"},
+ {id:"R40",area:"正能量",ev:"strong",cite:"Schutte & Malouff（2019），Journal of Happiness Studies",title:"用自己的優勢，能讓生活更有滋味",
+  finding:"統合 14 篇論文的 29 個效果：練習運用自己的代表性優勢，能提升生活滿意度（g = 0.42）和正向情緒（g = 0.32），也讓憂鬱下降（g = 0.21）。",
+  meaning:"找到你自然就做得好的事，並在日常多用一點，是維持能量很有效的方式。",limits:"納入的研究數量不多。",url:"https://ideas.repec.org/a/spr/jhappi/v20y2019i4d10.1007_s10902-018-9990-2.html"},
+ {id:"R41",area:"正能量",ev:"mid",cite:"White 等（2019），Scientific Reports",title:"每週在自然裡兩小時，與更好的身心有關",
+  finding:"英國 19,806 人的調查：前一週在自然環境待滿 120 分鐘的人，自評健康好、幸福感高的比例都比較高；一次待完或分好幾次都一樣。",
+  meaning:"公園、河邊、山上都算。把「到自然裡走走」排進一週，是穩定補充能量的方式。",limits:"是相關研究，不能證明是自然造成的差別。",url:"https://neurosciencenews.com/nature-health-wellbeing-14233/"},
+ {id:"R42",area:"正能量",ev:"mid",cite:"Fredrickson 等（2008），Journal of Personality and Social Psychology",title:"正向情緒會慢慢累積成內在資源",
+  finding:"139 位上班族練習慈心靜心約 7 週，正向情緒逐漸增加；增加的正向情緒進一步累積成內在資源，例如正念、生活目標、社會支持、和他人的好關係，這些資源再讓生活滿意度提高、憂鬱症狀降低。",
+  meaning:"這就是「擴展與建構」：好心情不只是當下舒服，它會一點一點長成你面對困難時的底氣。",limits:"依意向分析時，靜心對正向情緒的效果沒有達到顯著；需要投入足夠練習才有效。",url:"https://www.wisebrain.org/media/Papers/Metta&PosEmot.pdf"},
+
  {id:"R01",area:"儀式",ev:"mid",cite:"Norton & Gino（2014），Journal of Experimental Psychology: General",title:"儀式能減輕失落後的悲傷",
   finding:"在一系列實驗中，失去親人、結束關係，或在實驗中失去 200 美元獎金的人，做了儀式之後悲傷較低。實驗中的儀式很簡單：畫出感受、撒鹽、撕碎、數到十。效果來自重新找回控制感，而且不相信儀式的人一樣有效。",
   meaning:"面對無法改變的失去時，一個有開始、有結尾的小動作，可以讓心重新感覺「我還能做點什麼」。",limits:"多數是實驗室或線上研究，長期效果還不清楚。",url:"https://dash.harvard.edu/bitstream/1/10683152/1/norton%20gino_rituals-and-grief.pdf"},
@@ -800,6 +861,32 @@ const researchById=id=>allResearch().find(r=>r.id===id);
 
 /* ---------- method library ---------- */
 const METHODS=[
+ /* energy */
+ {id:"n_savor",cat:"energy",ev:"theory",refs:["R32","R42"],name:"品味一個好時刻",when:"有一件小小的好事發生，想讓它停留久一點",
+  what:"好心情很容易一閃而過。品味，是刻意放慢，讓好時刻在心裡多停一會兒。",
+  steps:["選一個剛剛發生的好時刻：一杯好喝的茶、一句溫暖的話、一段陽光","停下來 30 秒，用五感去感覺它：看到、聽到、聞到什麼","在心裡對自己說：「這很好，我想記住它」","如果可以，把它說給一個人聽，或寫進日記","睡前再想一次這個時刻"]},
+ {id:"n_awe",cat:"energy",ev:"mid",refs:["R33","R41"],name:"敬畏散步",when:"覺得被困住、心很窄、想換換腦袋的時候",
+  what:"出門走 15 分鐘，帶著「看看有什麼讓我驚嘆」的心情走。",
+  steps:["找一條可以走 15 分鐘的路，有樹、有天空更好","把手機收起來，用第一次來這裡的眼光看","留意讓你覺得「哇」的東西：雲的形狀、光影、很老的樹、遠方","在那個東西前面停一下，深呼吸","回來後寫下一句：今天讓我驚嘆的是……"]},
+ {id:"n_kind",cat:"energy",ev:"strong",refs:["R34"],name:"一個小善意",when:"覺得沒力氣、心裡有點空的時候",
+  what:"做一件很小、對別人好的事。給出去的善意，常常會把一點能量帶回來。",
+  steps:["想一個今天見得到或聯絡得到的人","選一件 5 分鐘內做得到的小事：一句謝謝、幫忙倒杯水、傳一則關心的訊息","去做，不期待回報","做完後留意自己的感覺","在日記寫下：今天我給出的善意是……"]},
+ {id:"n_chat",cat:"energy",ev:"mid",refs:["R35","R23"],name:"多聊一句",when:"一個人悶了一整天、覺得和世界有點疏離",
+  what:"和身邊的人多說一句話。不用深談，一個小小的連結就有用。",
+  steps:["選一個日常會遇到的人：店員、警衛、同事、鄰居","多說一句話：問候、稱讚，或問一個小問題","專心聽對方回答","留意聊完後心裡的變化","提醒自己：我們常低估別人願意和我們聊天的程度"]},
+ {id:"n_twomin",cat:"energy",ev:"mid",refs:["R36","R04"],name:"兩分鐘寫好時光",when:"想寫日記但沒什麼力氣，或想替自己充一點電",
+  what:"花兩分鐘，寫下一段讓你覺得美好的經驗。不用寫長，也不用寫得好。",
+  steps:["設定兩分鐘","想一段美好的經驗：可以是今天，也可以是很久以前","寫下當時在哪裡、和誰、發生了什麼","寫下當時心裡的感覺","明天如果想，再寫兩分鐘，換一段也可以"]},
+ {id:"n_battery",cat:"energy",ev:"mid",refs:["R21","R32"],name:"我的充電清單",when:"想知道什麼事能讓自己恢復能量",
+  what:"把「做了會充電」和「做了會耗電」的事列出來，下次累的時候，就知道可以做什麼。",
+  steps:["拿一張紙分兩欄：充電、耗電","回想最近一週，做完覺得比較有力氣的事，寫進「充電」","做完覺得被掏空的事，寫進「耗電」","從充電清單裡圈三件 15 分鐘內做得到的","下次覺得累的時候，從這三件裡選一件"]},
+ {id:"n_allow",cat:"energy",ev:"mid",refs:["R37","R05"],name:"允許所有的感覺",when:"覺得「我不應該這麼難過」、逼自己要正向的時候",
+  what:"真正的正能量，不是把難過趕走，而是允許它存在，再溫柔地照顧自己。",
+  steps:["說出現在的感覺：我現在覺得……","對自己說：「有這種感覺是可以的，任何人在這種情況都可能這樣」","把手放在胸口，給這個感覺一點空間，呼吸三次","問自己：我現在最需要的是什麼？","做一件小事照顧那個需要"]},
+ {id:"n_strength",cat:"energy",ev:"strong",refs:["R40","R29"],name:"找到我的優勢",when:"覺得自己沒什麼好、想找回自信的時候",
+  what:"回想自己做得好的時刻，找出背後的優勢，再在這週刻意多用一次。",
+  steps:["回想三個「我做得不錯」的時刻，大小都可以","問自己：那時候我用了什麼特質？例如耐心、好奇、幽默、細心、勇氣","把重複出現的特質圈起來，那可能就是你的優勢","想一個這週可以用到它的新方式","做完後在日記寫下感覺"]},
+
  /* ritual */
  {id:"r_tear",cat:"ritual",ev:"mid",refs:["R01"],name:"寫下、撕掉、數到十",when:"失落、被拒絕、事情已經無法挽回時",
   what:"把此刻的感受畫下來或寫下來，然後用一個固定的動作結束它。",
@@ -991,7 +1078,7 @@ function loadWeekly(){fetch("weekly.json",{cache:"no-cache"}).then(r=>r.ok?r.jso
 let installEvt=null;
 addEventListener("beforeinstallprompt",e=>{e.preventDefault();installEvt=e;schedule()});
 if("serviceWorker" in navigator&&location.protocol==="https:")navigator.serviceWorker.register("sw.js").catch(()=>{});
-const APP_VER="2026.11.14-2";
+const APP_VER="2026.11.14-3";
 async function checkUpdate(){try{const r=await fetch("version.json?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.json()).v;
   if(v&&v!==APP_VER&&!$("#updBar")){const b=document.createElement("button");b.id="updBar";b.className="updbar";b.textContent="有新版本，點這裡更新";b.onclick=()=>{b.textContent="更新中……";location.reload()};document.body.appendChild(b)}}catch(e){}}
 setTimeout(checkUpdate,1500);document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
@@ -1260,7 +1347,7 @@ function assistantPrompt(){
 
 【存回心路】
 當使用者說「存成心路格式」時，只輸出一個 JSON 物件（可以放在程式碼區塊裡），格式如下，讓他貼回心路 App：
-{"xinlu":1,"date":"YYYY-MM-DD","text":"使用者這篇日記的原文","analysis":{"summary":"一句話核心（20字內）","chain":{"event":"","thought":"","emotion":[""],"body":"","behavior":""},"need":"","people":[{"name":"","relation":"","stage":"童年|青少年|成年|現在|未知","role":""}],"themes":[{"name":"","why":""}],"pattern":"","methods":[{"id":"方法庫裡的 id","why":""}],"questions":[""],"risk":false}}
+{"xinlu":1,"date":"YYYY-MM-DD","text":"使用者這篇日記的原文","analysis":{"summary":"一句話核心（20字內）","chain":{"event":"","thought":"","emotion":[""],"body":"","behavior":""},"need":"","bright":"","people":[{"name":"","relation":"","stage":"童年|青少年|成年|現在|未知","role":""}],"themes":[{"name":"","why":""}],"pattern":"","methods":[{"id":"方法庫裡的 id","why":""}],"questions":[""],"risk":false}}
 risk 只有在出現自傷、自殺念頭或立即危險時才設為 true。`}
 function knowledgeMD(){
   const L=["# 心路方法庫與研究庫","","給「心路助手」參考的知識檔。方法的 id 用於「存成心路格式」。","","## 方法庫",""];
@@ -1555,7 +1642,7 @@ function homeRows(){
   const q=sessions().filter(e=>!e.talk&&(e.said||e.feel)).sort((a,b)=>(b.date||"").localeCompare(a.date||""))[0];
   if(q)row("edit",`data-id="${q.id}"`,"warm",`補完 ${fmtD(q.date)} 的諮商紀錄`,"上次先快速記了一句話和感覺");
   const nu=unanalyzed("all").length;
-  if(nu)row("batch",'data-scope="all"',"accent",`有 ${nu} 篇還沒整理`,"整理後，才看得出反覆出現的模式");
+  if(nu)row("batch",'data-scope="all"',"accent",`有 ${nu} 篇可以整理`,"整理後，看得見自己走過的路，和你做得好的地方");
   const st=steps().filter(x=>x.status!=="done")[0];
   if(st){const m=methodById(st.methodId);if(m)row("practice",`data-id="${m.id}" data-e="${st.entryId||""}"`,"method",`下一步：${esc(m.name)}`,"現在就做，一步一步帶你")}
   const lastS=sessions()[0];
@@ -1563,23 +1650,39 @@ function homeRows(){
   const rd=recapData();if(rd)row("recap","","person",`看看${rd.label}的心路`,`${rd.n} 篇紀錄，整理成幾張卡片`);
   const w=weeklyIssues()[0];if(w&&isFresh(w.issue))row("open-weekly","","method2",`本週心理學新知：${esc(w.title||"")}`,"");
   return rows.length?`<div class="hrows"><p class="label">接下來</p>${rows.slice(0,5).join("")}</div>`:""}
+
+const CHEERS=["今天也謝謝你，願意停下來看看自己。","不用每天都很好，願意面對自己，就已經很勇敢。","慢慢來也沒關係，你一直在往前。","你值得被好好對待，包括被你自己。","累的時候，休息也是一種前進。","每一次寫下來，都是在照顧自己。","今天只要做到一件小事，就夠了。","你比你以為的更有力量。","能感覺到難過，代表你很認真在生活。","有些日子是用來撐過去的，撐過去也很了不起。"];
+function cheer(){const es=entries(),n=es.length,d=new Date(),day=(d.getFullYear()*372+d.getMonth()*31+d.getDate());
+  const wk=new Date();wk.setDate(wk.getDate()-6);const wkk=`${wk.getFullYear()}-${pad(wk.getMonth()+1)}-${pad(wk.getDate())}`;const w=es.filter(e=>(e.date||"")>=wkk).length;
+  const own=[n>=3&&`你已經寫下 ${n} 篇，每一篇都是你在照顧自己。`,w>=2&&`這一週，你停下來看了自己 ${w} 次。`,steps().filter(s=>s.status==="done").length&&`你已經完成 ${steps().filter(s=>s.status==="done").length} 次練習，一步一步，都算數。`].filter(Boolean);
+  const pool=[...own,...CHEERS];return pool[day%pool.length]}
+function todayPractice(){const l=allMethods().filter(m=>m.cat==="energy");if(!l.length)return "";const d=new Date(),m=l[(d.getFullYear()*372+d.getMonth()*31+d.getDate())%l.length];
+  return `<div class="tp"><div class="spread"><p class="label">今天的小練習</p><button class="linkbtn" data-act="mcat-go" data-c="energy">更多正能量 →</button></div>
+   <b class="tp-n">${m.name}</b><p class="small muted">${m.when}</p><div class="row"><button class="btn sm" data-act="practice" data-id="${m.id}">現在就做</button><button class="btn sm ghost" data-act="open-method" data-id="${m.id}">看看怎麼做</button></div></div>`}
+function goodMoment(){
+  const cands=[];entries().forEach(e=>{if(e.analysis?.bright)cands.push({k:"b",e,t:e.analysis.bright});if(e.mood>=4&&e.type!=="letter")cands.push({k:"m",e,t:entryTitle(e)})});
+  if(!cands.length)return "";const d=new Date(),c=cands[(d.getDate()*7+d.getMonth())%cands.length];
+  return `<button type="button" class="gm" data-act="open-entry" data-id="${c.e.id}"><span class="label">${c.k==="b"?"你做得好的地方":"回到一個好時刻"}</span><b>${esc(c.t)}</b><small>${fmtD(c.e.date)}${c.k==="b"?" 的紀錄":" 的你，心情不錯"}</small></button>`}
+
 function vHome(){
   const d=new Date(),h=d.getHours();
   const hello=h<5?"夜深了":h<11?"早安":h<18?"午安":"晚上好";
   const es=entries(),sk=streakDays();
   const k=keptQuotes();const qt=k.length?k[Math.floor(Date.now()/864e5)%k.length]:null;
   return `<section class="view home">${statusNote()}
-  <div class="hello"><div class="spread"><p class="date">${d.getMonth()+1} 月 ${d.getDate()} 日 星期${"日一二三四五六"[d.getDay()]}</p>${sk>=2?`<span class="streak">連續 ${sk} 天</span>`:""}</div><h1>${hello}</h1>
+  <div class="hello"><div class="spread"><p class="date">${d.getMonth()+1} 月 ${d.getDate()} 日 星期${"日一二三四五六"[d.getDay()]}</p>${sk>=2?`<span class="streak">連續 ${sk} 天</span>`:""}</div><h1>${hello}</h1><p class="cheer">${esc(cheer())}</p>
    ${qt?`<button type="button" class="hello-q" data-act="open-quotes">「${esc(qt.text)}」<span>${esc(qt.date||"")} 的你</span></button>`:""}</div>
   <div class="write-block">
    <button type="button" class="hero-write" data-act="new" data-type="journal"><span><i>寫下此刻</i><b>${esc(promptOfDay())}</b></span><span class="hw-go" aria-hidden="true">→</span></button>
    <div class="sub-acts"><button type="button" class="pill-act" data-act="new" data-type="session">記錄諮商</button><button type="button" class="pill-act" data-act="import-old">匯入舊日記</button></div>
   </div>
   ${es.length?"":`<div class="card stack"><h2 style="font-size:20px">第一次來？</h2><p class="small muted">先寫一篇，或載入範例看看整理完會是什麼樣子。</p><div class="row"><button class="btn quiet sm" data-act="examples">載入範例</button><button class="btn ghost sm" data-view="about">認識心路</button></div></div>`}
-  ${homeInsight()}
+  ${todayPractice()}
+  ${goodMoment()}
   ${homeRows()}
   ${es.length?`<div class="hrecent"><div class="spread"><p class="label">最近的紀錄</p><button class="linkbtn" data-goto="log">全部 ${es.length} 篇</button></div>
    ${es.slice(0,3).map(e=>`<button type="button" class="mini-e" data-act="open-entry" data-id="${e.id}"><span>${fmtD(e.date)}</span>${esc(entryTitle(e))}${e.analysis?"":'<small class="un">未整理</small>'}</button>`).join("")}</div>`:""}
+  ${es.filter(e=>e.analysis).length>=2?`<button type="button" class="deep" data-act="go-review"><span><b>想回頭看看自己的時候</b><small>心路分析：反覆出現的模式、走過的路</small></span><span aria-hidden="true">›</span></button>`:""}
   ${typeof installEvt!=="undefined"&&installEvt?`<div><button class="btn sm ghost" data-act="install">安裝到桌面</button></div>`:""}
   </section>`}
 
@@ -1679,8 +1782,9 @@ function vMethods(){
     <div class="legend"><span>${evTag("strong")} 多項統合分析支持</span><span>${evTag("mid")} 有實驗或臨床研究</span><span>${evTag("theory")} 理論或臨床取向</span></div>
     <div class="mgrid">${list.map(r=>`<button type="button" class="mcard rcard" data-act="open-research" data-id="${r.id}"><span class="row" style="justify-content:space-between"><span class="cat" style="color:var(--theme)">${r.area}</span>${evTag(r.ev)}</span><b>${r.weekly&&isFresh(r.issue)?'<span class="badge">新</span> ':""}${r.title}</b><p class="clamp">${r.finding}</p><span class="tiny muted">${r.cite}</span></button>`).join("")}</div></section>`}
   const list=allMethods().filter(m=>methodCat==="all"||m.cat===methodCat);
-  return `<section class="view"><div class="head spread"><div><h1>方法庫</h1><p class="muted">面對一件事時，你可以選擇的辦法。分成十類，每個方法都標示它的依據。</p></div>${seg}</div>
+  return `<section class="view"><div class="head spread"><div><h1>方法庫</h1><p class="muted">面對一件事時，你可以選擇的辦法。每個方法都標示它的依據。</p></div>${seg}</div>
   <div class="hscroll-row">${[["all","全部"],...CATS].map(c=>`<button type="button" class="pick" data-act="mcat" data-c="${c[0]}" aria-pressed="${methodCat===c[0]}">${c[1]}${c[0]==="all"?"":` <span class="tiny">${allMethods().filter(m=>m.cat===c[0]).length}</span>`}</button>`).join("")}</div>
+  ${methodCat==="energy"||methodCat==="all"?`<div class="energy-intro"><p class="label">正能量，可以練習</p><div class="ei-grid"><div><b>產生</b><span>品味好時刻、寫兩分鐘好時光、想像最好的自己</span></div><div><b>取得</b><span>走進自然、多聊一句、給出一個小善意、感謝</span></div><div><b>維持</b><span>運用優勢、充電清單、允許所有的感覺</span></div></div><p class="tiny muted">正能量不是不准難過。研究發現，接納負面情緒的人反而比較健康；在這個基礎上，一點一點練習讓好時刻多停留一會兒。</p></div>`:""}
   ${methodCat==="all"?(()=>{const rec=recommendedMethods();
     return `${effectiveRow()}${rec.length?`<section class="mrow rec"><div class="spread"><h2>依照你最近的紀錄</h2><span class="tiny muted">AI 整理時建議過</span></div><div class="hscroll">${rec.map(mcardH).join("")}</div></section>`:""}
     ${CATS.map(c=>{const l=allMethods().filter(m=>m.cat===c[0]);return l.length?`<section class="mrow"><div class="spread"><h2>${c[1]}</h2><button class="linkbtn" data-act="mcat" data-c="${c[0]}">全部 ${l.length} →</button></div><div class="hscroll">${l.slice(0,8).map(mcardH).join("")}</div></section>`:""}).join("")}`})()
@@ -1695,7 +1799,7 @@ function vMap(){
   if(mapMode==="sky")return `<section class="view">${statusNote()}<div class="head spread"><h1>地圖</h1>${seg}</div>${vSky()}</section>`;
   if(mapMode==="rings")return `<section class="view">${statusNote()}<div class="head spread"><h1>地圖</h1>${seg}</div>${vRings()}</section>`;
   if(mapMode==="journey")return `<section class="view">${statusNote()}<div class="head spread"><h1>地圖</h1>${seg}</div>${vJourney()}</section>`;
-  if(mapMode==="review")return `<section class="view">${statusNote()}<div class="head spread"><h1>地圖</h1>${seg}</div>${vReview()}</section>`;
+  if(mapMode==="review")return `<section class="view">${statusNote()}<div class="head spread"><h1>地圖</h1>${seg}</div>${homeInsight()}${vReview()}</section>`;
   return `<section class="view">${statusNote()}<div class="head spread"><h1>地圖</h1>${seg}</div>
   <div class="hscroll-row">${["all",...STAGES].map(s=>`<button type="button" class="pick" data-act="mstage" data-s="${s}" aria-pressed="${mapStage===s}">${s==="all"?"全部階段":s}</button>`).join("")}<label class="pick" style="display:inline-flex;gap:6px;align-items:center"><input type="checkbox" id="showE" ${showEntries?"checked":""} style="accent-color:var(--accent);margin:0">每篇紀錄</label></div>
   <div class="mapwrap big" id="mapwrap"><svg id="graph" role="img" aria-label="人物、課題與方法的關係圖"></svg>
@@ -1885,6 +1989,7 @@ function anaBlock(e){
    ${a.summary?`<p class="need">${esc(a.summary)}</p>`:""}
    ${FL.length?`<div class="flow">${FL.map((x,i)=>`<div class="fl" style="--i:${i};--c:${x[2]}"><span class="fl-dot"></span><div><b>${x[0]}</b><span>${x[3]?x[1]:esc(x[1])}</span></div></div>`).join("")}</div>`:""}
    ${a.need?`<div class="needbox" style="--i:${FL.length}"><p class="label">背後的需要</p><p>${esc(a.need)}</p></div>`:""}
+   ${a.bright?`<div class="needbox bright" style="--i:${FL.length}"><p class="label">你做得好的地方</p><p>${esc(a.bright)}</p></div>`:""}
    ${similarBlock(e,FL.length+1)}
    ${(a.themes||[]).length?`<div class="stack"><p class="label">可能的課題</p>${a.themes.map(t=>`<p class="small"><span class="chip t">${esc(t.name)}</span> ${esc(t.why||"")}</p>`).join("")}</div>`:""}
    ${(a.people||[]).length?`<div class="stack"><p class="label">文中的人物</p>${a.people.map(p=>`<p class="small"><span class="chip p">${esc(p.name)}</span> ${esc([p.relation,p.stage,p.role].filter(Boolean).join(" · "))}</p>`).join("")}</div>`:""}
@@ -1908,6 +2013,22 @@ function applyBlock(e){
    <div><button class="btn sm" data-act="apply" data-id="${e.id}">收進地圖</button></div></div>`}
 
 /* ---- editor ---- */
+
+const WMODES=[["free","自由寫",null,"從一個畫面、一句話，或身體的感覺開始……"],["good","好事","今天有哪些事，讓你覺得還不錯？","今天讓我覺得還不錯的是……"],["thanks","感謝","今天想謝謝誰，或謝謝什麼？","我很感謝……，因為……"],["unload","卸下","有什麼放在心上，想先放下來？","現在心裡最重的是……"],["self","給自己","如果你是自己最好的朋友，會對今天的你說什麼？","親愛的自己，……"]];
+const WORDS={"開頭句":["今天讓我微笑的是","我很感謝","我做得不錯的是","我其實需要","讓我卡住的是","我想對自己說","如果明天可以更好一點，我想","我注意到自己"],
+ "好的感受":["開心","平靜","放鬆","安心","感動","被理解","滿足","自在","有希望","踏實","溫暖","鬆了一口氣","好奇","驕傲","被支持"],
+ "難受的感受":["委屈","焦慮","失落","生氣","疲憊","孤單","害怕","煩躁","無力","羞愧","受傷","失望","不被看見","有壓力","難過"],
+ "身體":["胸口緊緊的","肩膀很重","呼吸變淺","胃糾在一起","頭脹脹的","喉嚨卡卡的","全身放鬆","心跳很快","手心冒汗","想哭"],
+ "需要":["被理解","休息","安全感","被尊重","陪伴","自由","被肯定","空間","確定感","被照顧","好好說清楚"]};
+let wbTab="開頭句",lastTA="f-text";
+function wordBank(){return `<details class="wbank" ${sheet.wbOpen?"open":""}><summary data-act="wb-toggle">詞彙小幫手：點一下就放進日記</summary>
+  <div class="hscroll-row wb-tabs">${Object.keys(WORDS).map(k=>`<button type="button" class="pick" data-act="wb-tab" data-k="${k}" aria-pressed="${wbTab===k}">${k}</button>`).join("")}</div>
+  <div class="wb-words">${WORDS[wbTab].map(w=>`<button type="button" class="chip" data-act="wb-ins" data-w="${esc(w)}">${esc(w)}</button>`).join("")}</div>
+  <p class="tiny muted">寫日記的小訣竅：從一個具體的畫面開始 → 替感覺取個名字 → 寫下你需要什麼 → 最後寫一件你做得不錯的事。</p></details>`}
+function insertWord(w){const ta=$("#f-"+lastTA)||$("#f-text");if(!ta||!sheet||!sheet.draft)return;const k=ta.dataset.k;const cr=sheet.caret&&sheet.caret.k===k?Math.min(sheet.caret.pos,ta.value.length):ta.value.length;const act=document.activeElement===ta;const s0=act?ta.selectionStart:cr,s1=act?ta.selectionEnd:cr;
+  const before=ta.value.slice(0,s0),after=ta.value.slice(s1);const isStart=WORDS["開頭句"].includes(w);const ins=(isStart&&before&&!/\n$/.test(before)?"\n":"")+w;
+  ta.value=before+ins+after;sheet.draft[k]=ta.value;const pos=(before+ins).length;sheet.caret={k,pos};ta.focus();try{ta.setSelectionRange(pos,pos)}catch(e){}}
+
 function shEdit(){
   const d=sheet.draft,isS=d.type==="session";
   const ta=(k,label,hint,big)=>`<div class="field"><label for="f-${k}">${label}</label>${hint?`<p class="hint">${hint}</p>`:""}<div class="ta-wrap"><textarea id="f-${k}" data-k="${k}" class="${big?"big":""}">${esc(d[k]||"")}</textarea>${dict?`<button type="button" class="mic" data-mic="${k}">口述</button>`:""}</div></div>`;
@@ -1922,7 +2043,9 @@ function shEdit(){
     <label class="datechip"><span>${fmtLong(d.date)}</span><input type="date" id="f-date" value="${esc(d.date)}" aria-label="日期"></label>${isS?`<label class="row small">第 <input class="inp" type="number" id="f-no" min="1" value="${esc(d.no||"")}" style="width:72px"> 次</label>`:""}</div>
    ${isS&&sheet.quick?`<div class="quickhead"><b>剛走出諮商室？先記兩件事就好</b><p class="small muted">其他的之後再補。</p></div>`+ta("said","印象最深的一句話","諮商師說的，或你自己說出口的。",true)+ta("feel","我現在的感覺","身體、情緒，或腦中的一個畫面都可以。")+`<div><button type="button" class="linkbtn" data-act="quick-off">展開完整欄位（談了什麼、領悟、回家作業）</button></div>`
      :isS?`<div class="field"><label for="f-title">標題 <span class="hint">（可以不填）</span></label><input class="inp" id="f-title" data-k="title" value="${esc(d.title||"")}" placeholder="例如：談到爸爸的那次"></div>`+ta("talk","今天談了什麼","想到什麼寫什麼，剛走出諮商室時用口述最方便。",true)+ta("said","諮商師說的關鍵一句","讓你印象最深、想記住的那句話。")+ta("insight","我的領悟","")+ta("homework","回家作業","")+ta("next","下次想談的","")
-     :`<div class="field focuswrite"><label for="f-text" class="fw-q">${esc(sheet.prompt||(sheet.prompt=promptOfDay()))}</label><p class="hint">也可以寫任何此刻在心裡的事。不用管格式。</p><div class="ta-wrap"><textarea id="f-text" data-k="text" class="big xl" placeholder="從一個畫面、一句話，或身體的感覺開始……">${esc(d.text||"")}</textarea>${dict?`<button type="button" class="mic" data-mic="text">口述</button>`:""}</div></div>
+     :`<div class="field focuswrite"><div class="hscroll-row wmodes">${WMODES.map(m=>`<button type="button" class="pick" data-act="wmode" data-m="${m[0]}" aria-pressed="${(sheet.wmode||"free")===m[0]}">${m[1]}</button>`).join("")}</div>
+      <label for="f-text" class="fw-q">${esc((WMODES.find(m=>m[0]===(sheet.wmode||"free"))||[])[2]||sheet.prompt||(sheet.prompt=promptOfDay()))}</label><p class="hint">想寫什麼都可以，不用管格式。</p><div class="ta-wrap"><textarea id="f-text" data-k="text" class="big xl" placeholder="${esc((WMODES.find(m=>m[0]===(sheet.wmode||"free"))||WMODES[0])[3])}">${esc(d.text||"")}</textarea>${dict?`<button type="button" class="mic" data-mic="text">口述</button>`:""}</div></div>
+      ${wordBank()}
       <input class="inp ghostin" id="f-title" data-k="title" value="${esc(d.title||"")}" placeholder="幫這篇取個標題（可以不填）">`}
    <p class="partial" id="partial" aria-live="polite"></p>
    <details class="more" ${(d.media||[]).length||(sheet.newMedia||[]).length||d.stage?"open":""}><summary>照片、錄音、人生階段</summary>
@@ -2164,6 +2287,7 @@ ${body}
 {"summary":"一句話說出這篇的核心（20字內）",
  "chain":{"event":"發生了什麼（事實）","thought":"當下的想法","emotion":["情緒1","情緒2"],"body":"身體的反應，沒寫到就留空字串","behavior":"做了什麼或想做什麼"},
  "need":"這個反應背後，可能在保護或渴望的需要（一句話）",
+ "bright":"這篇裡使用者做得好的地方、展現的力量或資源（1 到 2 句，要具體、真誠，引用他做的事，不要空泛誇獎）",
  "people":[{"name":"人物名","relation":"關係","stage":"童年|青少年|成年|現在|未知","role":"他在這件事裡的角色（一句話）"}],
  "themes":[{"name":"課題名稱","why":"為什麼這樣判斷（一句話）"}],
  "pattern":"和最近紀錄或已知人物之間可能的重複模式；沒有就留空字串",
@@ -2181,7 +2305,7 @@ const asArr=v=>Array.isArray(v)?v:v&&typeof v==="object"?[v]:typeof v==="string"
 function cleanAnalysis(a){
   if(!a||typeof a!=="object")throw{code:"invalid_json"};
   return{summary:String(a.summary||""),chain:a.chain&&typeof a.chain==="object"?{event:String(a.chain.event||""),thought:String(a.chain.thought||""),emotion:asArr(a.chain.emotion).map(String).slice(0,5),body:String(a.chain.body||""),behavior:String(a.chain.behavior||"")}:{},
-    need:String(a.need||""),people:asArr(a.people).slice(0,8).map(p=>({name:String(p&&p.name||"").trim(),relation:String(p&&p.relation||""),stage:String(p&&p.stage||""),role:String(p&&p.role||"")})).filter(p=>p.name),
+    need:String(a.need||""),bright:String(a.bright||""),people:asArr(a.people).slice(0,8).map(p=>({name:String(p&&p.name||"").trim(),relation:String(p&&p.relation||""),stage:String(p&&p.stage||""),role:String(p&&p.role||"")})).filter(p=>p.name),
     themes:asArr(a.themes).slice(0,3).map(t=>({name:String(t&&t.name||"").trim(),why:String(t&&t.why||"")})).filter(t=>t.name),
     pattern:String(a.pattern||""),methods:asArr(a.methods).map(m=>({id:String(m&&m.id||""),why:String(m&&m.why||"")})).filter(m=>methodById(m.id)).slice(0,3),
     questions:asArr(a.questions).map(String).slice(0,3),risk:a.risk===true,at:Date.now()}}
@@ -2461,6 +2585,10 @@ document.addEventListener("click",async ev=>{
    case"help":openSheet({kind:"help"});break;
    case"new":openSheet({kind:"edit",draft:newDraft(t.dataset.type),quick:t.dataset.type==="session"});break;
    case"quick-off":sheet.quick=false;drawSheet();break;
+   case"wmode":{const ta=$("#f-text");if(ta)sheet.draft.text=ta.value;sheet.wmode=t.dataset.m;drawSheet();break}
+   case"wb-tab":wbTab=t.dataset.k;sheet.wbOpen=true;{const ta=$("#f-text");if(ta)sheet.draft.text=ta.value}drawSheet();break;
+   case"wb-ins":insertWord(t.dataset.w);break;
+   case"wb-toggle":sheet.wbOpen=!sheet.wbOpen;break;
    case"edit":{const e=S.entries.get(id);if(e)openSheet({kind:"edit",id,draft:clone(e)});break}
    case"open-entry":openSheet({kind:"entry",id});break;
    case"open-person":openSheet({kind:"person",id});break;
@@ -2488,6 +2616,7 @@ document.addEventListener("click",async ev=>{
    case"pstage":peopleStage=t.dataset.s;render();break;
    case"mstage":mapStage=t.dataset.s;selNode=null;G=null;render();break;
    case"mapmode":mapMode=t.dataset.m;render();break;
+   case"mcat-go":view="methods";methodTab="methods";methodCat=t.dataset.c;local.set("xinlu-view","methods");render();window.scrollTo(0,0);break;
    case"sky-star":skySelect("e",id);break;
    case"sky-con":if(!$("#sky")){view="map";mapMode="sky";render()}skySelect("con",id);break;
    case"ring-person":ringSelect("p",id);break;
@@ -2622,6 +2751,8 @@ document.addEventListener("click",ev=>{const b=ev.target.closest("[data-mic]");i
   if(dict.active()&&micTarget===b.dataset.mic){dict.stop().catch(()=>{});return}
   micTarget=b.dataset.mic;
   dict.start().catch(e=>{if(e&&e.code==="not_granted")toast("口述沒有開啟。可以在這個頁面的權限選單裡打開。");else if(e&&e.code==="unavailable")$$(".mic").forEach(x=>x.hidden=true);else if(e&&e.code!=="stopped"&&e.code!=="dismissed")toast("口述暫時無法使用，請改用打字。")})});
+["keyup","click","input","select"].forEach(t=>document.addEventListener(t,ev=>{const x=ev.target;if(x&&x.tagName==="TEXTAREA"&&x.dataset&&x.dataset.k&&x.id==="f-"+x.dataset.k&&sheet)sheet.caret={k:x.dataset.k,pos:x.selectionEnd}}));
+document.addEventListener("focusin",ev=>{const t=ev.target;if(t&&t.tagName==="TEXTAREA"&&t.dataset&&t.dataset.k&&t.id==="f-"+t.dataset.k)lastTA=t.dataset.k});
 document.addEventListener("input",ev=>{if(ev.target.id==="ai-paste"){const q=jobById(aiOpen);if(q)q.draft=ev.target.value}if(ev.target.id==="logq"){logQuery=ev.target.value;clearTimeout(vLog.t);vLog.t=setTimeout(()=>{const pos=ev.target.selectionStart;render();const q=$("#logq");if(q){q.focus();try{q.setSelectionRange(pos,pos)}catch(e){}}},250)}});
 document.addEventListener("change",ev=>{
   if(ev.target.id==="showE"){showEntries=ev.target.checked;selNode=null;render()}
