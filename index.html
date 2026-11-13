@@ -619,6 +619,28 @@ details.more[open]>summary{margin-bottom:6px}
 .rt-msg{position:absolute;left:0;right:0;top:calc(50% + 40px);text-align:center;font-family:var(--f-display);font-size:18px;color:#f3f0ff;opacity:0}
 .gather .rt-msg{animation:fadein .8s ease .5s forwards}
 @media (prefers-reduced-motion:reduce){.dust,.star .core,.con line,.con text,.rp,.rb-orb,.rc-slide>*,.rc-cloud span{animation:none!important;opacity:revert;stroke-dashoffset:0}.con text{opacity:.85}}
+
+/* ===== home v3 ===== */
+.view.home{gap:22px}
+.hello .spread{align-items:center}
+.streak{font-size:12px;padding:3px 10px;border-radius:999px;background:var(--m5-soft,color-mix(in srgb,var(--m5) 18%,transparent));color:var(--m5)}
+.hello-q{display:block;margin-top:8px;text-align:left;border:0;background:none;padding:0;cursor:pointer;color:var(--muted);font-family:var(--f-display);font-size:16px;line-height:1.6}
+.hello-q span{display:block;font-family:inherit;font-size:12px;opacity:.75;margin-top:2px}
+.write-block{display:grid;gap:10px}
+.sub-acts{display:flex;gap:8px}
+.pill-act{flex:1;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:11px 12px;font:inherit;font-size:15px;cursor:pointer}
+.pill-act:active{transform:scale(.98)}
+.hrows{display:grid;gap:8px}
+.hrow{display:flex;align-items:center;gap:12px;width:100%;text-align:left;cursor:pointer;padding:14px 16px;border-radius:16px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font:inherit}
+.hr-dot{flex:none;width:10px;height:10px;border-radius:50%;background:var(--muted)}
+.hrow.warn .hr-dot{background:var(--warn)}.hrow.warn{border-color:color-mix(in srgb,var(--warn) 45%,var(--line))}
+.hrow.warm .hr-dot{background:var(--m4)}.hrow.accent .hr-dot{background:var(--accent)}.hrow.method .hr-dot,.hrow.method2 .hr-dot{background:var(--method)}.hrow.person .hr-dot{background:conic-gradient(#9fa8ff,#ff9f8a,#ffd06b,#6fd6b8,#9fa8ff)}
+.hr-t{display:grid;gap:2px;flex:1;min-width:0}
+.hr-t b{font-weight:500;font-size:15px}
+.hr-t small{font-size:13px;color:var(--muted)}
+.hr-go{color:var(--muted);font-size:22px;line-height:1}
+.hrecent{display:grid;gap:8px}
+.mini-e .un{float:right;margin-top:2px;font-size:11px;color:var(--accent);white-space:nowrap;padding-left:8px}
 </style>
 </head>
 <body>
@@ -969,7 +991,7 @@ function loadWeekly(){fetch("weekly.json",{cache:"no-cache"}).then(r=>r.ok?r.jso
 let installEvt=null;
 addEventListener("beforeinstallprompt",e=>{e.preventDefault();installEvt=e;schedule()});
 if("serviceWorker" in navigator&&location.protocol==="https:")navigator.serviceWorker.register("sw.js").catch(()=>{});
-const APP_VER="2026.11.14-1";
+const APP_VER="2026.11.14-2";
 async function checkUpdate(){try{const r=await fetch("version.json?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.json()).v;
   if(v&&v!==APP_VER&&!$("#updBar")){const b=document.createElement("button");b.id="updBar";b.className="updbar";b.textContent="有新版本，點這裡更新";b.onclick=()=>{b.textContent="更新中……";location.reload()};document.body.appendChild(b)}}catch(e){}}
 setTimeout(checkUpdate,1500);document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
@@ -1328,7 +1350,8 @@ function render(){
   window.scrollTo(0,keepScroll);
 }
 
-function statusNote(){return view==="home"?backupNote():""}
+function statusNote(){return ""}
+function backupDue(){const n=entries().length;if(n<3)return null;const last=local.get("xinlu-lastbackup",0),d=last?Math.floor((Date.now()-last)/864e5):null;if(d!==null&&d<14)return null;return {d}}
 
 
 /* ---------------- insight helpers ---------------- */
@@ -1525,45 +1548,39 @@ function starRitual(text){
   setTimeout(()=>{box.classList.add("out");setTimeout(()=>{if(box.isConnected)r.innerHTML=""},700)},4300)}
 
 /* ---------------- home ---------------- */
+function streakDays(){const ds=new Set(entries().map(e=>e.date));let n=0;const d=new Date();if(!ds.has(today()))d.setDate(d.getDate()-1);for(;;){const k=`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;if(!ds.has(k))break;n++;d.setDate(d.getDate()-1)}return n}
+function homeRows(){
+  const rows=[],row=(act,attrs,tone,title,sub)=>rows.push(`<button type="button" class="hrow ${tone}" data-act="${act}" ${attrs}><span class="hr-dot"></span><span class="hr-t"><b>${title}</b>${sub?`<small>${sub}</small>`:""}</span><span class="hr-go" aria-hidden="true">›</span></button>`);
+  if(typeof backupDue==="function"){const b=backupDue();if(b)row("export","","warn",b.d===null?"還沒備份過":`上次備份是 ${b.d} 天前`,"資料只存在這台裝置，換手機或清除資料就會不見")}
+  const q=sessions().filter(e=>!e.talk&&(e.said||e.feel)).sort((a,b)=>(b.date||"").localeCompare(a.date||""))[0];
+  if(q)row("edit",`data-id="${q.id}"`,"warm",`補完 ${fmtD(q.date)} 的諮商紀錄`,"上次先快速記了一句話和感覺");
+  const nu=unanalyzed("all").length;
+  if(nu)row("batch",'data-scope="all"',"accent",`有 ${nu} 篇還沒整理`,"整理後，才看得出反覆出現的模式");
+  const st=steps().filter(x=>x.status!=="done")[0];
+  if(st){const m=methodById(st.methodId);if(m)row("practice",`data-id="${m.id}" data-e="${st.entryId||""}"`,"method",`下一步：${esc(m.name)}`,"現在就做，一步一步帶你")}
+  const lastS=sessions()[0];
+  if(lastS){const {qs,pr,since}=prepData();const open=qs.filter(x=>!x.done).length+(pr.myQs||[]).filter(x=>!x.done).length;row("open-prep","","",`準備下次諮商`,`上次之後寫了 ${since.length} 篇${open?`，有 ${open} 個想問的問題`:""}`)}
+  const rd=recapData();if(rd)row("recap","","person",`看看${rd.label}的心路`,`${rd.n} 篇紀錄，整理成幾張卡片`);
+  const w=weeklyIssues()[0];if(w&&isFresh(w.issue))row("open-weekly","","method2",`本週心理學新知：${esc(w.title||"")}`,"");
+  return rows.length?`<div class="hrows"><p class="label">接下來</p>${rows.slice(0,5).join("")}</div>`:""}
 function vHome(){
   const d=new Date(),h=d.getHours();
   const hello=h<5?"夜深了":h<11?"早安":h<18?"午安":"晚上好";
-  const es=entries(),todo=steps().filter(s=>s.status!=="done").slice(0,5);
-  const lastS=sessions()[0];
-  const qs=[];es.filter(e=>!lastS||(e.date||"")>=(lastS.date||"")).forEach(e=>(e.analysis?.questions||[]).forEach((q,i)=>qs.push({e,q,i,done:!!(e.asked||{})[i]})));
-  const ts=themeStats().filter(x=>x.n>0&&(S.themes.get(x.t.id)?.status||"facing")!=="walked").slice(0,5),max=Math.max(1,...ts.map(x=>x.n));
-  const nu=unanalyzed("all").length;
-  return `<section class="view">${statusNote()}
-  <div class="hello"><p class="date">${d.getMonth()+1} 月 ${d.getDate()} 日 星期${"日一二三四五六"[d.getDay()]}</p><h1>${hello}</h1></div>
-  ${homeInsight()}
-  ${quickNudge()}
-  ${recapCard()}
-  <button type="button" class="hero-write" data-act="new" data-type="journal"><span><i>寫下此刻</i><b>${esc(promptOfDay())}</b></span><span class="hw-go" aria-hidden="true">→</span></button>
-  <div class="actions three">
-    <button type="button" class="action session" data-act="new" data-type="session"><i>諮商</i><b>記錄諮商</b></button>
-    <button type="button" class="action tool" data-act="import-old"><i>匯入</i><b>舊日記</b></button>
-    <button type="button" class="action tool" data-act="${nu?"batch":"go-review"}" data-scope="all"><i>${nu?"AI 整理":"回顧"}</i><b>${nu?`整理 ${nu} 篇`:"整體回顧"}</b></button>
+  const es=entries(),sk=streakDays();
+  const k=keptQuotes();const qt=k.length?k[Math.floor(Date.now()/864e5)%k.length]:null;
+  return `<section class="view home">${statusNote()}
+  <div class="hello"><div class="spread"><p class="date">${d.getMonth()+1} 月 ${d.getDate()} 日 星期${"日一二三四五六"[d.getDay()]}</p>${sk>=2?`<span class="streak">連續 ${sk} 天</span>`:""}</div><h1>${hello}</h1>
+   ${qt?`<button type="button" class="hello-q" data-act="open-quotes">「${esc(qt.text)}」<span>${esc(qt.date||"")} 的你</span></button>`:""}</div>
+  <div class="write-block">
+   <button type="button" class="hero-write" data-act="new" data-type="journal"><span><i>寫下此刻</i><b>${esc(promptOfDay())}</b></span><span class="hw-go" aria-hidden="true">→</span></button>
+   <div class="sub-acts"><button type="button" class="pill-act" data-act="new" data-type="session">記錄諮商</button><button type="button" class="pill-act" data-act="import-old">匯入舊日記</button></div>
   </div>
-  ${homeCalendar()}
-  ${homeQuote()}
-  ${homeWeekly()}
-  ${es.length?"":`<div class="row"><button class="btn quiet sm" data-act="examples">載入範例</button><button class="btn ghost sm" data-view="about">認識心路</button></div>`}
-  ${installEvt?`<div><button class="btn sm ghost" data-act="install">安裝到桌面</button></div>`:""}
-  ${es.length?`<div class="cols">
-   <div class="stack">
-    <div class="card stack"><div class="spread"><h2 style="font-size:20px">我的下一步</h2><button class="linkbtn" data-goto="methods">方法庫</button></div>
-     ${todo.length?`<div class="steplist">${todo.map(s=>{const m=methodById(s.methodId),e=S.entries.get(s.entryId);return `<div class="step"><span class="dot"></span><div><b>${esc(m?.name||"自訂")}</b>${s.ex?' <span class="badge ex">範例</span>':""}<span class="sub">${e?esc(entryTitle(e)):esc(s.note||"")}</span></div><button class="btn sm quiet" data-act="done-step" data-id="${s.id}">做完了</button></div>`}).join("")}</div>`:`<p class="small muted">整理一篇紀錄後，可以從 AI 建議的方法裡，選一個當作下一步。</p><div><button class="btn sm quiet" data-goto="methods">逛逛方法庫</button></div>`}
-    </div>
-    ${prepCard()}
-   </div>
-   <div class="stack">
-    <div class="card stack"><div class="spread"><h2 style="font-size:20px">正在面對的課題</h2><button class="linkbtn" data-act="journey">旅程</button></div>
-     ${ts.length?`<div class="themebar">${ts.map(x=>`<button type="button" class="tb" data-act="open-theme" data-id="${x.t.id}"><b style="color:var(--theme);font-weight:500">${esc(x.t.name)}</b><span>${x.n} 篇</span><span class="track"><i style="width:${x.n/max*100}%"></i></span></button>`).join("")}</div>`:`<p class="small muted">整理紀錄後，反覆出現的課題會排在這裡。</p>`}
-    </div>
-    <div class="card stack"><div class="spread"><h2 style="font-size:20px">最近的紀錄</h2><button class="linkbtn" data-goto="log">全部</button></div>
-     <div class="stack">${es.slice(0,4).map(e=>`<button type="button" class="mini-e" data-act="open-entry" data-id="${e.id}"><span>${fmtD(e.date)}</span>${esc(entryTitle(e))}</button>`).join("")}</div>
-    </div>
-   </div></div>`:""}
+  ${es.length?"":`<div class="card stack"><h2 style="font-size:20px">第一次來？</h2><p class="small muted">先寫一篇，或載入範例看看整理完會是什麼樣子。</p><div class="row"><button class="btn quiet sm" data-act="examples">載入範例</button><button class="btn ghost sm" data-view="about">認識心路</button></div></div>`}
+  ${homeInsight()}
+  ${homeRows()}
+  ${es.length?`<div class="hrecent"><div class="spread"><p class="label">最近的紀錄</p><button class="linkbtn" data-goto="log">全部 ${es.length} 篇</button></div>
+   ${es.slice(0,3).map(e=>`<button type="button" class="mini-e" data-act="open-entry" data-id="${e.id}"><span>${fmtD(e.date)}</span>${esc(entryTitle(e))}${e.analysis?"":'<small class="un">未整理</small>'}</button>`).join("")}</div>`:""}
+  ${typeof installEvt!=="undefined"&&installEvt?`<div><button class="btn sm ghost" data-act="install">安裝到桌面</button></div>`:""}
   </section>`}
 
 /* ---------------- about ---------------- */
@@ -1602,6 +1619,7 @@ function vLog(){
   const q=logQuery.trim();
   const list=entries().filter(e=>logFilter==="all"||e.type===logFilter).filter(e=>!q||(entryTitle(e)+entryText(e)+(e.people||[]).map(pName).join("")).includes(q));
   return `<section class="view">${statusNote()}<div class="head spread"><h1>紀錄</h1><div class="row"><button class="btn sm" data-act="new" data-type="journal">寫日記</button><button class="btn sm ghost" data-act="new" data-type="session">記錄諮商</button><button class="btn sm quiet" data-act="import-old">匯入舊日記</button><button class="btn sm quiet" data-act="paste-chat">從 AI 對話貼上</button></div></div>
+  ${homeCalendar()}
   <div class="row"><div class="seg">${[["all","全部"],["journal","日記"],["session","諮商"],["letter","信"]].map(f=>`<button type="button" data-act="logf" data-f="${f[0]}" aria-pressed="${logFilter===f[0]}">${f[1]}</button>`).join("")}</div>
   <input class="search" id="logq" type="search" placeholder="搜尋內容或人物" value="${esc(logQuery)}" style="flex:1;min-width:180px"></div>
   ${list.length?`<div class="elist">${list.map(rowEntry).join("")}</div>`:`<p class="muted">${entries().length?"沒有符合的紀錄。":"還沒有紀錄。從寫下第一篇開始吧。"}</p>`}
