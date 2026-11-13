@@ -1078,7 +1078,7 @@ function loadWeekly(){fetch("weekly.json",{cache:"no-cache"}).then(r=>r.ok?r.jso
 let installEvt=null;
 addEventListener("beforeinstallprompt",e=>{e.preventDefault();installEvt=e;schedule()});
 if("serviceWorker" in navigator&&location.protocol==="https:")navigator.serviceWorker.register("sw.js").catch(()=>{});
-const APP_VER="2026.11.14-3";
+const APP_VER="2026.11.14-4";
 async function checkUpdate(){try{const r=await fetch("version.json?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.json()).v;
   if(v&&v!==APP_VER&&!$("#updBar")){const b=document.createElement("button");b.id="updBar";b.className="updbar";b.textContent="有新版本，點這裡更新";b.onclick=()=>{b.textContent="更新中……";location.reload()};document.body.appendChild(b)}}catch(e){}}
 setTimeout(checkUpdate,1500);document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
@@ -1674,14 +1674,12 @@ function vHome(){
    ${qt?`<button type="button" class="hello-q" data-act="open-quotes">「${esc(qt.text)}」<span>${esc(qt.date||"")} 的你</span></button>`:""}</div>
   <div class="write-block">
    <button type="button" class="hero-write" data-act="new" data-type="journal"><span><i>寫下此刻</i><b>${esc(promptOfDay())}</b></span><span class="hw-go" aria-hidden="true">→</span></button>
-   <div class="sub-acts"><button type="button" class="pill-act" data-act="new" data-type="session">記錄諮商</button><button type="button" class="pill-act" data-act="import-old">匯入舊日記</button></div>
+   <div class="sub-acts"><button type="button" class="pill-act" data-act="new" data-type="session">記錄諮商</button><button type="button" class="pill-act" data-act="sky-go">看看我的星空</button></div>
   </div>
   ${es.length?"":`<div class="card stack"><h2 style="font-size:20px">第一次來？</h2><p class="small muted">先寫一篇，或載入範例看看整理完會是什麼樣子。</p><div class="row"><button class="btn quiet sm" data-act="examples">載入範例</button><button class="btn ghost sm" data-view="about">認識心路</button></div></div>`}
   ${todayPractice()}
   ${goodMoment()}
   ${homeRows()}
-  ${es.length?`<div class="hrecent"><div class="spread"><p class="label">最近的紀錄</p><button class="linkbtn" data-goto="log">全部 ${es.length} 篇</button></div>
-   ${es.slice(0,3).map(e=>`<button type="button" class="mini-e" data-act="open-entry" data-id="${e.id}"><span>${fmtD(e.date)}</span>${esc(entryTitle(e))}${e.analysis?"":'<small class="un">未整理</small>'}</button>`).join("")}</div>`:""}
   ${es.filter(e=>e.analysis).length>=2?`<button type="button" class="deep" data-act="go-review"><span><b>想回頭看看自己的時候</b><small>心路分析：反覆出現的模式、走過的路</small></span><span aria-hidden="true">›</span></button>`:""}
   ${typeof installEvt!=="undefined"&&installEvt?`<div><button class="btn sm ghost" data-act="install">安裝到桌面</button></div>`:""}
   </section>`}
@@ -1721,7 +1719,7 @@ function vAbout(){
 function vLog(){
   const q=logQuery.trim();
   const list=entries().filter(e=>logFilter==="all"||e.type===logFilter).filter(e=>!q||(entryTitle(e)+entryText(e)+(e.people||[]).map(pName).join("")).includes(q));
-  return `<section class="view">${statusNote()}<div class="head spread"><h1>紀錄</h1><div class="row"><button class="btn sm" data-act="new" data-type="journal">寫日記</button><button class="btn sm ghost" data-act="new" data-type="session">記錄諮商</button><button class="btn sm quiet" data-act="import-old">匯入舊日記</button><button class="btn sm quiet" data-act="paste-chat">從 AI 對話貼上</button></div></div>
+  return `<section class="view">${statusNote()}<div class="head spread"><div><h1>紀錄</h1><p class="muted">你寫過的每一篇，都收在這裡。可以搜尋、篩選，或匯入以前的日記。</p></div><div class="row"><button class="btn sm quiet" data-act="import-old">匯入舊日記</button><button class="btn sm quiet" data-act="paste-chat">從 AI 對話貼上</button></div></div>
   ${homeCalendar()}
   <div class="row"><div class="seg">${[["all","全部"],["journal","日記"],["session","諮商"],["letter","信"]].map(f=>`<button type="button" data-act="logf" data-f="${f[0]}" aria-pressed="${logFilter===f[0]}">${f[1]}</button>`).join("")}</div>
   <input class="search" id="logq" type="search" placeholder="搜尋內容或人物" value="${esc(logQuery)}" style="flex:1;min-width:180px"></div>
@@ -2616,6 +2614,7 @@ document.addEventListener("click",async ev=>{
    case"pstage":peopleStage=t.dataset.s;render();break;
    case"mstage":mapStage=t.dataset.s;selNode=null;G=null;render();break;
    case"mapmode":mapMode=t.dataset.m;render();break;
+   case"sky-go":view="map";mapMode="sky";local.set("xinlu-view","map");render();window.scrollTo(0,0);break;
    case"mcat-go":view="methods";methodTab="methods";methodCat=t.dataset.c;local.set("xinlu-view","methods");render();window.scrollTo(0,0);break;
    case"sky-star":skySelect("e",id);break;
    case"sky-con":if(!$("#sky")){view="map";mapMode="sky";render()}skySelect("con",id);break;
