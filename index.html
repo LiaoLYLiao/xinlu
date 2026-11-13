@@ -389,6 +389,7 @@ ol.steps{margin:0;padding-left:1.3em;display:grid;gap:6px}
 .cal i.on{background:var(--accent)}
 .cal i.today{box-shadow:0 0 0 2px var(--ink) inset}
 .updbar{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom));z-index:200;border:0;border-radius:999px;padding:12px 22px;font-size:15px;font-weight:600;background:var(--accent);color:var(--on-accent);box-shadow:0 6px 24px rgba(0,0,0,.3);cursor:pointer}
+.maskcand{padding:10px 12px;border-radius:12px;border:1px dashed var(--warn);display:grid;gap:8px}
 .jobpill{margin-left:auto;border:0;border-radius:999px;padding:4px 12px;font-size:13px;cursor:pointer;background:var(--m5);color:#1a130a;font-weight:500}
 .jobpill.run{background:var(--accent);color:var(--on-accent)}
 .jobpill:not([hidden])+.about-btn{margin-left:0}
@@ -961,14 +962,14 @@ function del(col,id){S[col].delete(id);schedule();return persist(col)}
 async function boot(){
   try{await IDB.open();for(const c of COLS){const v=await IDB.get("cols",c);if(Array.isArray(v))S[c]=new Map(v.map(x=>[x.id,x]))}mode="device"}
   catch(e){mode="local";loadLocal()}
-  sample=AI;schedule();loadWeekly();refreshJobsUI();
+  sample=AI;schedule();loadWeekly();refreshJobsUI();askPersist();
   if(!local.get("xinlu-welcomed",false))setTimeout(()=>openSheet({kind:"welcome"}),300);
 }
 function loadWeekly(){fetch("weekly.json",{cache:"no-cache"}).then(r=>r.ok?r.json():null).then(o=>{if(o&&Array.isArray(o.issues)){WEEK=new Map(o.issues.filter(w=>w&&w.issue).map(w=>[String(w.issue),w]));schedule()}}).catch(()=>{})}
 let installEvt=null;
 addEventListener("beforeinstallprompt",e=>{e.preventDefault();installEvt=e;schedule()});
 if("serviceWorker" in navigator&&location.protocol==="https:")navigator.serviceWorker.register("sw.js").catch(()=>{});
-const APP_VER="2026.11.13-6";
+const APP_VER="2026.11.14-1";
 async function checkUpdate(){try{const r=await fetch("version.json?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.json()).v;
   if(v&&v!==APP_VER&&!$("#updBar")){const b=document.createElement("button");b.id="updBar";b.className="updbar";b.textContent="有新版本，點這裡更新";b.onclick=()=>{b.textContent="更新中……";location.reload()};document.body.appendChild(b)}}catch(e){}}
 setTimeout(checkUpdate,1500);document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
@@ -1102,11 +1103,25 @@ async function completeJob(id,raw,fromApi){
 function openJob(id){aiOpen=id;drawAI()}
 function closeAI(){aiOpen=null;$("#aiRoot").innerHTML=""}
 function cancelJob(id){const r=running.get(id);if(r)r.ctl.abort();running.delete(id);JOBS=JOBS.filter(x=>x.id!==id);saveJobs();if(aiOpen===id)closeAI();if(sheet&&sheet.kind!=="edit")drawSheet()}
+
+const SURN="陳林黃張李王吳劉蔡楊許鄭謝郭洪曾邱廖賴周徐蘇葉莊呂江何蕭羅高潘簡朱鍾游彭詹胡施沈余盧梁趙顏柯翁魏孫戴宋范方鄧杜傅侯曹薛丁卓阮馬董温溫唐藍石蔣古紀姚連馮歐程湯田康姜白汪鄒尤巫鐘黎涂龔嚴韓袁金童陸夏柳邵錢";
+const STOPN=new Set(["小時","小心","小孩","小學","小事","小姐","老師","老闆","老公","老婆","老家","老人","阿姨","阿嬤","阿公","阿伯","小組","小說","小吃","小小","小的","小了","小我","阿們","小動","小狗","小貓"]);
+let SRCTXT=null;
+function nameCands(text,known){if(SRCTXT===null)SRCTXT=[...document.scripts].map(x=>x.textContent).join("");
+  const t=String(text).replace(/［[^］]*］/g," "),found=new Map(),kn=new Set(known||[]);
+  const add=w=>{w=w.trim();if(w.length<2||STOPN.has(w)||kn.has(w)||SRCTXT.includes(w))return;found.set(w,(found.get(w)||0)+1)};
+  for(const m of t.matchAll(/(?:小|阿)[一-鿿](?=[^一-鿿]|$|說|跟|和|的|也|就|又|很|是|在|會|要|問|叫|讓|對|一|今|昨|當|突|約|傳|打|找|罵|吵|笑|哭)/g))add(m[0]);
+  for(const m of t.matchAll(new RegExp(`[${SURN}][\\u4e00-\\u9fff]{0,2}?(?:哥|姐|老師|主管|經理|醫師|醫生|同學|學長|學姐|先生|小姐|阿姨|總|董)`,"g")))add(m[0]);
+  for(const m of t.matchAll(/\b[A-Z][a-z]{2,}\b/g))add(m[0]);
+  return [...found.entries()].sort((a,b)=>b[1]-a[1]).map(x=>x[0]).slice(0,8)}
+async function askPersist(){try{if(navigator.storage&&navigator.storage.persist){const ok=await navigator.storage.persisted();if(!ok)await navigator.storage.persist()}}catch(e){}}
 function drawAI(){
   const r=$("#aiRoot"),j=aiOpen&&jobById(aiOpen);if(!j){r.innerHTML="";aiOpen=null;return}
   const st=settings(),api=st.aiMode==="api"&&!j.copy,run=running.has(j.id);
   const left=j.batch?JOBS.filter(x=>x.batch===j.batch).length:0;
-  const privacy=`<p class="tiny muted">已自動把 ${j.map.length} 個人名換成代號${j.masked?`，遮蔽 ${j.masked} 筆電話、Email 或證號`:""}。AI 回覆後，代號會在你的裝置上換回真名。</p>`;
+  const cands=run?[]:nameCands(j.text,j.map.map(x=>x[1]));
+  const candBox=cands.length?`<div class="maskcand"><p class="tiny">這些字<b>可能是名字</b>，還沒被遮蔽。點一下就會換成代號，以後也會自動遮蔽：</p><div class="row">${cands.map(w=>`<button type="button" class="chip" data-act="mask-word" data-w="${esc(w)}">${esc(w)} ＋</button>`).join("")}</div></div>`:"";
+  const privacy=`<p class="tiny muted">已自動把 ${j.map.length} 個人名換成代號${j.masked?`，遮蔽 ${j.masked} 筆電話、Email 或證號`:""}。AI 回覆後，代號會在你的裝置上換回真名。只有加進「人物」或設定裡「也要遮蔽的字」的名字會被遮蔽。</p>${candBox}`;
   const preview=`<details><summary class="small" style="cursor:pointer;color:var(--accent)">看看實際送出的內容（${j.text.length} 字）</summary><pre class="aipre">${esc(j.text)}</pre></details>`;
   const errBox=j.err?`<p class="notice warn" role="alert">${esc(j.err)}</p>`:"";
   let body;
@@ -1198,7 +1213,7 @@ function shWelcome(){
    <p class="need">每天寫一點，累積久了，就看得見自己心裡反覆發生的事。</p>
    <div class="kv">
     <div><b>你的資料只在你這裡</b><p>心路沒有帳號、沒有伺服器。日記只存在這台裝置，別人看不到，也不會被拿去做任何用途。記得定期備份。</p></div>
-    <div><b>用你自己的 AI 整理</b><p>想讓 AI 幫你整理時，可以用你平常的 ChatGPT、Claude 或 Gemini。送出前，人名會自動換成代號，電話、Email 等資料會被遮蔽。</p></div>
+    <div><b>用你自己的 AI 整理</b><p>想讓 AI 幫你整理時，可以用你平常的 ChatGPT、Claude 或 Gemini。送出前，你加進「人物」的名字會自動換成代號（還沒加的名字，送出前會提醒你），電話、Email 等資料會被遮蔽。</p></div>
     <div><b>這不是心理諮商</b><p>心路是自我紀錄和心理衛教工具，AI 的整理只是歸納，不是診斷。如果你正在經歷困難，請找專業的人一起面對。</p></div>
     <div><b>需要幫忙的時候</b><p>右上角的「求助」隨時都在。撐不下去時，請打安心專線 1925（24 小時）或生命線 1995，緊急時撥 119。</p></div>
    </div>
@@ -1572,7 +1587,7 @@ function vAbout(){
     <p class="small muted">AI 只負責歸納，不做診斷。重要的理解，請和專業的人一起確認。</p>`)}
   ${sec("隱私與 AI 風險",`<div class="kv">
     <div><b>沒有伺服器</b><p>心路是一個靜態網站，沒有帳號、沒有資料庫、沒有追蹤。你的日記只存在這台裝置的瀏覽器裡。</p></div>
-    <div><b>送出前自動保護</b><p>交給 AI 之前，人名會換成「人物A」這類代號，電話、Email、身分證字號、卡號會被遮蔽，你也可以在設定加上其他要遮蔽的字詞。每次都能先看實際送出的內容。</p></div>
+    <div><b>送出前自動保護</b><p>交給 AI 之前，你記下的人物名字會換成「人物A」這類代號（還沒記下的名字，送出前會提醒你遮蔽），電話、Email、身分證字號、卡號會被遮蔽，你也可以在設定加上其他要遮蔽的字詞。每次都能先看實際送出的內容。</p></div>
     <div><b>你選的 AI 服務</b><p>送出的內容會依照該服務的隱私政策處理。建議關閉「用我的內容改善模型」，或使用臨時對話。</p></div>
     <div><b>AI 可能出錯</b><p>AI 的整理可能不準，也可能過度解讀。哪些說法貼近你，由你決定；不貼近的，按 × 拿掉就好。</p></div>
     <div><b>記得備份</b><p>換手機或清除瀏覽器資料，紀錄就會不見。請定期「匯出備份」，存到自己的雲端硬碟。</p></div></div>`)}
@@ -2525,6 +2540,8 @@ document.addEventListener("click",async ev=>{
    case"ai-copy":{const q=jobById(aiOpen);if(!q)break;try{await navigator.clipboard.writeText(q.text);toast("已複製，去你的 AI 貼上吧")}catch(e){const pre=$("#aiRoot details");if(pre)pre.open=true;toast("複製失敗，請長按下方內容手動複製")}break}
    case"ai-later":closeAI();if(sheet&&sheet.kind!=="edit")drawSheet();break;
    case"open-job":openJob(id);break;
+   case"mask-word":{const j=jobById(aiOpen),w=t.dataset.w;if(!j||!w)break;const st=settings();const l=String(st.maskWords||"").split(/[\n,，、]/).map(x=>x.trim()).filter(Boolean);if(!l.includes(w)){l.push(w);st.maskWords=l.join("\n");saveSettings(st)}
+     const code=`［名字${CODE(j.map.length+40)}］`;j.text=j.text.split(w).join(code);j.map.push([code,w]);saveJobs();drawAI();toast(`「${w}」已換成代號`);break}
    case"job-run":runJob(id);break;
    case"job-del":cancelJob(id);break;
    case"open-jobs":openSheet({kind:"jobs"});break;
