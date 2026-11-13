@@ -524,6 +524,100 @@ details.more[open]>summary{margin-bottom:6px}
 .nudge .btn{flex:none}
 .quickhead b{font-family:var(--f-display);font-size:21px}
 @media (prefers-reduced-motion:reduce){.breath span,.pr-step{animation:none}}
+
+/* ===== visuals ===== */
+.head .seg{max-width:100%;overflow-x:auto;scrollbar-width:none}
+.head .seg::-webkit-scrollbar{display:none}
+.head .seg button{white-space:nowrap}
+.skywrap{position:relative;width:100%;max-width:min(100%,calc(100dvh - 250px));margin:0 auto;aspect-ratio:1/1;border-radius:24px;overflow:hidden;
+  background:radial-gradient(circle at 50% 50%,#1d2348 0%,#10132b 50%,#07080f 100%);border:1px solid #232a52;box-shadow:0 20px 50px rgba(5,6,20,.35)}
+.skywrap svg{width:100%;height:100%;display:block}
+.dust{fill:#cfd6ff;opacity:.3;animation:tw 5s ease-in-out infinite}
+@keyframes tw{0%,100%{opacity:.12}50%{opacity:.6}}
+.star{cursor:pointer;transition:opacity .3s}
+.star .hit{fill:transparent}
+.star .core{fill:var(--sc);filter:drop-shadow(0 0 8px var(--sc));animation:tw2 4s ease-in-out infinite;animation-delay:var(--d)}
+.star .halo{fill:var(--sc);opacity:.13}
+.star .spark{stroke:var(--sc);stroke-width:2.5;opacity:.75}
+@keyframes tw2{0%,100%{opacity:1}50%{opacity:.65}}
+.star.newest .halo{animation:pulse 2.4s ease-out infinite;transform-box:fill-box;transform-origin:center;opacity:.35}
+.con{cursor:pointer;transition:opacity .3s}
+.con line{stroke:var(--cc);stroke-width:3;opacity:.55;stroke-dasharray:1;stroke-dashoffset:1;animation:draw 1.4s ease forwards;animation-delay:calc(.3s + var(--k)*.3s)}
+@keyframes draw{to{stroke-dashoffset:0}}
+.con text{fill:#eef0ff;font-size:36px;text-anchor:middle;opacity:0;paint-order:stroke;stroke:#0c0f22;stroke-width:8px;animation:fadein .8s ease forwards;animation-delay:calc(1.2s + var(--k)*.3s)}
+@keyframes fadein{to{opacity:.85}}
+#sky.focus .star:not(.on),#sky.focus .con:not(.on){opacity:.12}
+#sky.focus .con.on line{opacity:1;stroke-width:5}
+#sky .star.on .halo{opacity:.35}
+.skystat{position:absolute;left:14px;top:12px;font-size:12px;color:#aab3e0;pointer-events:none}
+.vizpanel{position:absolute;left:10px;right:10px;bottom:10px;display:grid;gap:8px;padding:14px 16px;border-radius:16px;background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow);animation:rise .3s ease}
+.vp-t{font-family:var(--f-display);font-size:19px}
+.cdot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px}
+/* rings */
+.ringwrap{background:radial-gradient(circle,color-mix(in srgb,var(--m5) 10%,var(--surface)),var(--surface) 75%);border-color:var(--line);box-shadow:var(--shadow)}
+.band{stroke:color-mix(in srgb,var(--m5) 35%,var(--line));stroke-width:2}
+.band.b3{fill:color-mix(in srgb,var(--m5) 9%,var(--surface))}.band.b2{fill:color-mix(in srgb,var(--m5) 15%,var(--surface))}.band.b1{fill:color-mix(in srgb,var(--m5) 21%,var(--surface))}.band.b0{fill:color-mix(in srgb,var(--m5) 28%,var(--surface))}
+.grain{fill:none;stroke:color-mix(in srgb,var(--m5) 22%,transparent);stroke-width:1.2}
+.core-me{fill:color-mix(in srgb,var(--accent) 22%,var(--surface));stroke:var(--accent);stroke-width:2}
+.me{font-family:var(--f-display);font-size:34px;text-anchor:middle;fill:var(--ink)}
+.rlab{font-size:28px;text-anchor:middle;fill:var(--muted);letter-spacing:.1em;paint-order:stroke;stroke:var(--surface);stroke-width:6px}
+.rp{cursor:pointer;transition:opacity .3s;animation:fadein2 .6s ease both;animation-delay:var(--d)}
+@keyframes fadein2{from{opacity:0}to{opacity:1}}
+.rp .thread{stroke:var(--person);stroke-width:5;stroke-linecap:round;opacity:.55}
+.rp .pd{fill:var(--person);stroke:var(--surface);stroke-width:3;filter:drop-shadow(0 0 5px color-mix(in srgb,var(--person) 60%,transparent))}
+.rp .hit{fill:transparent}
+.rp .pl{font-size:36px;fill:var(--ink);font-weight:600;paint-order:stroke;stroke:var(--surface);stroke-width:7px}
+.ed{opacity:.7;cursor:pointer;transition:opacity .3s}
+#rings.focus .rp:not(.on),#rings.focus .ed:not(.on){opacity:.15}
+#rings .rp.on .thread{opacity:1}#rings .ed.on{opacity:1}
+/* recap */
+.recap-btn{display:flex;align-items:center;gap:14px;width:100%;text-align:left;cursor:pointer;padding:16px 18px;border-radius:20px;border:1px solid color-mix(in srgb,var(--person) 30%,var(--line));
+  background:linear-gradient(120deg,color-mix(in srgb,var(--person) 14%,var(--surface)),color-mix(in srgb,var(--theme) 14%,var(--surface)));color:var(--ink);font:inherit}
+.recap-btn b{display:block;font-family:var(--f-display);font-size:18px}
+.recap-btn small{color:var(--muted);font-size:13px}
+.recap-btn>span:last-child{margin-left:auto;color:var(--accent);font-size:18px}
+.rb-orb{flex:none;width:42px;height:42px;border-radius:50%;background:conic-gradient(from 200deg,#9fa8ff,#ff9f8a,#ffd06b,#6fd6b8,#9fa8ff);filter:saturate(.9);animation:spin 12s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.recap{position:fixed;inset:0;z-index:300;color:#f3f4ff;display:grid;place-items:center;padding:calc(64px + env(safe-area-inset-top)) 28px calc(40px + env(safe-area-inset-bottom));overflow:hidden;
+  background:radial-gradient(circle at 20% 10%,var(--g1),transparent 55%),radial-gradient(circle at 90% 90%,var(--g2),transparent 55%),#0d0f22;transition:background .5s}
+.recap.c0{--g1:#3b3f8f;--g2:#6a2f63}.recap.c1{--g1:#3d4aa8;--g2:#1f2a66}.recap.c2{--g1:#8a3d3a;--g2:#3c2147}.recap.c3{--g1:#7a5a1f;--g2:#3b2a5a}.recap.c4{--g1:#1f6b5a;--g2:#1d2c55}.recap.c5{--g1:#4b2f7a;--g2:#1c3b5a}.recap.c6{--g1:#2b3270;--g2:#5a2c55}
+.rc-bars{position:absolute;top:calc(14px + env(safe-area-inset-top));left:16px;right:60px;display:flex;gap:5px;z-index:3}
+.rc-bars i{flex:1;height:3px;border-radius:3px;background:rgba(255,255,255,.25)}
+.rc-bars i.done,.rc-bars i.on{background:#fff}
+.rc-x{position:absolute;top:calc(4px + env(safe-area-inset-top));right:10px;z-index:4;width:44px;height:44px;border:0;background:transparent;color:#fff;font-size:28px;cursor:pointer}
+.rc-prev,.rc-next{position:absolute;top:0;bottom:0;border:0;background:transparent;cursor:pointer;z-index:1}
+.rc-prev{left:0;width:30%}.rc-next{right:0;width:70%}
+.rc-slide{position:relative;z-index:2;width:100%;max-width:460px;display:grid;gap:16px;pointer-events:none}
+.rc-slide>*{animation:rise .7s cubic-bezier(.2,.7,.2,1) both}
+.rc-slide>*:nth-child(2){animation-delay:.15s}.rc-slide>*:nth-child(3){animation-delay:.35s}.rc-slide>*:nth-child(4){animation-delay:.55s}
+.rc-ui,.rc-ui *{pointer-events:auto}
+.rc-k{font-size:14px;letter-spacing:.14em;color:#c9cdf5}
+.rc-big{font-family:var(--f-display);font-size:96px;line-height:1;font-weight:700}
+.rc-big small{font-size:26px;font-weight:500}
+.rc-name{font-family:var(--f-display);font-size:40px;line-height:1.3}
+.rc-p{font-size:17px;line-height:1.8;color:#dfe2ff}
+.rc-hint{font-size:13px;color:#9da4d8}
+.rc-cloud{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:baseline}
+.rc-cloud span{font-family:var(--f-display);color:#ffe7b8;animation:rise .6s ease both;animation-delay:calc(var(--i)*.12s + .2s)}
+.rc-q{font-family:var(--f-display);font-size:28px;line-height:1.6;margin:0}
+.rc-opts{display:grid;gap:10px}
+.rc-opts label{display:flex;gap:10px;align-items:center;font-size:16px}
+.rc-opts input{width:20px;height:20px;accent-color:#9fa8ff}
+.rc-img{width:100%;border-radius:16px;box-shadow:0 20px 50px rgba(0,0,0,.4);pointer-events:auto;-webkit-touch-callout:default}
+.recap .btn.ghost{color:#fff;border-color:rgba(255,255,255,.5)}
+/* ritual */
+.ritual2{position:fixed;inset:0;z-index:300;display:grid;place-items:center;padding:32px;background:rgba(6,7,16,.86);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);animation:fadein3 .3s ease;transition:opacity .6s}
+@keyframes fadein3{from{opacity:0}}
+.ritual2.out{opacity:0}
+.rt-text{max-width:520px;font-family:var(--f-display);font-size:20px;line-height:1.9;color:#eef0ff;text-align:center}
+.rt-text span{display:inline-block;animation:dissolve 1.3s cubic-bezier(.55,0,.75,.2) forwards;animation-delay:var(--d)}
+@keyframes dissolve{0%{opacity:1;transform:none}40%{color:#ffe3a3;text-shadow:0 0 8px #ffd06b}100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(.15);color:#ffd06b}}
+.rt-star{position:absolute;left:50%;top:50%;width:18px;height:18px;margin:-9px 0 0 -9px;border-radius:50%;background:#fff6d6;box-shadow:0 0 18px 6px #ffd06b,0 0 60px 20px rgba(255,208,107,.35);opacity:0;transform:scale(0)}
+.gather .rt-star{animation:starIn 1.1s cubic-bezier(.2,1.4,.4,1) forwards}
+@keyframes starIn{0%{opacity:0;transform:scale(0)}60%{opacity:1;transform:scale(1.6)}100%{opacity:1;transform:scale(1)}}
+.rt-msg{position:absolute;left:0;right:0;top:calc(50% + 40px);text-align:center;font-family:var(--f-display);font-size:18px;color:#f3f0ff;opacity:0}
+.gather .rt-msg{animation:fadein .8s ease .5s forwards}
+@media (prefers-reduced-motion:reduce){.dust,.star .core,.con line,.con text,.rp,.rb-orb,.rc-slide>*,.rc-cloud span{animation:none!important;opacity:revert;stroke-dashoffset:0}.con text{opacity:.85}}
 </style>
 </head>
 <body>
@@ -874,7 +968,7 @@ function loadWeekly(){fetch("weekly.json",{cache:"no-cache"}).then(r=>r.ok?r.jso
 let installEvt=null;
 addEventListener("beforeinstallprompt",e=>{e.preventDefault();installEvt=e;schedule()});
 if("serviceWorker" in navigator&&location.protocol==="https:")navigator.serviceWorker.register("sw.js").catch(()=>{});
-const APP_VER="2026.11.13-5";
+const APP_VER="2026.11.13-6";
 async function checkUpdate(){try{const r=await fetch("version.json?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.json()).v;
   if(v&&v!==APP_VER&&!$("#updBar")){const b=document.createElement("button");b.id="updBar";b.className="updbar";b.textContent="有新版本，點這裡更新";b.onclick=()=>{b.textContent="更新中……";location.reload()};document.body.appendChild(b)}}catch(e){}}
 setTimeout(checkUpdate,1500);document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
@@ -1290,6 +1384,131 @@ function personTimeline(p,es){
 function quickNudge(){const q=sessions().filter(e=>!e.talk&&(e.said||e.feel)).sort((a,b)=>(b.date||"").localeCompare(a.date||""))[0];if(!q)return "";
   return `<div class="nudge"><span>${fmtD(q.date)} 的諮商是快速記錄，有空時補上談了什麼、回家作業。</span><button class="btn sm quiet" data-act="edit" data-id="${q.id}">補上</button></div>`}
 
+
+/* ---------------- visuals: sky, rings, recap, ritual ---------------- */
+function hashS(x){let h=2166136261;for(const c of String(x))h=Math.imul(h^c.charCodeAt(0),16777619);return h>>>0}
+function rng(seed){let a=seed>>>0;return()=>{a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+const CHUE=["#9fa8ff","#ff9f8a","#6fd6b8","#f3c969","#c79bff","#7cc8ff"];
+const SKYMOOD={1:"#8d9bd6",2:"#b9a6e8",3:"#e7e9ff",4:"#ffe3a3",5:"#ffd06b"};
+function mst(pts){const n=pts.length,inT=new Array(n).fill(false),d=new Array(n).fill(Infinity),par=new Array(n).fill(-1),seg=[];d[0]=0;
+  for(let k=0;k<n;k++){let u=-1;for(let i=0;i<n;i++)if(!inT[i]&&(u<0||d[i]<d[u]))u=i;inT[u]=true;if(par[u]>=0)seg.push([pts[par[u]],pts[u]]);
+    for(let v=0;v<n;v++)if(!inT[v]){const w=Math.hypot(pts[u].x-pts[v].x,pts[u].y-pts[v].y);if(w<d[v]){d[v]=w;par[v]=u}}}return seg}
+function vSky(){
+  const es=entries().filter(e=>e.type!=="letter").slice().sort((a,b)=>(a.date||"").localeCompare(b.date||"")||(a.createdAt||0)-(b.createdAt||0));
+  if(!es.length)return `<div class="empty"><p>寫下第一篇紀錄，你的星空就會亮起第一顆星。</p><button class="btn" data-act="new" data-type="journal">寫下此刻</button></div>`;
+  const N=es.length,GA=Math.PI*(3-Math.sqrt(5)),pos=new Map();
+  es.forEach((e,i)=>{const j=rng(hashS(e.id));const r=70+390*Math.sqrt((i+.5)/N);const a=i*GA+(j()-.5)*.35;pos.set(e.id,{x:500+r*Math.cos(a),y:500+r*Math.sin(a)})});
+  const R=rng(7);let dust="";for(let i=0;i<160;i++)dust+=`<circle cx="${(R()*1000).toFixed(0)}" cy="${(R()*1000).toFixed(0)}" r="${(R()*2.2+.6).toFixed(1)}" class="dust" style="animation-delay:${(R()*6).toFixed(1)}s"/>`;
+  const cons=[...S.themes.values()].map(t=>({t,l:es.filter(e=>(e.themes||[]).includes(t.id))})).filter(c=>c.l.length>=2).sort((a,b)=>b.l.length-a.l.length);
+  const conSvg=cons.map((c,k)=>{const pts=c.l.map(e=>pos.get(e.id));const sg=mst(pts);const cx=pts.reduce((a,p)=>a+p.x,0)/pts.length,cy=pts.reduce((a,p)=>a+p.y,0)/pts.length;
+    return `<g class="con" data-act="sky-con" data-id="${c.t.id}" style="--cc:${CHUE[k%CHUE.length]};--k:${k}">${sg.map(([a,b])=>`<line x1="${a.x.toFixed(1)}" y1="${a.y.toFixed(1)}" x2="${b.x.toFixed(1)}" y2="${b.y.toFixed(1)}" pathLength="1"/>`).join("")}<text x="${cx.toFixed(0)}" y="${(cy-26).toFixed(0)}">${esc(c.t.name)}</text></g>`}).join("");
+  const stars=es.map((e,i)=>{const q=pos.get(e.id),col=SKYMOOD[e.mood]||"#e7e9ff",S_=e.type==="session",r=(S_?13:9)+(e.analysis?2:0),x=q.x.toFixed(1),y=q.y.toFixed(1);
+    return `<g class="star${i===N-1?" newest":""}" data-act="sky-star" data-id="${e.id}" style="--sc:${col};--d:${(hashS(e.id)%50)/10}s"><circle class="hit" cx="${x}" cy="${y}" r="34"/><circle class="halo" cx="${x}" cy="${y}" r="${r*2.6}"/>${S_?`<path class="spark" d="M${q.x-r*2.4} ${y}H${q.x+r*2.4}M${x} ${q.y-r*2.4}V${q.y+r*2.4}"/>`:""}<circle class="core" cx="${x}" cy="${y}" r="${r}"/></g>`}).join("");
+  return `<p class="small muted">每顆星是一篇紀錄。中心是最早的，越往外越近期；顏色是當時的心情，有十字光芒的是諮商。同一個課題的星星，會連成一個星座。</p>
+  <div class="skywrap"><svg id="sky" viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMid meet" role="img" aria-label="紀錄星空"><rect width="1000" height="1000" fill="transparent" data-act="viz-clear"/>${dust}<g>${conSvg}</g><g>${stars}</g></svg>
+   <div class="skystat">${N} 顆星 · ${cons.length} 個星座</div><div id="vizPanel" class="vizpanel" hidden></div></div>
+  ${cons.length?`<div class="hscroll-row">${cons.map((c,k)=>`<button type="button" class="pick" data-act="sky-con" data-id="${c.t.id}"><i class="cdot" style="background:${CHUE[k%CHUE.length]}"></i>${esc(c.t.name)} · ${c.l.length}</button>`).join("")}</div>`:`<p class="tiny muted">整理過的紀錄有共同課題時，就會連成星座。</p>`}`}
+function vizPanel(html){const pn=$("#vizPanel");if(!pn)return;pn.innerHTML=html;pn.hidden=false}
+function vizClear(){const sv=$("#sky")||$("#rings");if(sv){sv.classList.remove("focus");sv.querySelectorAll(".on").forEach(x=>x.classList.remove("on"))}const pn=$("#vizPanel");if(pn)pn.hidden=true}
+const xBtn=`<button type="button" class="btn sm ghost" data-act="viz-clear" aria-label="關閉">×</button>`;
+function skySelect(kind,id){const sv=$("#sky");if(!sv)return;vizClear();sv.classList.add("focus");
+  if(kind==="con"){const t=S.themes.get(id);if(!t)return;sv.querySelectorAll(`.con[data-id="${id}"]`).forEach(x=>x.classList.add("on"));const es=entriesOfTheme(id).filter(e=>e.type!=="letter").sort((a,b)=>(a.date||"").localeCompare(b.date||""));es.forEach(e=>sv.querySelector(`.star[data-id="${e.id}"]`)?.classList.add("on"));
+    vizPanel(`<div class="spread"><b class="vp-t">${esc(t.name)}</b>${xBtn}</div><p class="small muted">這個星座有 ${es.length} 顆星，從 ${fmtD(es[0]?.date)} 到 ${fmtD(es[es.length-1]?.date)}。</p><div class="row"><button class="btn sm" data-act="open-theme" data-id="${id}">看這個課題</button></div>`)}
+  else{const e=S.entries.get(id);if(!e)return;sv.querySelector(`.star[data-id="${id}"]`)?.classList.add("on");const ts=(e.themes||[]).filter(t=>S.themes.has(t));ts.forEach(t=>sv.querySelectorAll(`.con[data-id="${t}"]`).forEach(x=>x.classList.add("on")));
+    vizPanel(`<div class="spread"><span class="tiny muted">${esc(e.date||"")}${e.type==="session"?" · 諮商":""}</span>${xBtn}</div><b class="vp-t">${esc(entryTitle(e))}</b>${ts.length?`<div class="row">${ts.map(t=>`<button type="button" class="chip t" data-act="sky-con" data-id="${t}">${esc(tName(t))}</button>`).join("")}</div>`:""}<div class="row"><button class="btn sm" data-act="open-entry" data-id="${id}">打開這篇</button></div>`)}}
+/* rings */
+function wob(r,seed,amp){const R=rng(seed);const ph=R()*6.28,ph2=R()*6.28;let d="";for(let i=0;i<=96;i++){const a=i/96*Math.PI*2,rr=r+amp*Math.sin(a*3+ph)+amp*.6*Math.sin(a*7+ph2);d+=(i?"L":"M")+(500+rr*Math.cos(a)).toFixed(1)+" "+(500+rr*Math.sin(a)).toFixed(1)}return d+"Z"}
+const RINGS=[[95,190],[190,285],[285,380],[380,470]];
+function ringStages(p){const st=new Set(p.stages||[]);entriesOfPerson(p.id).forEach(e=>{if(e.stage)st.add(e.stage)});return STAGES.filter(s=>st.has(s))}
+function vRings(){
+  const all=[...S.people.values()];const placed=all.map(p=>({p,st:ringStages(p),n:entriesOfPerson(p.id).length})).filter(o=>o.st.length).sort((a,b)=>STAGES.indexOf(a.st[0])-STAGES.indexOf(b.st[0])||b.n-a.n);
+  const loose=all.length-placed.length;
+  if(!placed.length)return `<div class="empty"><p>幫人物標上出現在哪些人生階段，年輪就會長出來。</p><button class="btn" data-view="people">去人物頁</button></div>`;
+  let bands="";RINGS.slice().reverse().forEach(([a,b],k)=>{const idx=3-k;bands+=`<path d="${wob(b,11+idx,4)}" class="band b${idx}"/>`});
+  let grain="";RINGS.forEach(([a,b],idx)=>{for(let g=1;g<4;g++)grain+=`<path d="${wob(a+(b-a)*g/4,100+idx*7+g,2.5)}" class="grain"/>`});
+  const labels=RINGS.map(([a,b],i)=>`<text class="rlab" x="500" y="${500-(a+b)/2+8}">${STAGES[i]}</text>`).join("");
+  const P=placed.length;
+  const ppl=placed.map((o,k)=>{const ang=-Math.PI/2+(k+.5)*2*Math.PI/P+.18,c=Math.cos(ang),s_=Math.sin(ang);const rs=o.st.map(st=>{const[a,b]=RINGS[STAGES.indexOf(st)];return(a+b)/2});
+    const r0=Math.min(...rs),r1=Math.max(...rs),sz=Math.min(16,7+o.n*1.5);const lx=500+(r1+sz+16)*c,ly=500+(r1+sz+16)*s_;
+    return `<g class="rp" data-act="ring-person" data-id="${o.p.id}" style="--d:${k*.12}s">${rs.length>1?`<line class="thread" x1="${(500+r0*c).toFixed(1)}" y1="${(500+r0*s_).toFixed(1)}" x2="${(500+r1*c).toFixed(1)}" y2="${(500+r1*s_).toFixed(1)}"/>`:""}
+     ${rs.map(r=>`<circle class="pd" cx="${(500+r*c).toFixed(1)}" cy="${(500+r*s_).toFixed(1)}" r="${sz}"/>`).join("")}<circle class="hit" cx="${(500+r1*c).toFixed(1)}" cy="${(500+r1*s_).toFixed(1)}" r="34"/>
+     <text class="pl" x="${lx.toFixed(1)}" y="${(ly+9).toFixed(1)}" text-anchor="${c>.25?"start":c<-.25?"end":"middle"}">${esc(o.p.name)}</text></g>`}).join("");
+  const eds=entries().filter(e=>e.stage&&STAGES.includes(e.stage)&&e.type!=="letter").map(e=>{const R=rng(hashS(e.id)),[a,b]=RINGS[STAGES.indexOf(e.stage)],r=a+12+(b-a-24)*R(),ang=R()*Math.PI*2;
+    return `<circle class="ed" data-act="ring-entry" data-id="${e.id}" cx="${(500+r*Math.cos(ang)).toFixed(1)}" cy="${(500+r*Math.sin(ang)).toFixed(1)}" r="6" style="fill:${e.mood?moodOf(e.mood)[2]:"var(--entry)"}"/>`}).join("");
+  const long=placed.filter(o=>o.st.length>=2&&o.st[0]!=="現在"&&o.st.includes("現在"));
+  return `<p class="small muted">像樹的橫切面：中心是童年，往外是青少年、成年，最外圈是現在。同一個人在不同階段出現，會連成一條線，看得出哪些關係一路延伸到現在。</p>
+  <div class="skywrap ringwrap"><svg id="rings" viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMid meet" role="img" aria-label="生命年輪"><rect width="1000" height="1000" fill="transparent" data-act="viz-clear"/>${bands}${grain}<circle cx="500" cy="500" r="95" class="core-me"/><text class="me" x="500" y="512">我</text>${labels}<g>${eds}</g><g>${ppl}</g></svg>
+   <div id="vizPanel" class="vizpanel" hidden></div></div>
+  ${long.length?`<p class="small">從過去一路延伸到現在的關係：${long.map(o=>`<button type="button" class="linkbtn" data-act="ring-person" data-id="${o.p.id}">${esc(o.p.name)}</button>`).join("、")}</p>`:""}
+  ${loose?`<p class="tiny muted">還有 ${loose} 個人沒有標記階段，所以沒有出現在年輪上。</p>`:""}`}
+function ringSelect(kind,id){const sv=$("#rings");if(!sv)return;vizClear();sv.classList.add("focus");
+  if(kind==="p"){const p=S.people.get(id);if(!p)return;sv.querySelector(`.rp[data-id="${id}"]`)?.classList.add("on");const es=entriesOfPerson(id);es.forEach(e=>sv.querySelector(`.ed[data-id="${e.id}"]`)?.classList.add("on"));const st=ringStages(p);
+    vizPanel(`<div class="spread"><b class="vp-t">${esc(p.name)}<span class="tiny muted">　${esc(p.relation||"")}</span></b>${xBtn}</div><p class="small">${st.join(" → ")}${st.length>=2&&st.includes("現在")&&st[0]!=="現在"?"，一路延伸到現在":""}　·　${es.length} 篇紀錄</p><div class="row"><button class="btn sm" data-act="open-person" data-id="${id}">看我們之間的時間軸</button></div>`)}
+  else{const e=S.entries.get(id);if(!e)return;sv.querySelector(`.ed[data-id="${id}"]`)?.classList.add("on");
+    vizPanel(`<div class="spread"><span class="tiny muted">${esc(e.stage||"")} · ${esc(e.date||"")}</span>${xBtn}</div><b class="vp-t">${esc(entryTitle(e))}</b><div class="row"><button class="btn sm" data-act="open-entry" data-id="${id}">打開這篇</button></div>`)}}
+/* recap */
+let recap=null;
+function recapData(){
+  const now=new Date(),ym=`${now.getFullYear()}-${pad(now.getMonth()+1)}`;
+  let es=entries().filter(e=>(e.date||"").startsWith(ym)&&e.type!=="letter"),label=`${now.getMonth()+1} 月`,from=ym+"-01";
+  if(es.length<3){const c=new Date();c.setDate(c.getDate()-30);from=`${c.getFullYear()}-${pad(c.getMonth()+1)}-${pad(c.getDate())}`;es=entries().filter(e=>(e.date||"")>=from&&e.type!=="letter");label="最近 30 天"}
+  if(es.length<2)return null;
+  const cnt=a=>{const m=new Map();a.forEach(x=>m.set(x,(m.get(x)||0)+1));return [...m.entries()].sort((x,y)=>y[1]-x[1])};
+  const th=cnt(es.flatMap(e=>(e.themes||[]).filter(t=>S.themes.has(t))))[0];
+  const pp=cnt(es.flatMap(e=>(e.people||[]).filter(x=>S.people.has(x))))[0];
+  const emo=cnt(es.flatMap(e=>e.analysis?.chain?.emotion||[])).slice(0,9);
+  const pEmo=pp?cnt(es.filter(e=>(e.people||[]).includes(pp[0])).flatMap(e=>e.analysis?.chain?.emotion||[]))[0]:null;
+  const fromMs=new Date(from+"T00:00:00").getTime();
+  const ms=cnt(steps().filter(x=>x.status==="done"&&(x.doneAt||0)>=fromMs&&methodById(x.methodId)).map(x=>x.methodId));
+  const bestM=steps().filter(x=>x.status==="done"&&(x.doneAt||0)>=fromMs&&x.help>=3&&methodById(x.methodId)).sort((a,b)=>b.help-a.help)[0];
+  const q=[...S.quotes.values()].filter(x=>x.status!=="candidate"&&(x.date||"")>=from).sort((a,b)=>String(b.date||"").localeCompare(String(a.date||"")))[0];
+  const said=es.filter(e=>e.said).sort((a,b)=>(b.date||"").localeCompare(a.date||""))[0];
+  const quote=q?{text:q.text,src:"你寫下的話"}:said?{text:said.said,src:"諮商時印象最深的一句"}:null;
+  return {label,n:es.length,ss:es.filter(e=>e.type==="session").length,days:new Set(es.map(e=>e.date)).size,
+    theme:th&&{id:th[0],name:tName(th[0]),n:th[1]},person:pp&&{id:pp[0],name:pName(pp[0]),rel:S.people.get(pp[0])?.relation||"",n:pp[1],emo:pEmo&&pEmo[0]},
+    emo,method:bestM?{name:methodById(bestM.methodId).name,help:bestM.help,ref:bestM.reflection||"",n:ms.find(x=>x[0]===bestM.methodId)?.[1]||1}:null,quote}}
+function recapSlides(d){const sl=[];
+  sl.push(["c0",`<p class="rc-k">${d.label}的心路</p><h2 class="rc-big">${d.n}<small> 篇紀錄</small></h2><p class="rc-p">${d.ss?`其中 ${d.ss} 次是諮商。`:""}有 ${d.days} 天，你停下來看看自己。</p><p class="rc-hint">點右邊看下一張</p>`]);
+  if(d.theme)sl.push(["c1",`<p class="rc-k">最常出現的課題</p><h2 class="rc-name">${esc(d.theme.name)}</h2><p class="rc-p">出現了 ${d.theme.n} 次。它反覆出現，代表這件事對你很重要，值得慢慢看懂。</p>`]);
+  if(d.person)sl.push(["c2",`<p class="rc-k">最常出現在紀錄裡的人</p><h2 class="rc-name">${esc(d.person.name)}</h2><p class="rc-p">${d.person.rel?esc(d.person.rel)+"，":""}出現在 ${d.person.n} 篇紀錄裡${d.person.emo?`，最常伴隨的感受是「${esc(d.person.emo[0])}」`:""}。</p>`]);
+  if(d.emo.length){const mx=d.emo[0][1];sl.push(["c3",`<p class="rc-k">這段時間的感受</p><div class="rc-cloud">${d.emo.map(([w,n],i)=>`<span style="font-size:${(18+22*n/mx).toFixed(0)}px;--i:${i}">${esc(w)}</span>`).join("")}</div><p class="rc-p">每一種感受都有它的理由，不需要分好壞。</p>`])}
+  if(d.method)sl.push(["c4",`<p class="rc-k">對你最有幫助的方法</p><h2 class="rc-name">${esc(d.method.name)}</h2><p class="rc-p">你做了 ${d.method.n} 次，覺得「${HELPW[d.method.help-1]}」。${d.method.ref?`<br>你發現：${esc(d.method.ref)}`:""}</p>`]);
+  if(d.quote)sl.push(["c5",`<p class="rc-k">${d.quote.src}</p><blockquote class="rc-q">「${esc(d.quote.text)}」</blockquote>`]);
+  sl.push(["c6",recap&&recap.img?`<p class="rc-k">長按圖片，存到相簿</p><img class="rc-img" src="${recap.img}" alt="心路回顧圖片"><div class="row rc-ui"><button class="btn" data-act="recap-dl">下載圖片</button><button class="btn ghost" data-act="recap-reimg">重新選擇內容</button></div>`
+    :`<p class="rc-k">下個月，想多照顧自己哪一點？</p><h2 class="rc-name" style="font-size:26px">把這段時間收成一張圖</h2><div class="rc-opts rc-ui">${[["theme","最常出現的課題",d.theme,1],["person","最常出現的人（名字會出現在圖上）",d.person,0],["emo","這段時間的感受",d.emo.length,1],["method","最有幫助的方法",d.method,1],["quote","那一句話",d.quote,1]].filter(x=>x[2]).map(([k,l,_,on])=>`<label><input type="checkbox" data-rk="${k}" ${(recap.opt[k]??on)?"checked":""}>${l}</label>`).join("")}</div><div class="rc-ui"><button class="btn" data-act="recap-img">做成圖片</button></div>`]);
+  return sl}
+function drawRecap(){const r=$("#photoRoot");if(!recap){r.innerHTML="";return}const sl=recapSlides(recap.d),i=Math.min(recap.i,sl.length-1);recap.i=i;
+  r.innerHTML=`<div class="recap ${sl[i][0]}" role="dialog" aria-label="心路回顧"><div class="rc-bars">${sl.map((_,k)=>`<i class="${k<i?"done":k===i?"on":""}"></i>`).join("")}</div><button type="button" class="rc-x" data-act="recap-close" aria-label="關閉">×</button>
+   <button type="button" class="rc-prev" data-act="recap-go" data-d="-1" aria-label="上一張"></button><button type="button" class="rc-next" data-act="recap-go" data-d="1" aria-label="下一張"></button><div class="rc-slide" key="${i}">${sl[i][1]}</div></div>`}
+function recapCanvas(){const d=recap.d,o=recap.opt,W=1080,H=1350,c=document.createElement("canvas");c.width=W;c.height=H;const x=c.getContext("2d");
+  const g=x.createLinearGradient(0,0,W,H);g.addColorStop(0,"#151a3a");g.addColorStop(.55,"#2a2357");g.addColorStop(1,"#4a2a4f");x.fillStyle=g;x.fillRect(0,0,W,H);
+  const R=rng(3);for(let i=0;i<120;i++){x.globalAlpha=R()*.6+.1;x.fillStyle="#dfe4ff";x.beginPath();x.arc(R()*W,R()*H,R()*2.2+.4,0,7);x.fill()}x.globalAlpha=1;
+  const SER='"Noto Serif TC","Songti TC","PingFang TC",serif',SAN='"PingFang TC","Noto Sans TC",system-ui,sans-serif';
+  const wrap=(t,X,Y,mw,lh,max)=>{let line="",n=0;for(const ch of String(t)){if(x.measureText(line+ch).width>mw){x.fillText(line,X,Y);Y+=lh;line=ch;if(++n>=max-1){line=line+"…";break}}else line+=ch}x.fillText(line,X,Y);return Y+lh};
+  let y=150;x.fillStyle="#b9c0f5";x.font=`500 34px ${SAN}`;x.fillText("我的心路",90,y);y+=90;
+  x.fillStyle="#ffffff";x.font=`700 76px ${SER}`;x.fillText(`${d.label}`,90,y);y+=70;
+  x.fillStyle="#d7dbf7";x.font=`400 34px ${SAN}`;y=wrap(`寫了 ${d.n} 篇${d.ss?`，諮商 ${d.ss} 次`:""}，有 ${d.days} 天停下來看看自己`,90,y,900,50,2)+40;
+  const block=(k,v,col)=>{if(y>H-200)return;x.fillStyle="#9aa3dc";x.font=`500 28px ${SAN}`;x.fillText(k,90,y);y+=64;x.fillStyle=col;x.font=`700 50px ${SER}`;y=wrap(v,90,y,900,64,2)+34};
+  if(o.theme!==false&&d.theme)block("最常出現的課題",d.theme.name,"#c3c9ff");
+  if(o.person&&d.person)block("最常出現的人",d.person.name,"#ffb4a3");
+  if(o.emo!==false&&d.emo.length)block("這段時間的感受",d.emo.slice(0,4).map(e=>e[0]).join("、"),"#ffe0a3");
+  if(o.method!==false&&d.method)block("最有幫助的方法",d.method.name,"#9fe6cf");
+  if(o.quote!==false&&d.quote&&y<H-260){x.fillStyle="#ffffff";x.font=`500 40px ${SER}`;y=wrap(`「${d.quote.text}」`,90,y+10,900,62,4)}
+  x.fillStyle="#8e96cf";x.font=`400 26px ${SAN}`;x.fillText("心路 · 看見自己反覆發生的事",90,H-80);
+  return c}
+async function saveImage(blob,name){if(typeof dls!=="undefined"&&dls){try{await dls.save({filename:name,data:blob});toast("已存成圖片");return}catch(e){if(e&&e.code==="declined")return}}
+  const u=URL.createObjectURL(blob);const a=document.createElement("a");a.href=u;a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(u);a.remove()},2000)}
+function recapCard(){const d=recapData();if(!d)return "";return `<button type="button" class="recap-btn" data-act="recap"><span class="rb-orb" aria-hidden="true"></span><span><b>看看${d.label}的心路</b><small>${d.n} 篇紀錄，整理成幾張卡片</small></span><span aria-hidden="true">→</span></button>`}
+/* save ritual */
+function starRitual(text){
+  if(matchMedia("(prefers-reduced-motion: reduce)").matches)return;
+  const t=String(text||"").replace(/\s+/g," ").trim().slice(0,80);if(!t)return;
+  const r=$("#photoRoot");r.innerHTML=`<div class="ritual2" data-act="rt-skip" role="status" aria-label="已儲存"><div class="rt-text">${[...t].map(c=>`<span>${esc(c)}</span>`).join("")}</div><div class="rt-star"></div><p class="rt-msg">這一刻，收進了你的星空</p></div>`;
+  const box=r.querySelector(".ritual2"),W=innerWidth/2,H=innerHeight/2;
+  box.querySelectorAll(".rt-text span").forEach((sp,i)=>{const b=sp.getBoundingClientRect();sp.style.setProperty("--dx",(W-b.left-b.width/2).toFixed(0)+"px");sp.style.setProperty("--dy",(H-b.top-b.height/2).toFixed(0)+"px");sp.style.setProperty("--d",(.45+Math.random()*.7+i*.004).toFixed(2)+"s")});
+  setTimeout(()=>box.classList.add("gather"),1900);
+  setTimeout(()=>{box.classList.add("out");setTimeout(()=>{if(box.isConnected)r.innerHTML=""},700)},4300)}
+
 /* ---------------- home ---------------- */
 function vHome(){
   const d=new Date(),h=d.getHours();
@@ -1303,6 +1522,7 @@ function vHome(){
   <div class="hello"><p class="date">${d.getMonth()+1} 月 ${d.getDate()} 日 星期${"日一二三四五六"[d.getDay()]}</p><h1>${hello}</h1></div>
   ${homeInsight()}
   ${quickNudge()}
+  ${recapCard()}
   <button type="button" class="hero-write" data-act="new" data-type="journal"><span><i>寫下此刻</i><b>${esc(promptOfDay())}</b></span><span class="hw-go" aria-hidden="true">→</span></button>
   <div class="actions three">
     <button type="button" class="action session" data-act="new" data-type="session"><i>諮商</i><b>記錄諮商</b></button>
@@ -1438,7 +1658,9 @@ const mcardH=m=>`<button type="button" class="mcard" data-act="open-method" data
 /* ---------------- map + journey ---------------- */
 let mapStage="all", showEntries=false, selNode=null;
 function vMap(){
-  const seg=`<div class="seg"><button type="button" data-act="mapmode" data-m="net" aria-pressed="${mapMode==="net"}">心智網絡</button><button type="button" data-act="mapmode" data-m="journey" aria-pressed="${mapMode==="journey"}">旅程</button><button type="button" data-act="mapmode" data-m="review" aria-pressed="${mapMode==="review"}">回顧</button></div>`;
+  const seg=`<div class="seg"><button type="button" data-act="mapmode" data-m="net" aria-pressed="${mapMode==="net"}">網絡</button><button type="button" data-act="mapmode" data-m="sky" aria-pressed="${mapMode==="sky"}">星空</button><button type="button" data-act="mapmode" data-m="rings" aria-pressed="${mapMode==="rings"}">年輪</button><button type="button" data-act="mapmode" data-m="journey" aria-pressed="${mapMode==="journey"}">旅程</button><button type="button" data-act="mapmode" data-m="review" aria-pressed="${mapMode==="review"}">回顧</button></div>`;
+  if(mapMode==="sky")return `<section class="view">${statusNote()}<div class="head spread"><h1>地圖</h1>${seg}</div>${vSky()}</section>`;
+  if(mapMode==="rings")return `<section class="view">${statusNote()}<div class="head spread"><h1>地圖</h1>${seg}</div>${vRings()}</section>`;
   if(mapMode==="journey")return `<section class="view">${statusNote()}<div class="head spread"><h1>地圖</h1>${seg}</div>${vJourney()}</section>`;
   if(mapMode==="review")return `<section class="view">${statusNote()}<div class="head spread"><h1>地圖</h1>${seg}</div>${vReview()}</section>`;
   return `<section class="view">${statusNote()}<div class="head spread"><h1>地圖</h1>${seg}</div>
@@ -2233,6 +2455,18 @@ document.addEventListener("click",async ev=>{
    case"pstage":peopleStage=t.dataset.s;render();break;
    case"mstage":mapStage=t.dataset.s;selNode=null;G=null;render();break;
    case"mapmode":mapMode=t.dataset.m;render();break;
+   case"sky-star":skySelect("e",id);break;
+   case"sky-con":if(!$("#sky")){view="map";mapMode="sky";render()}skySelect("con",id);break;
+   case"ring-person":ringSelect("p",id);break;
+   case"ring-entry":ringSelect("e",id);break;
+   case"viz-clear":vizClear();break;
+   case"rt-skip":$("#photoRoot").innerHTML="";break;
+   case"recap":{const d=recapData();if(!d)break;recap={d,i:0,opt:{},img:""};drawRecap();break}
+   case"recap-close":recap=null;drawRecap();break;
+   case"recap-go":{const n=recapSlides(recap.d).length;const ni=recap.i+ +t.dataset.d;if(ni>=n){recap=null;drawRecap();break}recap.i=Math.max(0,ni);drawRecap();break}
+   case"recap-img":{document.querySelectorAll("[data-rk]").forEach(c=>recap.opt[c.dataset.rk]=c.checked);recap.img=recapCanvas().toDataURL("image/png");drawRecap();break}
+   case"recap-reimg":recap.img="";drawRecap();break;
+   case"recap-dl":{const c=recapCanvas();c.toBlob(b=>{if(b)saveImage(b,`心路回顧-${today()}.png`)},"image/png");break}
    case"journey":view="map";mapMode="journey";local.set("xinlu-view","map");render();window.scrollTo(0,0);break;
    case"zoom":zoomAt(+t.dataset.z);break;
    case"examples":await loadExamples();break;
@@ -2341,7 +2575,7 @@ document.addEventListener("click",async ev=>{
      if(!e.date)e.date=today();const fromPrep=e.fromPrep;delete e.fromPrep;await put("entries",e);
      if(fromPrep)await put("meta",{id:"prep"});
      for(const m of sheet.removed||[])delMedia(m);sheet.newMedia=[];
-     const then=t.dataset.then;sheet={kind:"entry",id:e.id};drawSheet();toast("已儲存");if(then==="analyze")analyze(e.id);break}
+     const then=t.dataset.then;sheet={kind:"entry",id:e.id};drawSheet();if(!old&&e.type!=="letter"&&then!=="analyze")starRitual(e.type==="session"?(e.said||e.talk||e.feel):e.text);else toast("已儲存");if(then==="analyze")analyze(e.id);break}
    /* person sheet */
    case"pp-stage":{capturePD();const d=sheet.pd;const l=d.stages=d.stages||[];const i=l.indexOf(t.dataset.s);i>=0?l.splice(i,1):l.push(t.dataset.s);drawSheet();break}
    case"save-person":{capturePD();const d=sheet.pd;d.name=d.name.trim();d.relation=(d.relation||"").trim();if(!d.name){toast("請輸入名字或稱呼");break}const curP=d.id&&S.people.get(d.id);if(curP)d.unsaid=curP.unsaid||[];
