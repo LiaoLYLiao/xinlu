@@ -668,6 +668,20 @@ details.more[open]>summary{margin-bottom:6px}
 .ei-grid b{font-family:var(--f-display);font-size:17px;color:var(--method)}
 .ei-grid span{font-size:12.5px;line-height:1.6}
 @media (max-width:420px){.ei-grid{grid-template-columns:1fr}}
+
+/* ===== good times ===== */
+.tonebadge{justify-self:start;font-size:12px;padding:3px 10px;border-radius:999px;background:var(--raise);color:var(--muted);border:1px solid var(--line)}
+.tonebadge.good{background:color-mix(in srgb,var(--m5) 20%,transparent);color:var(--m5);border-color:color-mix(in srgb,var(--m5) 45%,transparent)}
+.tonebadge.mixed{color:var(--theme)}
+.ana.sunny{background:linear-gradient(170deg,color-mix(in srgb,var(--m5) 10%,var(--surface)),var(--surface) 55%)}
+.srcchip{display:inline-block;font-size:13px;padding:3px 10px;margin:2px 4px 2px 0;border-radius:999px;background:color-mix(in srgb,var(--m5) 18%,transparent);color:var(--m5)}
+.needbox.keepbox{background:linear-gradient(135deg,color-mix(in srgb,var(--m5) 16%,var(--raise)),var(--raise));border-color:color-mix(in srgb,var(--m5) 45%,var(--line))}
+.needbox.keepbox .label,.needbox.srcbox .label{color:var(--m5)}
+.needbox.keepbox p:not(.label){font-family:var(--f-display);font-size:18px;line-height:1.6}
+.insight.sunny{background:radial-gradient(120% 140% at 100% 0%,color-mix(in srgb,var(--m5) 26%,transparent),transparent 60%),radial-gradient(90% 120% at 0% 100%,color-mix(in srgb,var(--person) 14%,transparent),transparent 60%),var(--surface);border-color:color-mix(in srgb,var(--m5) 40%,var(--line))}
+.insight.sunny .label,.insight.sunny .ins-n b{color:var(--m5)}
+.dchip{font-size:12px;padding:2px 9px;border-radius:999px;border:0;background:color-mix(in srgb,var(--m5) 18%,transparent);color:var(--m5);cursor:pointer;font-family:inherit}
+.psun{font-size:13px;color:var(--m5)}
 </style>
 </head>
 <body>
@@ -721,6 +735,16 @@ const EVID={strong:["多項統合分析支持","var(--ok)"],mid:["有實驗或�
 
 /* ---------- research library ---------- */
 const RESEARCH=[
+ {id:"R43",area:"順境",ev:"mid",cite:"Gable、Reis、Impett & Asher（2004），Journal of Personality and Social Psychology",title:"把好事說出來，好心情會加倍",
+  finding:"四個研究（包括 154 位大學生的日記、89 對夫妻的每日紀錄）：把自己遇到的好事告訴別人的那幾天，正向情緒和生活滿意度更高，而且超出那件好事本身帶來的效果。如果聽的人熱情、投入地回應，好處更大。",
+  meaning:"順境不只要經歷，也值得被說出來。分享一件好事，是讓它在你心裡停留更久的方法。",limits:"多數是相關研究，大部分參與者是美國大學生和伴侶。",url:"https://www.sas.rochester.edu/psy/people/faculty/reis_harry/assets/pdf/GableReisImpettAsher_2004.pdf"},
+ {id:"R44",area:"順境",ev:"mid",cite:"Gable、Gonzaga & Strachman（2006），Journal of Personality and Social Psychology",title:"關係的品質，看你怎麼回應對方的好消息",
+  finding:"79 對情侶輪流談一件最近的好事和一件壞事，並錄影觀察。對方怎麼回應「好消息」，比怎麼回應「壞消息」，更能預測這段關係的品質，以及兩個月後是否分手。",
+  meaning:"我們常以為「在對方難過時陪伴」最重要；其實在對方開心時真心替他高興，同樣是在灌溉關係。",limits:"樣本是交往中的情侶，追蹤時間只有兩個月。",url:"https://pubmed.ncbi.nlm.nih.gov/17059309/"},
+ {id:"R45",area:"順境",ev:"mid",cite:"Jose、Lim & Bryant（2012），The Journal of Positive Psychology",title:"好事要經過「品味」，才會變成好心情",
+  finding:"101 人連續 30 天每天回報：遇到好事的那天心情比較好，而其中大約一半的效果，是透過「品味」（停下來感受、享受這件好事）達成的。習慣淡化好事的人（例如想「這沒什麼」），好心情比較少。",
+  meaning:"順境來的時候，停一下、讓自己真的感覺到它，比急著往下一件事走更重要。",limits:"是相關研究，樣本以紐西蘭大學生為主。",url:"https://static1.squarespace.com/static/5deab5a49f9b232bd0dea919/t/5f07b4672a781d01ba91eaea/1594340457141/Does+savoring+increase+happiness+A+daily+diary+study.pdf"},
+
  {id:"R32",area:"正能量",ev:"strong",cite:"Carr 等（2021），The Journal of Positive Psychology",title:"正向心理練習的整體效果",
   finding:"整合 347 個研究、超過 72,000 人、41 個國家。正向心理練習（例如感恩、品味、善意、運用優勢）平均約 6 週、10 次，能提升幸福感（g = 0.39）、優勢與生活品質，也能降低憂鬱（g = −0.39）、焦慮（g = −0.62）和壓力（g = −0.58），效果在三個月後仍在。組合多種練習、持續較久的效果更好。",
   meaning:"正能量不是天生的個性，是可以練習的。一次做一點點，持續下去，累積起來就有差別。",limits:"各研究的做法差異很大；效果屬於小到中等，不是萬靈丹。",url:"https://stafforini.com/works/carr-2021-effectiveness-of-positive/"},
@@ -887,6 +911,15 @@ const METHODS=[
   what:"回想自己做得好的時刻，找出背後的優勢，再在這週刻意多用一次。",
   steps:["回想三個「我做得不錯」的時刻，大小都可以","問自己：那時候我用了什麼特質？例如耐心、好奇、幽默、細心、勇氣","把重複出現的特質圈起來，那可能就是你的優勢","想一個這週可以用到它的新方式","做完後在日記寫下感覺"]},
 
+ {id:"n_share",cat:"energy",ev:"mid",refs:["R43","R45"],name:"分享一件好消息",when:"有一件開心、順利的事發生時",
+  what:"把好事說給一個在乎你的人聽。說出來的好事，會在心裡停留得更久。",
+  steps:["選一件今天發生的好事，大小都可以","想一個會真心替你高興的人","具體說出發生了什麼、你當時的感覺","留意對方的回應，和你心裡的變化","在日記寫下：今天我分享的好事是……"]},
+ {id:"n_acr",cat:"energy",ev:"mid",refs:["R44","R43"],name:"熱情接住別人的好消息",when:"身邊的人跟你分享一件開心的事",
+  what:"別人分享好事時，真心替他高興、多問一點細節，是讓關係變好的關鍵時刻。",
+  steps:["放下手邊的事，看著對方","說出你的感受：「真的嗎？太好了！」","多問一兩個問題：當時怎麼發生的？你感覺怎麼樣？","讓對方多說一點，不急著轉到自己的事","之後再提起一次：「上次那件事後來怎麼樣？」"]},
+ {id:"n_credit",cat:"energy",ev:"theory",refs:["R45","R40"],name:"看見自己的功勞",when:"事情順利，卻習慣說「只是運氣好」",
+  what:"順利的事通常有你的一份努力。看見它，下次就知道怎麼再做一次。",
+  steps:["寫下最近一件順利的事","問自己：這件事裡，我做了哪些選擇或努力？","寫下至少一個你自己的貢獻，再寫一個別人的幫忙","對自己說：「這有我的功勞」","想一想：下次可以怎麼再創造一次類似的時刻？"]},
  /* ritual */
  {id:"r_tear",cat:"ritual",ev:"mid",refs:["R01"],name:"寫下、撕掉、數到十",when:"失落、被拒絕、事情已經無法挽回時",
   what:"把此刻的感受畫下來或寫下來，然後用一個固定的動作結束它。",
@@ -1078,7 +1111,7 @@ function loadWeekly(){fetch("weekly.json",{cache:"no-cache"}).then(r=>r.ok?r.jso
 let installEvt=null;
 addEventListener("beforeinstallprompt",e=>{e.preventDefault();installEvt=e;schedule()});
 if("serviceWorker" in navigator&&location.protocol==="https:")navigator.serviceWorker.register("sw.js").catch(()=>{});
-const APP_VER="2026.11.14-4";
+const APP_VER="2026.11.19-1";
 async function checkUpdate(){try{const r=await fetch("version.json?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.json()).v;
   if(v&&v!==APP_VER&&!$("#updBar")){const b=document.createElement("button");b.id="updBar";b.className="updbar";b.textContent="有新版本，點這裡更新";b.onclick=()=>{b.textContent="更新中……";location.reload()};document.body.appendChild(b)}}catch(e){}}
 setTimeout(checkUpdate,1500);document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
@@ -1347,7 +1380,7 @@ function assistantPrompt(){
 
 【存回心路】
 當使用者說「存成心路格式」時，只輸出一個 JSON 物件（可以放在程式碼區塊裡），格式如下，讓他貼回心路 App：
-{"xinlu":1,"date":"YYYY-MM-DD","text":"使用者這篇日記的原文","analysis":{"summary":"一句話核心（20字內）","chain":{"event":"","thought":"","emotion":[""],"body":"","behavior":""},"need":"","bright":"","people":[{"name":"","relation":"","stage":"童年|青少年|成年|現在|未知","role":""}],"themes":[{"name":"","why":""}],"pattern":"","methods":[{"id":"方法庫裡的 id","why":""}],"questions":[""],"risk":false}}
+{"xinlu":1,"date":"YYYY-MM-DD","text":"使用者這篇日記的原文","analysis":{"summary":"一句話核心（20字內）","chain":{"event":"","thought":"","emotion":[""],"body":"","behavior":""},"tone":"good|hard|mixed","need":"","bright":"","sources":[],"keep":"","people":[{"name":"","relation":"","stage":"童年|青少年|成年|現在|未知","role":""}],"themes":[{"name":"","why":""}],"pattern":"","methods":[{"id":"方法庫裡的 id","why":""}],"questions":[""],"risk":false}}
 risk 只有在出現自傷、自殺念頭或立即危險時才設為 true。`}
 function knowledgeMD(){
   const L=["# 心路方法庫與研究庫","","給「心路助手」參考的知識檔。方法的 id 用於「存成心路格式」。","","## 方法庫",""];
@@ -1421,7 +1454,7 @@ const VIEWS=[["home","今天",'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M1
  ["people","人物",'<circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c.8-3.4 3-5 5.5-5s4.7 1.6 5.5 5"/><circle cx="17" cy="9" r="2.4"/><path d="M15.5 14.2c2.4-.3 4.3 1.2 5 4.3"/>'],
  ["methods","方法",'<path d="M12 3l2.6 5.4 5.9.8-4.3 4.1 1 5.8L12 16.4 6.8 19.1l1-5.8L3.5 9.2l5.9-.8z"/>']];
 let view=local.get("xinlu-view","home");if(!VIEWS.some(v=>v[0]===view)&&view!=="about")view="home";
-let mapMode="net", logFilter="all", logQuery="", methodCat="all", peopleStage="all";
+let mapMode="net", logFilter="all", logTone="all", logQuery="", methodCat="all", peopleStage="all";
 $("#topnav").innerHTML=VIEWS.map(v=>`<button type="button" data-view="${v[0]}">${v[1]}</button>`).join("");
 $("#tabs").innerHTML=VIEWS.map(v=>`<button type="button" data-view="${v[0]}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${v[2]}</svg>${v[1]}</button>`).join("");
 function go(v){view=v;local.set("xinlu-view",v);render();window.scrollTo(0,0)}
@@ -1465,7 +1498,7 @@ function homeInsight(){
     return `<div class="insight empty"><span class="label">反覆出現的</span><p class="ins-empty">整理過幾篇紀錄後，這裡會告訴你，什麼在你心裡反覆出現、常和誰有關。</p>${nu?`<div><button class="btn sm" data-act="batch" data-scope="all">整理 ${nu} 篇紀錄</button></div>`:""}</div>`}
   const all=r.ps.length&&r.ps[0][1]===r.n;
   return `<div class="insight" role="button" tabindex="0" data-act="open-theme" data-id="${r.tid}">
-   <span class="label">${r.scope}反覆出現的</span>
+   <span class="label">${r.scope}反覆出現的課題</span>
    <div class="ins-head"><h2>${esc(tName(r.tid))}</h2><span class="ins-n"><b>${r.n}</b>次</span></div>
    ${r.ps.length||r.emo.length?`<p class="ins-p">${r.ps.length?`${all?"每次都和":"最常和"} ${r.ps.map(x=>`<em>${esc(pName(x[0]))}</em>`).join("、")} 有關`:""}${r.ps.length&&r.emo.length?"，":""}${r.emo.length?`常伴隨著${r.emo.map(esc).join("、")}`:""}。</p>`:""}
    ${r.need?`<p class="ins-need">背後可能在渴望：${esc(r.need)}</p>`:""}
@@ -1589,11 +1622,13 @@ function recapData(){
   const q=[...S.quotes.values()].filter(x=>x.status!=="candidate"&&(x.date||"")>=from).sort((a,b)=>String(b.date||"").localeCompare(String(a.date||"")))[0];
   const said=es.filter(e=>e.said).sort((a,b)=>(b.date||"").localeCompare(a.date||""))[0];
   const quote=q?{text:q.text,src:"你寫下的話"}:said?{text:said.said,src:"諮商時印象最深的一句"}:null;
-  return {label,n:es.length,ss:es.filter(e=>e.type==="session").length,days:new Set(es.map(e=>e.date)).size,
+  const gs=es.filter(isGood),gsrc=cnt(gs.flatMap(e=>e.analysis?.sources||[]))[0];
+  return {label,good:gs.length,goodSrc:gsrc?gsrc[0]:"",n:es.length,ss:es.filter(e=>e.type==="session").length,days:new Set(es.map(e=>e.date)).size,
     theme:th&&{id:th[0],name:tName(th[0]),n:th[1]},person:pp&&{id:pp[0],name:pName(pp[0]),rel:S.people.get(pp[0])?.relation||"",n:pp[1],emo:pEmo&&pEmo[0]},
     emo,method:bestM?{name:methodById(bestM.methodId).name,help:bestM.help,ref:bestM.reflection||"",n:ms.find(x=>x[0]===bestM.methodId)?.[1]||1}:null,quote}}
 function recapSlides(d){const sl=[];
   sl.push(["c0",`<p class="rc-k">${d.label}的心路</p><h2 class="rc-big">${d.n}<small> 篇紀錄</small></h2><p class="rc-p">${d.ss?`其中 ${d.ss} 次是諮商。`:""}有 ${d.days} 天，你停下來看看自己。</p><p class="rc-hint">點右邊看下一張</p>`]);
+  {const g=d.good||0;if(g)sl.push(["c4",`<p class="rc-k">這段時間的順境</p><h2 class="rc-big">${g}<small> 個好時光</small></h2><p class="rc-p">${d.goodSrc?`你的好，常常來自「${esc(d.goodSrc)}」。`:""}順境不是理所當然，它們值得被記住。</p>`])}
   if(d.theme)sl.push(["c1",`<p class="rc-k">最常出現的課題</p><h2 class="rc-name">${esc(d.theme.name)}</h2><p class="rc-p">出現了 ${d.theme.n} 次。它反覆出現，代表這件事對你很重要，值得慢慢看懂。</p>`]);
   if(d.person)sl.push(["c2",`<p class="rc-k">最常出現在紀錄裡的人</p><h2 class="rc-name">${esc(d.person.name)}</h2><p class="rc-p">${d.person.rel?esc(d.person.rel)+"，":""}出現在 ${d.person.n} 篇紀錄裡${d.person.emo?`，最常伴隨的感受是「${esc(d.person.emo[0])}」`:""}。</p>`]);
   if(d.emo.length){const mx=d.emo[0][1];sl.push(["c3",`<p class="rc-k">這段時間的感受</p><div class="rc-cloud">${d.emo.map(([w,n],i)=>`<span style="font-size:${(18+22*n/mx).toFixed(0)}px;--i:${i}">${esc(w)}</span>`).join("")}</div><p class="rc-p">每一種感受都有它的理由，不需要分好壞。</p>`])}
@@ -1634,6 +1669,25 @@ function starRitual(text){
   setTimeout(()=>box.classList.add("gather"),1900);
   setTimeout(()=>{box.classList.add("out");setTimeout(()=>{if(box.isConnected)r.innerHTML=""},700)},4300)}
 
+
+/* ---------------- good times ---------------- */
+const toneOf=e=>{const t=e&&e.analysis&&e.analysis.tone;if(t)return t;if(e&&e.mood>=4)return "good";if(e&&e.mood&&e.mood<=2)return "hard";return ""};
+const isGood=e=>toneOf(e)==="good"||toneOf(e)==="mixed"&&e.mood>=4;
+function goodInsight(){
+  const g=entries().filter(e=>e.type!=="letter"&&isGood(e));if(g.length<2)return "";
+  const cnt=a=>{const m=new Map();a.forEach(x=>m.set(x,(m.get(x)||0)+1));return [...m.entries()].sort((x,y)=>y[1]-x[1])};
+  const ps=cnt(g.flatMap(e=>(e.people||[]).filter(x=>S.people.has(x)))).slice(0,3);
+  const src=cnt(g.flatMap(e=>e.analysis?.sources||[])).slice(0,3);
+  const ts=cnt(g.flatMap(e=>(e.themes||[]).filter(x=>S.themes.has(x)))).slice(0,2);
+  const keep=g.map(e=>e.analysis?.keep).filter(Boolean)[0];
+  return `<div class="insight sunny"><span class="label">你的順境</span>
+   <div class="ins-head"><h2>${g.length} 個好時光</h2><span class="ins-n"><b>☀</b></span></div>
+   ${ps.length?`<p class="ins-p">讓你充電的人：${ps.map(x=>`<button type="button" class="linkbtn" data-act="open-person" data-id="${x[0]}"><em>${esc(pName(x[0]))}</em></button>`).join("、")}</p>`:""}
+   ${src.length?`<p class="ins-p">你的好，常常來自：${src.map(x=>`<span class="srcchip">${esc(x[0])}</span>`).join("")}</p>`:""}
+   ${ts.length?`<p class="ins-p small">順境裡常出現的主題：${ts.map(x=>esc(tName(x[0]))).join("、")}</p>`:""}
+   ${keep?`<p class="ins-need">讓它多一點：${esc(keep)}</p>`:""}
+   <div class="ins-dates">${g.slice(0,6).map(e=>`<button type="button" class="dchip" data-act="open-entry" data-id="${e.id}">${fmtD(e.date)}</button>`).join("")}<span><button type="button" class="linkbtn" data-act="log-good">看全部 →</button></span></div></div>`}
+
 /* ---------------- home ---------------- */
 function streakDays(){const ds=new Set(entries().map(e=>e.date));let n=0;const d=new Date();if(!ds.has(today()))d.setDate(d.getDate()-1);for(;;){const k=`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;if(!ds.has(k))break;n++;d.setDate(d.getDate()-1)}return n}
 function homeRows(){
@@ -1654,7 +1708,7 @@ function homeRows(){
 const CHEERS=["今天也謝謝你，願意停下來看看自己。","不用每天都很好，願意面對自己，就已經很勇敢。","慢慢來也沒關係，你一直在往前。","你值得被好好對待，包括被你自己。","累的時候，休息也是一種前進。","每一次寫下來，都是在照顧自己。","今天只要做到一件小事，就夠了。","你比你以為的更有力量。","能感覺到難過，代表你很認真在生活。","有些日子是用來撐過去的，撐過去也很了不起。"];
 function cheer(){const es=entries(),n=es.length,d=new Date(),day=(d.getFullYear()*372+d.getMonth()*31+d.getDate());
   const wk=new Date();wk.setDate(wk.getDate()-6);const wkk=`${wk.getFullYear()}-${pad(wk.getMonth()+1)}-${pad(wk.getDate())}`;const w=es.filter(e=>(e.date||"")>=wkk).length;
-  const own=[n>=3&&`你已經寫下 ${n} 篇，每一篇都是你在照顧自己。`,w>=2&&`這一週，你停下來看了自己 ${w} 次。`,steps().filter(s=>s.status==="done").length&&`你已經完成 ${steps().filter(s=>s.status==="done").length} 次練習，一步一步，都算數。`].filter(Boolean);
+  const gn=es.filter(isGood).length;const own=[gn>=2&&`你已經收藏了 ${gn} 個好時光，它們都是真的。`,n>=3&&`你已經寫下 ${n} 篇，每一篇都是你在照顧自己。`,w>=2&&`這一週，你停下來看了自己 ${w} 次。`,steps().filter(s=>s.status==="done").length&&`你已經完成 ${steps().filter(s=>s.status==="done").length} 次練習，一步一步，都算數。`].filter(Boolean);
   const pool=[...own,...CHEERS];return pool[day%pool.length]}
 function todayPractice(){const l=allMethods().filter(m=>m.cat==="energy");if(!l.length)return "";const d=new Date(),m=l[(d.getFullYear()*372+d.getMonth()*31+d.getDate())%l.length];
   return `<div class="tp"><div class="spread"><p class="label">今天的小練習</p><button class="linkbtn" data-act="mcat-go" data-c="energy">更多正能量 →</button></div>
@@ -1718,11 +1772,12 @@ function vAbout(){
 /* ---------------- log ---------------- */
 function vLog(){
   const q=logQuery.trim();
-  const list=entries().filter(e=>logFilter==="all"||e.type===logFilter).filter(e=>!q||(entryTitle(e)+entryText(e)+(e.people||[]).map(pName).join("")).includes(q));
+  const list=entries().filter(e=>logFilter==="all"||e.type===logFilter).filter(e=>logTone==="all"||(logTone==="good"?isGood(e):toneOf(e)==="hard"||toneOf(e)==="mixed"&&!isGood(e))).filter(e=>!q||(entryTitle(e)+entryText(e)+(e.people||[]).map(pName).join("")).includes(q));
   return `<section class="view">${statusNote()}<div class="head spread"><div><h1>紀錄</h1><p class="muted">你寫過的每一篇，都收在這裡。可以搜尋、篩選，或匯入以前的日記。</p></div><div class="row"><button class="btn sm quiet" data-act="import-old">匯入舊日記</button><button class="btn sm quiet" data-act="paste-chat">從 AI 對話貼上</button></div></div>
   ${homeCalendar()}
   <div class="row"><div class="seg">${[["all","全部"],["journal","日記"],["session","諮商"],["letter","信"]].map(f=>`<button type="button" data-act="logf" data-f="${f[0]}" aria-pressed="${logFilter===f[0]}">${f[1]}</button>`).join("")}</div>
   <input class="search" id="logq" type="search" placeholder="搜尋內容或人物" value="${esc(logQuery)}" style="flex:1;min-width:180px"></div>
+  <div class="hscroll-row">${[["all","順境逆境都看"],["good","☀ 順境"],["hard","逆境"]].map(f=>`<button type="button" class="pick" data-act="logtone" data-f="${f[0]}" aria-pressed="${logTone===f[0]}">${f[1]}</button>`).join("")}</div>
   ${list.length?`<div class="elist">${list.map(rowEntry).join("")}</div>`:`<p class="muted">${entries().length?"沒有符合的紀錄。":"還沒有紀錄。從寫下第一篇開始吧。"}</p>`}
   </section>`}
 function mediaChip(e){const ms=e.media||[];if(!ms.length)return "";const ni=ms.filter(m=>m.kind==="image").length,na=ms.length-ni;return `<span class="chip s">${[ni?`照片 ${ni}`:"",na?`錄音 ${na}`:""].filter(Boolean).join(" · ")}</span>`}
@@ -1743,7 +1798,7 @@ function vPeople(){
   const card=p=>{const es=entriesOfPerson(p.id);const tc=new Map();es.forEach(e=>(e.themes||[]).forEach(t=>{if(S.themes.has(t))tc.set(t,(tc.get(t)||0)+1)}));const top=[...tc.entries()].sort((a,b)=>b[1]-a[1])[0];
     return `<button type="button" class="pcard" data-act="open-person" data-id="${p.id}"><span class="nm"><span class="av">${esc((p.name||"?").slice(0,1))}</span><span class="who"><b>${esc(p.name)}</b><span class="rel">${esc(p.relation||"")}${p.ex?" · 範例":""}</span></span><span class="pn"><b>${es.length}</b>篇</span></span>
      ${(p.stages||[]).length?`<span class="pst">${STAGES.map(s=>`<i class="${(p.stages||[]).includes(s)?"on":""}">${s}</i>`).join("")}</span>`:""}
-     ${top&&top[1]>=1?`<span class="ptheme">常和「${esc(tName(top[0]))}」一起出現</span>`:""}</button>`};
+     ${top&&top[1]>=1?`<span class="ptheme">常和「${esc(tName(top[0]))}」一起出現</span>`:""}${(()=>{const g=es.filter(isGood).length;return g?`<span class="psun">☀ ${g} 個好時光</span>`:""})()}</button>`};
   const sorted=ps.slice().sort((a,b)=>entriesOfPerson(b.id).length-entriesOfPerson(a.id).length);
   const stages=peopleStage==="all"?STAGES:[peopleStage];
   return `<section class="view">${statusNote()}<div class="head spread"><div><h1>人物</h1><p class="muted">在你的生命裡，對你影響深的人。</p></div><button class="btn sm" data-act="new-person">新增人物</button></div>
@@ -1797,7 +1852,7 @@ function vMap(){
   if(mapMode==="sky")return `<section class="view">${statusNote()}<div class="head spread"><h1>地圖</h1>${seg}</div>${vSky()}</section>`;
   if(mapMode==="rings")return `<section class="view">${statusNote()}<div class="head spread"><h1>地圖</h1>${seg}</div>${vRings()}</section>`;
   if(mapMode==="journey")return `<section class="view">${statusNote()}<div class="head spread"><h1>地圖</h1>${seg}</div>${vJourney()}</section>`;
-  if(mapMode==="review")return `<section class="view">${statusNote()}<div class="head spread"><h1>地圖</h1>${seg}</div>${homeInsight()}${vReview()}</section>`;
+  if(mapMode==="review")return `<section class="view">${statusNote()}<div class="head spread"><h1>地圖</h1>${seg}</div><p class="small muted">順境和逆境都是你的一部分。兩邊都看見，才是完整的你。</p>${goodInsight()}${homeInsight()}${vReview()}</section>`;
   return `<section class="view">${statusNote()}<div class="head spread"><h1>地圖</h1>${seg}</div>
   <div class="hscroll-row">${["all",...STAGES].map(s=>`<button type="button" class="pick" data-act="mstage" data-s="${s}" aria-pressed="${mapStage===s}">${s==="all"?"全部階段":s}</button>`).join("")}<label class="pick" style="display:inline-flex;gap:6px;align-items:center"><input type="checkbox" id="showE" ${showEntries?"checked":""} style="accent-color:var(--accent);margin:0">每篇紀錄</label></div>
   <div class="mapwrap big" id="mapwrap"><svg id="graph" role="img" aria-label="人物、課題與方法的關係圖"></svg>
@@ -1981,12 +2036,15 @@ function anaBlock(e){
   const ch=a.chain||{};
   const pend=!e.applied;
   const FL=[["事件",ch.event,"var(--entry)"],["想法",ch.thought,"var(--theme)"],["情緒",(ch.emotion||[]).length?`<span class="emos">${ch.emotion.map(x=>`<span>${esc(x)}</span>`).join("")}</span>`:"","var(--person)",1],["身體",ch.body,"var(--m5)"],["反應",ch.behavior,"var(--method)"]].filter(x=>x[1]);
-  return `<div class="ana${revealId===e.id?" reveal":""}">
+  const tone=a.tone||toneOf(e),sunny=tone==="good";
+  return `<div class="ana${revealId===e.id?" reveal":""}${sunny?" sunny":""}">${tone?`<span class="tonebadge ${tone}">${{good:"☀ 順境",hard:"逆境",mixed:"順逆交織"}[tone]}</span>`:""}
    <div class="spread"><h3>整理</h3>${e.ex?'<span class="badge ex">範例整理</span>':""}</div>
    ${a.risk?`<div class="risk"><b>你寫到的內容讓人擔心你現在的安全。</b><p class="small">如果你正在想傷害自己，或處在危險中，請現在就打電話：安心專線 1925、生命線 1995，緊急時撥 119。也請盡快告訴你的諮商師。</p></div>`:""}
    ${a.summary?`<p class="need">${esc(a.summary)}</p>`:""}
    ${FL.length?`<div class="flow">${FL.map((x,i)=>`<div class="fl" style="--i:${i};--c:${x[2]}"><span class="fl-dot"></span><div><b>${x[0]}</b><span>${x[3]?x[1]:esc(x[1])}</span></div></div>`).join("")}</div>`:""}
-   ${a.need?`<div class="needbox" style="--i:${FL.length}"><p class="label">背後的需要</p><p>${esc(a.need)}</p></div>`:""}
+   ${a.need?`<div class="needbox" style="--i:${FL.length}"><p class="label">${sunny?"這件事滿足了你的":"背後的需要"}</p><p>${esc(a.need)}</p></div>`:""}
+   ${(a.sources||[]).length?`<div class="needbox srcbox" style="--i:${FL.length}"><p class="label">這份好，從哪裡來</p><div class="row">${a.sources.map(x=>`<span class="srcchip">${esc(x)}</span>`).join("")}</div></div>`:""}
+   ${a.keep?`<div class="needbox keepbox" style="--i:${FL.length}"><p class="label">讓它多停留一點</p><p>${esc(a.keep)}</p><div class="row"><button class="btn sm" data-act="practice" data-id="n_savor" data-e="${e.id}">品味這個時刻</button><button class="btn sm ghost" data-act="practice" data-id="n_share" data-e="${e.id}">分享這件好事</button></div></div>`:""}
    ${a.bright?`<div class="needbox bright" style="--i:${FL.length}"><p class="label">你做得好的地方</p><p>${esc(a.bright)}</p></div>`:""}
    ${similarBlock(e,FL.length+1)}
    ${(a.themes||[]).length?`<div class="stack"><p class="label">可能的課題</p>${a.themes.map(t=>`<p class="small"><span class="chip t">${esc(t.name)}</span> ${esc(t.why||"")}</p>`).join("")}</div>`:""}
@@ -2012,8 +2070,9 @@ function applyBlock(e){
 
 /* ---- editor ---- */
 
-const WMODES=[["free","自由寫",null,"從一個畫面、一句話，或身體的感覺開始……"],["good","好事","今天有哪些事，讓你覺得還不錯？","今天讓我覺得還不錯的是……"],["thanks","感謝","今天想謝謝誰，或謝謝什麼？","我很感謝……，因為……"],["unload","卸下","有什麼放在心上，想先放下來？","現在心裡最重的是……"],["self","給自己","如果你是自己最好的朋友，會對今天的你說什麼？","親愛的自己，……"]];
-const WORDS={"開頭句":["今天讓我微笑的是","我很感謝","我做得不錯的是","我其實需要","讓我卡住的是","我想對自己說","如果明天可以更好一點，我想","我注意到自己"],
+const WMODES=[["free","自由寫",null,"從一個畫面、一句話，或身體的感覺開始……"],["win","順利","今天有什麼順利、值得高興的事？你在其中做了什麼？","今天順利的是……"],["good","好事","今天有哪些事，讓你覺得還不錯？","今天讓我覺得還不錯的是……"],["thanks","感謝","今天想謝謝誰，或謝謝什麼？","我很感謝……，因為……"],["unload","卸下","有什麼放在心上，想先放下來？","現在心裡最重的是……"],["self","給自己","如果你是自己最好的朋友，會對今天的你說什麼？","親愛的自己，……"]];
+const WORDS={"開頭句":["今天順利的是","我為自己高興的是","這份好來自","今天讓我微笑的是","我很感謝","我做得不錯的是","我其實需要","讓我卡住的是","我想對自己說","如果明天可以更好一點，我想","我注意到自己"],
+ "順境":["我做到了","有成就感","被肯定","被需要","很幸運","剛剛好","有默契","心滿意足","謝謝自己","努力有回報","比想像中順利","想再來一次"],
  "好的感受":["開心","平靜","放鬆","安心","感動","被理解","滿足","自在","有希望","踏實","溫暖","鬆了一口氣","好奇","驕傲","被支持"],
  "難受的感受":["委屈","焦慮","失落","生氣","疲憊","孤單","害怕","煩躁","無力","羞愧","受傷","失望","不被看見","有壓力","難過"],
  "身體":["胸口緊緊的","肩膀很重","呼吸變淺","胃糾在一起","頭脹脹的","喉嚨卡卡的","全身放鬆","心跳很快","手心冒汗","想哭"],
@@ -2283,8 +2342,11 @@ ${body}
 
 請只回覆一個 JSON 物件，放在 \`\`\`json 程式碼區塊裡，使用半形雙引號 "，欄位之間用逗號分隔，不要有其他文字。格式如下：
 {"summary":"一句話說出這篇的核心（20字內）",
+ "tone":"good（順境：開心、順利、被支持、有成就）| hard（逆境：難受、受挫、衝突）| mixed（兩者都有）",
  "chain":{"event":"發生了什麼（事實）","thought":"當下的想法","emotion":["情緒1","情緒2"],"body":"身體的反應，沒寫到就留空字串","behavior":"做了什麼或想做什麼"},
- "need":"這個反應背後，可能在保護或渴望的需要（一句話）",
+ "need":"逆境時：這個反應背後，可能在保護或渴望的需要；順境時：這件事滿足了你的什麼需要（一句話）",
+ "sources":["順境或混合時才填：這份好從哪裡來，從這些選 1 到 3 個：自己的努力、別人的支持、環境與時機、一份好運、長期的累積；逆境時給空陣列"],
+ "keep":"順境或混合時才填：怎麼讓這份好多停留一點、或下次再發生（1 到 2 句，具體可做）；逆境時留空字串",
  "bright":"這篇裡使用者做得好的地方、展現的力量或資源（1 到 2 句，要具體、真誠，引用他做的事，不要空泛誇獎）",
  "people":[{"name":"人物名","relation":"關係","stage":"童年|青少年|成年|現在|未知","role":"他在這件事裡的角色（一句話）"}],
  "themes":[{"name":"課題名稱","why":"為什麼這樣判斷（一句話）"}],
@@ -2297,13 +2359,14 @@ ${body}
 - people：只列文中具體出現的他人，不包含使用者自己；若和已知人物是同一人，name 必須和已知人物完全相同。
 - themes：1 到 3 個。優先沿用已知課題的名稱（完全相同）；新課題用 4 到 10 個字的中性描述，例如「害怕被否定」「界線難以說出口」「渴望被看見」。
 - methods：2 到 3 個，id 只能用方法庫裡的；依這篇的狀況選最合適的類別（例如人際衝突選人際與界線，反覆想同一件事選覺察想法或照顧身體，和童年有關的深層經驗可選處理過去）。
-- questions：2 到 3 個，具體、可以直接在諮商時問出口。
+- questions：2 到 3 個，具體、可以直接在諮商時問出口。順境時，問題要幫助使用者看見自己做對了什麼、怎麼延續，不要硬找問題。
+- 順境（good）的紀錄：不要把它當成需要解決的問題。chain 照樣描述（想法和情緒可以是正向的），methods 優先從「正能量」類別選（例如品味、分享好消息、看見自己的功勞）。
 - risk：只有在內容提到自傷、自殺念頭，或正處於被暴力傷害的立即危險時才設為 true。`}
 const asArr=v=>Array.isArray(v)?v:v&&typeof v==="object"?[v]:typeof v==="string"&&v.trim()?v.split(/[、，,]\s*/).length>1&&v.length<40?v.split(/[、，,]\s*/):[v]:[];
 function cleanAnalysis(a){
   if(!a||typeof a!=="object")throw{code:"invalid_json"};
   return{summary:String(a.summary||""),chain:a.chain&&typeof a.chain==="object"?{event:String(a.chain.event||""),thought:String(a.chain.thought||""),emotion:asArr(a.chain.emotion).map(String).slice(0,5),body:String(a.chain.body||""),behavior:String(a.chain.behavior||"")}:{},
-    need:String(a.need||""),bright:String(a.bright||""),people:asArr(a.people).slice(0,8).map(p=>({name:String(p&&p.name||"").trim(),relation:String(p&&p.relation||""),stage:String(p&&p.stage||""),role:String(p&&p.role||"")})).filter(p=>p.name),
+    need:String(a.need||""),bright:String(a.bright||""),tone:["good","hard","mixed"].includes(a.tone)?a.tone:"",sources:asArr(a.sources).map(String).filter(x=>x&&x.length<12).slice(0,3),keep:String(a.keep||""),people:asArr(a.people).slice(0,8).map(p=>({name:String(p&&p.name||"").trim(),relation:String(p&&p.relation||""),stage:String(p&&p.stage||""),role:String(p&&p.role||"")})).filter(p=>p.name),
     themes:asArr(a.themes).slice(0,3).map(t=>({name:String(t&&t.name||"").trim(),why:String(t&&t.why||"")})).filter(t=>t.name),
     pattern:String(a.pattern||""),methods:asArr(a.methods).map(m=>({id:String(m&&m.id||""),why:String(m&&m.why||"")})).filter(m=>methodById(m.id)).slice(0,3),
     questions:asArr(a.questions).map(String).slice(0,3),risk:a.risk===true,at:Date.now()}}
@@ -2614,6 +2677,8 @@ document.addEventListener("click",async ev=>{
    case"pstage":peopleStage=t.dataset.s;render();break;
    case"mstage":mapStage=t.dataset.s;selNode=null;G=null;render();break;
    case"mapmode":mapMode=t.dataset.m;render();break;
+   case"logtone":logTone=t.dataset.f;render();break;
+   case"log-good":view="log";logTone="good";logFilter="all";local.set("xinlu-view","log");render();window.scrollTo(0,0);break;
    case"sky-go":view="map";mapMode="sky";local.set("xinlu-view","map");render();window.scrollTo(0,0);break;
    case"mcat-go":view="methods";methodTab="methods";methodCat=t.dataset.c;local.set("xinlu-view","methods");render();window.scrollTo(0,0);break;
    case"sky-star":skySelect("e",id);break;
