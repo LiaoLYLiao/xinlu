@@ -1111,7 +1111,7 @@ function loadWeekly(){fetch("weekly.json",{cache:"no-cache"}).then(r=>r.ok?r.jso
 let installEvt=null;
 addEventListener("beforeinstallprompt",e=>{e.preventDefault();installEvt=e;schedule()});
 if("serviceWorker" in navigator&&location.protocol==="https:")navigator.serviceWorker.register("sw.js").catch(()=>{});
-const APP_VER="2026.11.19-1";
+const APP_VER="2026.11.19-2";
 async function checkUpdate(){try{const r=await fetch("version.json?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;const v=(await r.json()).v;
   if(v&&v!==APP_VER&&!$("#updBar")){const b=document.createElement("button");b.id="updBar";b.className="updbar";b.textContent="有新版本，點這裡更新";b.onclick=()=>{b.textContent="更新中……";location.reload()};document.body.appendChild(b)}}catch(e){}}
 setTimeout(checkUpdate,1500);document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate()});
@@ -1175,7 +1175,9 @@ function lenientJSON(src,start){
 function parseJSONLoose(s){
   const raw=String(s).replace(/```(?:json|JSON)?/g,"");
   const m=raw.replace(/[\u201C\u201D\u201E\u201F\uFF02]/g,'"').replace(/\u00A0/g," ");
-  const b=m.lastIndexOf("}");
+  const b=m.lastIndexOf("}"),a0=m.indexOf("{");
+  if(a0>=0&&b>a0){const c=m.slice(a0,b+1);for(const t of [c,c.replace(/,\s*([}\]])/g,"$1")]){try{const v=JSON.parse(t);if(v&&typeof v==="object"&&!Array.isArray(v))return v}catch(e){}}}
+  if(a0>=0){try{const v=lenientJSON(String(s).replace(/```(?:json|JSON)?/g,""),String(s).replace(/```(?:json|JSON)?/g,"").indexOf("{"));if(v&&typeof v==="object"&&Object.keys(v).length>=2)return v}catch(e){}}
   if(b>=0)for(let a=m.indexOf("{");a>=0&&a<b;a=m.indexOf("{",a+1)){const c=m.slice(a,b+1);for(const t of [c,c.replace(/,\s*([}\]])/g,"$1")]){try{const v=JSON.parse(t);if(v&&typeof v==="object"&&!Array.isArray(v))return v}catch(e){}}}
   const a=raw.indexOf("{");
   if(a>=0){try{const v=lenientJSON(raw,a);if(v&&typeof v==="object"&&Object.keys(v).length)return v}catch(e){}}
@@ -2356,10 +2358,11 @@ ${body}
  "risk":false}
 
 規則：
-- people：只列文中具體出現的他人，不包含使用者自己；若和已知人物是同一人，name 必須和已知人物完全相同。
+- people：只列文中具體出現、和這件事最相關的他人，最多 8 位，role 不超過 15 字，不包含使用者自己；若和已知人物是同一人，name 必須和已知人物完全相同。
 - themes：1 到 3 個。優先沿用已知課題的名稱（完全相同）；新課題用 4 到 10 個字的中性描述，例如「害怕被否定」「界線難以說出口」「渴望被看見」。
 - methods：2 到 3 個，id 只能用方法庫裡的；依這篇的狀況選最合適的類別（例如人際衝突選人際與界線，反覆想同一件事選覺察想法或照顧身體，和童年有關的深層經驗可選處理過去）。
 - questions：2 到 3 個，具體、可以直接在諮商時問出口。順境時，問題要幫助使用者看見自己做對了什麼、怎麼延續，不要硬找問題。
+- 內容很長時，每個欄位都要精簡，確保整個 JSON 完整輸出。
 - 順境（good）的紀錄：不要把它當成需要解決的問題。chain 照樣描述（想法和情緒可以是正向的），methods 優先從「正能量」類別選（例如品味、分享好消息、看見自己的功勞）。
 - risk：只有在內容提到自傷、自殺念頭，或正處於被暴力傷害的立即危險時才設為 true。`}
 const asArr=v=>Array.isArray(v)?v:v&&typeof v==="object"?[v]:typeof v==="string"&&v.trim()?v.split(/[、，,]\s*/).length>1&&v.length<40?v.split(/[、，,]\s*/):[v]:[];
